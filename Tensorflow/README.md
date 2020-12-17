@@ -6,10 +6,10 @@ All the actual work done to support A-Connect using TensorFlow.
 
 ## Table of Contents
 
-1. [Graphs](/Graphs)
-2. [Layers](/Layers)
-3. [Networks](/Networks)
-4. [Useful Scripts](/Scripts)
+1. [Graphs](/Tensorflow/Graphs)
+2. [Layers](/Tensorflow/Layers)
+3. [Networks](/Tensorflow/Networks)
+4. [Useful Scripts](/Tensorflow/Scripts)
 
 ### General Info
 
