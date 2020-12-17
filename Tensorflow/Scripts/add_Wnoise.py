@@ -12,18 +12,33 @@ def add_Wnoise(net,Wstd,Bstd,force):
 	MBerr = np.random.randn(SRAMBsz)
 	
 	for i in range(Nlayers):
-		if isprop(layers(i),'Weights'): # Buscar equiv tf
+		if hasattr(layers(i),'weights') or hasattr(layers(i),'W'): # Buscar equiv tf
 			
 			Wsz = np.shape(layers(i).Weights)
 			Bsz = np.shape(layers(i).Bias)
 			Merr_aux = Merr(1:Wsz(1), 1:Wsz(2))
 			MBerr_aux = MBerr(1:Bsz(1), 1:Bsz(2))
 			
-			if isprop(layers(i), 'Wstd'):
+			if hasattr(layers(i), 'Wstd'):
 				if force == "no":
 					Wstd = layers(i).Wstd
-			if isprop(layers(i), 'Bstd'):
+			if hasattr(layers(i), 'Bstd'):
 				if force == "no":
 					Bstd = layers(i).Bstd
-					
-			if isprop(layers(i), 'Werr')
+			if hasattr(layers(i),'Werr'):
+				Werr = abs(1+Wstd*Merr_aux)
+				Berr = abs(1+Bstd*MBerr_aux)
+				
+				if hasattr(layers(i), 'Werr'):
+					layers(i).Werr = Werr
+				if hasattr(layers(i), 'Berr'):
+					layers(i).Berr = Berr
+			else:
+				Werr = abs(1+Wstd*Merr_aux)
+				layers(i).weights = layers(i).weights * Werr
+				layers(i).W = layers(i).W * Werr
+				Berr = abs(1+Bstd*MBerr_aux)
+				layers(i).bias = layers(i).bias * Berr
+				
+	return net,Wstd,Bstd
+				

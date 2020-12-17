@@ -13,14 +13,14 @@ numbers = ['0','1','2','3','4','5','6','7','8','9']
 epochs = 10
 fname_test = ['','','','','','','','']
 fname_train = ['','','','','','','','']
-model = [[],[],[],[],[],[],[],[]]
-predictions = [[],[],[],[],[],[],[],[]]
-history = [[],[],[],[],[],[],[],[]]
-for i in range(8):
+model = [[],[],[],[]]
+predictions = [[],[],[],[]]
+history = [[],[],[],[]]
+for i in range(4):
 	temp, fname_test[i], fname_train[i] = MNIST_mismatch.Test_MNIST(i)
 	model[i] = temp
 		
-for j in range(8):
+for j in range(4):
 	print("Train network: %d" % j)
 	model[j].compile(optimizer='adam',loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])
 	history[j] = model[j].fit(x_train,y_train,validation_data=(x_test,y_test,),epochs = epochs)
