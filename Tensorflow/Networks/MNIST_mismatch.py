@@ -33,7 +33,7 @@ def Test_MNIST(opt):
 		#history = model.fit(x_train,y_train,validation_data=(x_test,y_test,),epochs = epochs)
 		fname_test = 'MNIST_keras_layers'
 		fname_train = 'MNIST_keras_layers_test'
-		model.save(folder+'Models/Noreg')
+		#model.save(folder+'Models/Noreg')
 		return model, fname_test, fname_train
 		#predictions = model.predict(x_test)	
 		#my.plot_test_imgs(predictions,y_test,x_test, numbers, 5 , 3,fname_test)
@@ -56,7 +56,7 @@ def Test_MNIST(opt):
 		#history = model.fit(x_train,y_train,validation_data=(x_test,y_test,),epochs = epochs)
 		fname_test = 'MNIST_dropout_keras_layers'
 		fname_train = 'MNIST_dropout_keras_layers_test'
-		model.save(folder+'Models/wDropo')
+		#model.save(folder+'Models/wDropo')
 		return model, fname_test, fname_train
 		#predictions = model.predict(x_test)
 		#my.plot_test_imgs(predictions,y_test,x_test, numbers, 5 , 3,fname_test)
@@ -171,7 +171,7 @@ def Test_MNIST(opt):
 		fname_test = 'MNIST_Dropconnect_layer'
 		#predictions = model.predict(x_test)
 		fname_train = 'MNIST_Dropconnect_layer_test'
-		model.save(folder+'/Models/wDropC')
+		#model.save(folder+'/Models/wDropC')
 		return model, fname_test, fname_train
 		#my.plot_test_imgs(predictions,y_test,x_test, numbers, 5 , 3,fname_test)
 		#my.plot_full_history(history.history['accuracy'],history.history['val_accuracy'],history.history['loss'],history.history['val_loss'],range(epochs),fname_train)
@@ -207,5 +207,5 @@ def Test_MNIST(opt):
 		])
 		fname_test = 'MNIST_AConnect_layer'
 		fname_train = 'MNIST_AConnect_layer_test'
-		model.save(folder}'Models/wAConn')
+#		model.save(folder+'Models/wAConn')
 		return model, fname_test, fname_train		
