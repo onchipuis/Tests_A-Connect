@@ -6,11 +6,11 @@ sys.path.append('/home/rvergel/Desktop/Library_AConnect_TG/Scripts/')
 from Scripts import addMismatch
 
 class DropConnect(tf.keras.layers.Layer):
-	def __init__(self, output_size,Probability=0, isBin="no", **kwargs):
+	def __init__(self, output_size,Wstd=0, isBin="no", **kwargs):
 		super(DropConnect, self).__init__()
 		self.output_size = output_size
 		
-		self.Probability = Probability
+		self.Wstd = Wstd
 		
 		self.isBin = isBin
 
@@ -23,9 +23,9 @@ class DropConnect(tf.keras.layers.Layer):
 		self.bias = self.add_weight("bias", shape = [1 ,self.output_size], 
 										trainable=True,
 										initializer='zeros')
-		self.dist = tfp.distributions.Bernoulli(probs=self.Probability, dtype=tf.float32)
+		self.dist = tfp.distributions.Bernoulli(probs=self.Wstd, dtype=tf.float32)
 		
-		if(self.Probability != 0):
+		if(self.Wstd != 0):
 			self.Berr = self.dist.sample([1e3,1,self.output_size])
 			self.Werr = self.dist.sample([1e3,int(input_shape[-1]),self.output_size])
 			self.Werr = self.Werr.numpy()
@@ -53,7 +53,7 @@ class DropConnect(tf.keras.layers.Layer):
 		else:
 			self.X = X
 			bias = self.bias
-			if(self.Probability != 0):
+			if(self.Wstd != 0):
 				Werr = self.Werr[1,:,:]
 				Berr = self.Berr[1,:,:]
 			else:
@@ -75,7 +75,7 @@ class DropConnect(tf.keras.layers.Layer):
 		config = super(DropConnect, self).get_config()
 		config.update({
 			'output_size': self.output_size,
-			'Probability': self.Probability,
+			'Wstd': self.Wstd,
 			'isBin': self.isBin
 		})
 		return config

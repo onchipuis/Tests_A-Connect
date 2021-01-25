@@ -15,7 +15,7 @@ class AConnect(tf.keras.layers.Layer):
 		self.Wstd = Wstd
 		
 	def build(self,input_shape):
-		self.w = self.add_weight("W",
+		self.W = self.add_weight("W",
 										shape = [int(input_shape[-1]),self.output_size],
 										initializer = "glorot_uniform",
 										trainable= True)
@@ -47,11 +47,11 @@ class AConnect(tf.keras.layers.Layer):
 				ID = np.random.randint(0,dim[0]-1)
 				Werr = self.Werr[ID,:,:]
 				Berr = self.Berr[ID,:,:]
-				weights = self.w*Werr
+				weights = self.W*Werr
 				bias = self.bias*Berr
 				Z = tf.matmul(self.X,weights) + bias
 			else:
-				weights = self.w
+				weights = self.W
 				bias = self.bias
 				Z = tf.matmul(self.X,weights) + bias
 		else:
@@ -61,7 +61,7 @@ class AConnect(tf.keras.layers.Layer):
 			else:
 				Werr = self.Werr
 				Berr = self.Berr
-			weights = self.w*Werr
+			weights = self.W*Werr
 			bias = self.bias*Berr
 			Z = tf.matmul(self.X,weights) + bias
 		return Z
