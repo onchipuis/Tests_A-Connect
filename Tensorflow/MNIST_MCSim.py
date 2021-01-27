@@ -40,8 +40,8 @@ for i in range(4):
 		model[i] = tf.keras.models.load_model("./Models/aconnect_network.h5", custom_objects = {'AConnect':AConnect.AConnect})
 
 acc_noisy = np.zeros((1000,1))
-net = "./Models/aconnect_network.h5"
-custom_objects ={'AConnect':AConnect.AConnect}
+net = "./Models/no_reg_network.h5"
+custom_objects = {'fullyconnected':fullyconnected.fullyconnected}
 acc_noisy = MCsim.MCsim(net,x_test,y_test,1000,0.5,0.5,"no",custom_objects)
 
 
@@ -49,8 +49,8 @@ folder = folder+'/Graphs/'
 plt.title('Accuracy')
 plt.hist(acc_noisy)
 plt.grid(True)
-#plt.savefig(folder+'aconnect_nn'+'.png')
-plt.show()
+plt.savefig(folder+'no_reg_nn'+'.png')
+#plt.show()
 plt.clf()
 
 

@@ -6,7 +6,12 @@ import tensorflow as tf
 import tensorflow_probability as tfp
 import numpy as np
 import sys
-sys.path.append('/home/rvergel/Desktop/Library_AConnect_TG/Scripts/')
+config = open('config.txt','r')
+folder = config.read()
+sys.path.append(folder)
+sys.path.append(folder+'/Scripts')
+import Scripts 
+from Scripts import addMismatch
 
 class AConnect(tf.keras.layers.Layer):
 	def __init__(self,output_size,Wstd=0, **kwargs):

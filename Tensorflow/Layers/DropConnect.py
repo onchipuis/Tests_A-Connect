@@ -2,7 +2,11 @@ import tensorflow as tf
 import tensorflow_probability as tfp
 import numpy as np
 import sys
-sys.path.append('/home/rvergel/Desktop/Library_AConnect_TG/Scripts/')
+config = open('config.txt','r')
+folder = config.read()
+sys.path.append(folder)
+sys.path.append(folder+'/Scripts')
+import Scripts 
 from Scripts import addMismatch
 
 class DropConnect(tf.keras.layers.Layer):
@@ -40,15 +44,19 @@ class DropConnect(tf.keras.layers.Layer):
 		dim = np.shape(self.X)
 
 		if(training):
-			if(np.size(np.shape(self.X))<=3):
-				batchSize = 1
-				[weights,bias,Werr,Berr] = addMismatch.addMismatch(self, batchSize)	
-				Z = tf.matmul(self.X, weights) + bias
+			if(self.Wstd != 0):
+				for j in range(int(len(self.X)/np.shape(X)[0])):
+					if(np.size(np.shape(self.X))<2):
+						batchSize = 1
+					else:
+						batchSize = np.shape(X)[0]
+					for i in range(batchSize):
+						[weights,bias,Werr,Berr] = addMismatch.addMismatch(self, batchSize)	
+						Z = tf.matmul(self.X[(j)*batchSize:(j+1)*(batchSize),:],weights) + bias
 			else:
-				batchSize = np.shape(X)[-1]
-				[weights,bias,Werr,Berr] = addMismatch.addMismatch(self,batchSize)	
-				Z = tf.matmul(self.X, weights) + bias
-			return Z
+				weights = self.W
+				bias = self.bias
+				Z = tf.matmul(self.X,weights) + bias
 		
 		else:
 			self.X = X
@@ -69,7 +77,7 @@ class DropConnect(tf.keras.layers.Layer):
 			bias = bias*Berr
 			
 			Z = tf.matmul(self.X, weights) + bias
-			return Z
+		return Z
 			
 	def get_config(self):
 		config = super(DropConnect, self).get_config()

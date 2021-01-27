@@ -1,11 +1,12 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
-import mylib as my
 import sys
 import os
-import get_dir as gd
-folder = gd.get_dir()
+config = open('config.txt','r')
+folder = config.read()
+sys.path.append(folder)
+import mylib as my
 sys.path.append(folder+'/Layers/')
 sys.path.append(folder+'/Scripts/')
 from Scripts import CustomBackprop
