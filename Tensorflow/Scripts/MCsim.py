@@ -12,21 +12,24 @@ import matplotlib.pyplot as plt
 from Layers import fullyconnected
 import tensorflow as tf
 
-def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,custom_objects=None,optimizer='Adam',loss=['sparse_categorical_crossentropy'],metrics=['accuracy']):
+def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,net_name="Network",custom_objects=None,optimizer='Adam',loss=['sparse_categorical_crossentropy'],metrics=['accuracy']):
 	acc_noisy = np.zeros((M,1))
+	#f = open(net_name,'w')
+	local_net = tf.keras.models.load_model(net,custom_objects = custom_objects)
+	local_net.save_weights(filepath=('./Models/'+net_name+'_weights.h5'))
 	print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy\n')
 	print('----------------------------------------------------------------')
 #	global parallel
 
-	#print(net.layers[1].weights[0])
+
 	for i in range(M):
-		local_net = tf.keras.models.load_model(net,custom_objects = custom_objects)
 		[NetNoisy,Wstdn,Bstdn] = add_Wnoise.add_Wnoise(local_net,Wstd,Bstd,force)
 		acc_noisy[i] = classify.classify(NetNoisy, Xtest, Ytest)
 		acc_noisy[i] = 100*acc_noisy[i]
 		print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i]))
+		local_net.load_weights(filepath=('./Models/'+net_name+'_weights.h5'))
 #		return acc_noisy
-	#print(local_net.layers[1].weights[0])
+
 	#pool = Pool(mp.cpu_count())
 	#acc_noisy = pool.map(parallel, range(M))
 	#pool.close()
@@ -36,6 +39,6 @@ def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,custom_objects=None,optimizer='Adam'
 #	print('Min. Accuracy: %.1f%%\n' % 100.0*np.amin(acc_noisy))
 #	print('Max. Accuracy: %.1f%%\n'% 100.0*np.amax(acc_noisy))
 
-	
+	np.savetxt(net_name+'.txt',acc_noisy,fmt="%.2f")
 	return acc_noisy
 	

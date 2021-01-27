@@ -2,8 +2,11 @@ import Networks
 import numpy as np
 import mylib as my
 import tensorflow as tf
+from datetime import datetime
 from Networks import MNIST_mismatch
 from multiprocessing import Pool
+
+
 
 def parallel_training(n):
 	(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
@@ -35,8 +38,16 @@ def parallel_training(n):
 		string = "./Models/aconnect_network.h5"
 	model[j].save(string,include_optimizer=True)
 pool = Pool()
-
+now = datetime.now()
+starttime = now.time()
+print('\n\n*******************************************************************************************')
 pool.map(parallel_training, range(4))
 pool.close()
+now = datetime.now()
+endtime = now.time()
+print('\n\n*******************************************************************************************')
+print('\n\nTraining started at: ',starttime)
+print('Training finished at: ', endtime)
+#print('\n\n Time taken: %f' % (endtime-starttime))
 
 

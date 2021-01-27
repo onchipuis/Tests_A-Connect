@@ -9,9 +9,10 @@ from Layers import DropConnect
 from Layers import AConnect
 from Scripts import classify
 from Layers import fullyconnected
+from datetime import datetime
 import matplotlib.pyplot as plt
-import get_dir as gd
-folder = gd.get_dir()
+config = open('config.txt','r')
+folder = config.read()
 
 fname_test = ['','','','']
 fname_train = ['','','','']
@@ -29,27 +30,53 @@ def load_ds():
 model = [[],[],[],[]]
 history = [[],[],[],[]]
 (x_train, y_train), (x_test, y_test) = load_ds()
-for i in range(4):
-	if i == 0:
-		model[i] = tf.keras.models.load_model("./Models/no_reg_network.h5",custom_objects = {'fullyconnected':fullyconnected.fullyconnected})
-	elif i == 1:
-		model[i] = tf.keras.models.load_model("./Models/dropout_network.h5")
-	elif i == 2:
-		model[i] = tf.keras.models.load_model("./Models/dropconnect_network.h5", custom_objects = {'DropConnect':DropConnect.DropConnect})
-	elif i == 3:
-		model[i] = tf.keras.models.load_model("./Models/aconnect_network.h5", custom_objects = {'AConnect':AConnect.AConnect})
+#for i in range(4):
+#	if i == 0:
+#		model[i] = tf.keras.models.load_model("./Models/no_reg_network.h5",custom_objects = {'fullyconnected':fullyconnected.fullyconnected})
+#	elif i == 1:
+#		model[i] = tf.keras.models.load_model("./Models/dropout_network.h5")
+#	elif i == 2:
+#		model[i] = tf.keras.models.load_model("./Models/dropconnect_network.h5", custom_objects = {'DropConnect':DropConnect.DropConnect})
+#	elif i == 3:
+#		model[i] = tf.keras.models.load_model("./Models/aconnect_network.h5", custom_objects = {'AConnect':AConnect.AConnect})
 
 acc_noisy = np.zeros((1000,1))
-net = "./Models/no_reg_network.h5"
-custom_objects = {'fullyconnected':fullyconnected.fullyconnected}
-acc_noisy = MCsim.MCsim(net,x_test,y_test,1000,0.5,0.5,"no",custom_objects)
+N = 4
+Wstd = '50%'
+if N == 1:
+	net = "./Models/no_reg_network.h5"
+	custom_objects = None
+	name = "noreg_nn"
+elif N == 2:
+	net = "./Models/dropout_network.h5"
+	custom_objects = None
+	name = "dropout_nn"
+elif N == 3:
+	net = "./Models/dropconnect_network.h5"
+	custom_objects = {'DropConnect':DropConnect.DropConnect}
+	name = "dropconnect_nn"
+elif N == 4:
+	net = "./Models/aconnect_network.h5"
+	custom_objects = {'AConnect':AConnect.AConnect}
+	name = "aconnect_nn"
 
+now = datetime.now()
+starttime = now.time()
+#####
+acc_noisy = MCsim.MCsim(net,x_test,y_test,1000,0.5,0.5,"no",name,custom_objects)
+#####
+now = datetime.now()
+endtime = now.time()
+
+print('\n\n*******************************************************************************************')
+print('\n Simulation started at: ',starttime)
+print('Simulation finished at: ', endtime)
 
 folder = folder+'/Graphs/'
-plt.title('Accuracy')
+plt.title('Validation Accuracy Wstd = ' + Wstd)
 plt.hist(acc_noisy)
 plt.grid(True)
-plt.savefig(folder+'no_reg_nn'+'.png')
+plt.savefig(folder+name+'.png')
 #plt.show()
 plt.clf()
 

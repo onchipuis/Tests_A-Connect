@@ -2,8 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 def add_Wnoise(net,Wstd,Bstd,force,optimizer='Adam',loss=['sparse_categorical_crossentropy'],metrics=['accuracy']):
-	layers = net.layers  
-	layers = layers
+	layers = net.layers 
 	Nlayers = np.size(layers)
 	
 	SRAMsz = [1024,1024]
@@ -67,6 +66,6 @@ def add_Wnoise(net,Wstd,Bstd,force,optimizer='Adam',loss=['sparse_categorical_cr
 		
 	#layers = [tf.keras.layers.Flatten(input_shape=(28,28)),tf.keras.layers.Dense(10),tf.keras.layers.Softmax()]		
 	NoisyNet = tf.keras.Sequential(layers)
-	net.compile(optimizer,loss,metrics)	
+	#net.compile(optimizer,loss,metrics)	
 	return NoisyNet,Wstd,Bstd
 				
