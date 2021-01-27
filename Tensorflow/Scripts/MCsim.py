@@ -1,6 +1,6 @@
 ### Edited by: Ricardo Vergel - 11/12/2020
 ###
-### Script to do a Monte Carlo simulation to test neural networks
+### Monte Carlo simulation for testing neural networks
 
 
 import numpy as np
@@ -9,19 +9,24 @@ from multiprocessing import Pool
 from Scripts import classify
 from Scripts import add_Wnoise
 import matplotlib.pyplot as plt
+from Layers import fullyconnected
+import tensorflow as tf
 
-def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force):
+def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,custom_objects=None,optimizer='Adam',loss=['sparse_categorical_crossentropy'],metrics=['accuracy']):
 	acc_noisy = np.zeros((M,1))
 	print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy\n')
 	print('----------------------------------------------------------------')
-	
 #	global parallel
+
+	#print(net.layers[1].weights[0])
 	for i in range(M):
-		[NetNoisy,Wstdn,Bstdn] = add_Wnoise.add_Wnoise(net,Wstd,Bstd,force)
+		local_net = tf.keras.models.load_model(net,custom_objects = custom_objects)
+		[NetNoisy,Wstdn,Bstdn] = add_Wnoise.add_Wnoise(local_net,Wstd,Bstd,force)
 		acc_noisy[i] = classify.classify(NetNoisy, Xtest, Ytest)
 		acc_noisy[i] = 100*acc_noisy[i]
-		print('\t%i\t | \t%f\t | \t%f\t | \t%f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i]))
+		print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i]))
 #		return acc_noisy
+	#print(local_net.layers[1].weights[0])
 	#pool = Pool(mp.cpu_count())
 	#acc_noisy = pool.map(parallel, range(M))
 	#pool.close()
@@ -31,9 +36,6 @@ def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force):
 #	print('Min. Accuracy: %.1f%%\n' % 100.0*np.amin(acc_noisy))
 #	print('Max. Accuracy: %.1f%%\n'% 100.0*np.amax(acc_noisy))
 
-	plt.title('Accuracy')
-	plt.hist(acc_noisy, range=((0,100)))
-	plt.grid(True)
-	plt.show()
-	plt.clf()
+	
+	return acc_noisy
 	

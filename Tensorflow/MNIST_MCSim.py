@@ -8,7 +8,10 @@ from Scripts import MCsim
 from Layers import DropConnect
 from Layers import AConnect
 from Scripts import classify
-
+from Layers import fullyconnected
+import matplotlib.pyplot as plt
+import get_dir as gd
+folder = gd.get_dir()
 
 fname_test = ['','','','']
 fname_train = ['','','','']
@@ -28,18 +31,26 @@ history = [[],[],[],[]]
 (x_train, y_train), (x_test, y_test) = load_ds()
 for i in range(4):
 	if i == 0:
-		model[i] = tf.keras.models.load_model("./Models/no_reg_network.h5")
+		model[i] = tf.keras.models.load_model("./Models/no_reg_network.h5",custom_objects = {'fullyconnected':fullyconnected.fullyconnected})
 	elif i == 1:
 		model[i] = tf.keras.models.load_model("./Models/dropout_network.h5")
 	elif i == 2:
 		model[i] = tf.keras.models.load_model("./Models/dropconnect_network.h5", custom_objects = {'DropConnect':DropConnect.DropConnect})
 	elif i == 3:
 		model[i] = tf.keras.models.load_model("./Models/aconnect_network.h5", custom_objects = {'AConnect':AConnect.AConnect})
-	model[i].compile(optimizer='adam',loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])
-#loss, acc = model[0].evaluate(x_test,y_test,verbose=2)
-#print('\nTest accuracy:', acc)
 
-MCsim.MCsim(model[3],x_test,y_test,1000,0.5,0.5,"no")
+acc_noisy = np.zeros((1000,1))
+net = "./Models/aconnect_network.h5"
+custom_objects ={'AConnect':AConnect.AConnect}
+acc_noisy = MCsim.MCsim(net,x_test,y_test,1000,0.5,0.5,"no",custom_objects)
 
+
+folder = folder+'/Graphs/'
+plt.title('Accuracy')
+plt.hist(acc_noisy)
+plt.grid(True)
+#plt.savefig(folder+'aconnect_nn'+'.png')
+plt.show()
+plt.clf()
 
 

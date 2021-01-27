@@ -9,12 +9,12 @@ import tensorflow as tf
 #Clase fullyconnected
 
 class fullyconnected(tf.keras.layers.Layer):
-	def __init__(self, n_neurons):
+	def __init__(self, n_neurons, **kwargs):
 		super(fullyconnected, self).__init__()
 		self.n_neurons = n_neurons
 	
 	def build(self, input_shape):
-		self.kernel = self.add_weight("kernel",
+		self.W = self.add_weight("W",
 										shape = [int(input_shape[-1]),
 												self.n_neurons],
 										#initializer = "random_normal",
@@ -28,9 +28,14 @@ class fullyconnected(tf.keras.layers.Layer):
 ##Feedforward
 	def call(self, X):
 		self.X = X
-		return tf.matmul(self.X, self.kernel) + self.bias
+		return tf.matmul(self.X, self.W) + self.bias
 
-##Backpropagation
+	def get_config(self):
+		config = super(fullyconnected, self).get_config()
+		config.update({
+			'n_neurons': self.n_neurons,
+			})
+		return config
 
 
 

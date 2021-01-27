@@ -5,12 +5,16 @@
 import numpy as np
 
 def classify(net,Xtest,Ytest):
-	Ypred = net.predict(Xtest)
 	pred = np.zeros(len(Ytest))
-	for i in range(len(Ytest)):
-		pred[i] = np.argmax(Ypred[i])
-		pred[i] = int(pred[i])
-		#print(pred[i])
-	accuracy = np.sum(pred == Ytest)/np.size(Ytest)
-	#_,accuracy = net.evaluate(Xtest,Ytest,verbose=2)
+	label_predicted = np.zeros(len(Ytest))
+	Ypred = net.predict(Xtest)
+
+	for i in range(len(Xtest)):
+		temp = np.argmax(Ypred[i])
+		label_predicted[i] = int(temp)
+		#print(label_predicted[i])
+		pred[i] = label_predicted[i] == Ytest[i]
+		
+	accuracy = np.sum(pred)/len(Ytest)
+	#loss,accuracy = net.evaluate(Xtest,Ytest,verbose=2)
 	return accuracy

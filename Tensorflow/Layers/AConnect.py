@@ -1,6 +1,6 @@
 ### Modified by: Ricardo Vergel - Dec 03/2020
 ###
-### First approach to an A-Connect fully connected layer
+### A-Connect fully connected layer
 
 import tensorflow as tf
 import tensorflow_probability as tfp
@@ -38,22 +38,26 @@ class AConnect(tf.keras.layers.Layer):
 		self.X = X
 		if(training):
 			if(self.Wstd != 0):
-				#if(np.size(np.shape(self.X))<=3):
-				#	batchSize = 1
-				#else:
-				#	batchSize = np.shape(X)[-1]
-
-				dim = np.shape(self.Werr)
-				ID = np.random.randint(0,dim[0]-1)
-				Werr = self.Werr[ID,:,:]
-				Berr = self.Berr[ID,:,:]
-				weights = self.W*Werr
-				bias = self.bias*Berr
-				Z = tf.matmul(self.X,weights) + bias
+				for j in range(int(len(self.X)/np.shape(X)[0])):
+					if(np.size(np.shape(self.X))<2):
+						batchSize = 1
+					else:
+						batchSize = np.shape(X)[0]
+					#print(batchSize)
+					for i in range(batchSize):
+						dim = np.shape(self.Werr)
+						self.ID = np.random.randint(0,dim[0]-1)
+						Werr = self.Werr[self.ID,:,:]
+						#print(self.ID)
+						Berr = self.Berr[self.ID,:,:]
+						weights = self.W*Werr
+						bias = self.bias*Berr
+						Z = tf.matmul(self.X[(j)*batchSize:(j+1)*(batchSize),:],weights) + bias
 			else:
 				weights = self.W
 				bias = self.bias
 				Z = tf.matmul(self.X,weights) + bias
+
 		else:
 			if(self.Wstd != 0):
 				Werr = self.Werr[1,:,:]

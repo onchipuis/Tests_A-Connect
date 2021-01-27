@@ -23,9 +23,9 @@ def Test_MNIST(opt):
 
 		model = tf.keras.Sequential([
 			tf.keras.layers.Flatten(input_shape=(28,28)),
-			tf.keras.layers.Dense(128),
+			fullyconnected.fullyconnected(128),
 			tf.keras.layers.ReLU(),
-			tf.keras.layers.Dense(10),
+			fullyconnected.fullyconnected(10),
 			tf.keras.layers.Softmax()
 		])
 		
@@ -202,7 +202,7 @@ def Test_MNIST(opt):
 			tf.keras.layers.Flatten(input_shape=(28,28)),
 			AConnect.AConnect(128,0.5),
 			tf.keras.layers.ReLU(),
-			AConnect.AConnect(10),
+			tf.keras.layers.Dense(10),
 			tf.keras.layers.Softmax()
 		])
 		fname_test = 'MNIST_AConnect_layer'

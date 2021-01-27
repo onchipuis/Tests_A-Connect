@@ -1,8 +1,9 @@
 import numpy as np
+import tensorflow as tf
 
-
-def add_Wnoise(net,Wstd,Bstd,force):
-	layers = net.layers 
+def add_Wnoise(net,Wstd,Bstd,force,optimizer='Adam',loss=['sparse_categorical_crossentropy'],metrics=['accuracy']):
+	layers = net.layers  
+	layers = layers
 	Nlayers = np.size(layers)
 	
 	SRAMsz = [1024,1024]
@@ -10,10 +11,11 @@ def add_Wnoise(net,Wstd,Bstd,force):
 	
 	Merr = np.random.randn(SRAMsz[0],SRAMsz[1])
 	MBerr = np.random.randn(SRAMBsz[0],SRAMBsz[1])
-	
+
+#	
 	for i in range(Nlayers):
 		if layers[i].count_params() != 0:
-			if hasattr(layers[i],'weights') or hasattr(layers[i],'W')or hasattr(layers[i],'w'): 
+			if hasattr(layers[i],'weights') or hasattr(layers[i],'W'): 
 				
 				Wsz = np.shape(layers[i].weights[0])
 				Bsz = np.shape(layers[i].weights[1])
@@ -38,37 +40,33 @@ def add_Wnoise(net,Wstd,Bstd,force):
 				else:
 					Bstd = Bstd
 				if hasattr(layers[i],'Werr'):
-					
+#					
 					Werr = abs(1+Wstd*Merr_aux)
 					Berr = abs(1+Bstd*MBerr_aux)
 					
 					if hasattr(layers[i], 'Werr'):
 						if(layers[i].Wstd != 0):
-							if(np.size(np.shape(layers[i].Werr)) == 3):
-								layers[i].Werr[1,:,:] = Werr
-							else:
-								layers[i].Werr = Werr
+							layers[i].Werr[1,:,:] = Werr
 						else:
 							layers[i].Werr = np.random.randn()
 					if hasattr(layers[i], 'Berr'):
 						if(layers[i].Wstd != 0):
-							if(np.size(np.shape(layers[i].Berr)) == 3):
-								layers[i].Berr[1,:,:] = Berr
-							else:
-								layers[i].Berr = Berr
+							layers[i].Berr[1,:,:] = Berr
 						else:
 							layers[i].Berr = np.random.randn()
 				else:
 					Werr = abs(1+Wstd*Merr_aux)
 					Berr = abs(1+Bstd*MBerr_aux)
-					local_weights = [layers[i].weights[0]*Werr,layers[i].weights[1]*Berr]
+					weights = layers[i].weights[0]*Werr
+					bias = layers[i].weights[1]*Berr
+					local_weights = [weights,bias]
 					layers[i].set_weights(local_weights)
-					#layers[i].weights[1] = layers[i].set_weights(layers[i].weights[1]*Berr)
 
+	
 
-					
-				
-					
-				
-	return net,Wstd,Bstd
+		
+	#layers = [tf.keras.layers.Flatten(input_shape=(28,28)),tf.keras.layers.Dense(10),tf.keras.layers.Softmax()]		
+	NoisyNet = tf.keras.Sequential(layers)
+	net.compile(optimizer,loss,metrics)	
+	return NoisyNet,Wstd,Bstd
 				
