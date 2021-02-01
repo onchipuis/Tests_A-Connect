@@ -28,7 +28,9 @@ class fullyconnected(tf.keras.layers.Layer):
 ##Feedforward
 	def call(self, X):
 		self.X = X
-		return tf.matmul(self.X, self.W) + self.bias
+		self.Zaux = tf.matmul(self.X, self.W)
+		Z = tf.add(self.Zaux,self.bias)
+		return Z
 
 	def get_config(self):
 		config = super(fullyconnected, self).get_config()
@@ -36,7 +38,10 @@ class fullyconnected(tf.keras.layers.Layer):
 			'n_neurons': self.n_neurons,
 			})
 		return config
+	
 
+		
+			
 
 
 

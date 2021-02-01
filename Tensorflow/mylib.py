@@ -82,9 +82,9 @@ def plot_history(result,option): #Plot the loss or the accuracy of our nn vs epo
 		print('Invalid option, type 1 for loss graph, 2 for accuracy graph')
 	plt.show()
 
-def plot_full_history(acc,val_acc,loss,val_loss,epochs_range,*args):
+def plot_full_history(acc,val_acc,loss,val_loss,epochs_range,string=None):
 	path = "/home/rvergel/Desktop/Library_AConnect_TG/Tensorflow/Graphs/Training/"
-	string = args[0]
+	#string = args[0]
 	plt.figure(figsize=(8, 8))
 	plt.subplot(1, 2, 1)
 	plt.xlabel("Epochs")
@@ -101,7 +101,8 @@ def plot_full_history(acc,val_acc,loss,val_loss,epochs_range,*args):
 	plt.plot(epochs_range, val_loss, label='Validation Loss')
 	plt.legend(loc='upper right')
 	plt.title('Training and Validation Loss')
-	if(args!=None):
+	if(string!=None):
 		plt.savefig(path+string+".png")
-	#plt.show()
+	else:
+		plt.show()
 	

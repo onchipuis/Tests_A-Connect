@@ -14,12 +14,15 @@ import Scripts
 from Scripts import addMismatch
 
 class AConnect(tf.keras.layers.Layer):
-	def __init__(self,output_size,Wstd=0, **kwargs):
+	def __init__(self,output_size,Wstd=0,isBin = "no",**kwargs):
 		super(AConnect, self).__init__()
 		self.output_size = output_size
 		self.Wstd = Wstd
+		self.isBin = isBin
 		
 	def build(self,input_shape):
+		self.batch_size = input_shape[0]
+
 		self.W = self.add_weight("W",
 										shape = [int(input_shape[-1]),self.output_size],
 										initializer = "glorot_uniform",
@@ -29,57 +32,60 @@ class AConnect(tf.keras.layers.Layer):
 										initializer = "zeros",
 										trainable= True)
 		if(self.Wstd != 0):
-			self.dist = tfp.distributions.Normal(loc=1,scale=self.Wstd)
-			self.Berr = self.dist.sample([1e3,1,self.output_size])
-			self.Werr = self.dist.sample([1e3,int(input_shape[-1]),self.output_size])
-			self.Werr = self.Werr.numpy()
-			self.Berr = self.Berr.numpy()
+			self.Berr = abs(np.random.normal(scale=self.Wstd,size=[1000,1,self.output_size]))
+			self.Werr = abs(np.random.normal(scale=self.Wstd,size=[1000,int(input_shape[-1]),self.output_size]))
+
 		else:
 			self.Werr = 1
 			self.Berr = 1
 		
-		
 	def call(self, X, training):
 		self.X = X
+		if self.batch_size == None:
+			self.batch_size = 32
+		else:
+			self.batch_size = self.batch_size
+
 		if(training):
 			if(self.Wstd != 0):
-				for j in range(int(len(self.X)/np.shape(X)[0])):
-					if(np.size(np.shape(self.X))<2):
-						batchSize = 1
-					else:
-						batchSize = np.shape(X)[0]
-					#print(batchSize)
-					for i in range(batchSize):
-						dim = np.shape(self.Werr)
-						self.ID = np.random.randint(0,dim[0]-1)
-						Werr = self.Werr[self.ID,:,:]
-						#print(self.ID)
-						Berr = self.Berr[self.ID,:,:]
-						weights = self.W*Werr
-						bias = self.bias*Berr
-						Z = tf.matmul(self.X[(j)*batchSize:(j+1)*(batchSize),:],weights) + bias
+				[self.memweights, self.membias, self.memWerr, self.memBerr] = addMismatch.addMismatch(self, self.batch_size)
+				for i in range(self.batch_size):
+					Z = tf.matmul(self.X,self.memweights[i,:,:])
+					Z = tf.add(Z, self.membias[i,:,:])
 			else:
 				weights = self.W
 				bias = self.bias
-				Z = tf.matmul(self.X,weights) + bias
+				for i in range(self.batch_size):
+					Z = tf.matmul(self.X,self.W)
+					Z = tf.add(Z,self.bias)
+
+
 
 		else:
+		
 			if(self.Wstd != 0):
 				Werr = self.Werr[1,:,:]
 				Berr = self.Berr[1,:,:]
 			else:
 				Werr = self.Werr
 				Berr = self.Berr
-			weights = self.W*Werr
-			bias = self.bias*Berr
-			Z = tf.matmul(self.X,weights) + bias
+			weights = tf.multiply(self.W,Werr)
+			bias = tf.multiply(self.bias,Berr)
+			#print(np.shape(weights))
+		#	for i in range(self.batch_size):
+			Z = tf.matmul(self.X, weights)
+			Z = tf.add(Z, bias)
+			#print(np.shape(Z))
+
+			
 		return Z
 		
 	def get_config(self):
 		config = super(AConnect, self).get_config()
 		config.update({
 			'output_size': self.output_size,
-			'Wstd': self.Wstd})
+			'Wstd': self.Wstd,
+			'isBin': self.isBin})
 		return config
 		
 
