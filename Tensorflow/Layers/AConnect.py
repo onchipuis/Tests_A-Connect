@@ -47,17 +47,19 @@ class AConnect(tf.keras.layers.Layer):
 		if(training):
 			if(self.Wstd != 0):
 				self.batch_size = tf.shape(self.X)[0]
-				self.X = tf.reshape(self.X, [self.batch_size,1, np.shape(self.X)[1]])
+				#print(self.batch_size)
+				#print(np.shape(self.X))
+				#print(tf.shape(self.X))
+				self.X = tf.reshape(self.X, [self.batch_size, 1,np.shape(self.X)[1]])
 				[self.memweights, self.membias, self.memWerr, self.memBerr] = addMismatch.addMismatch(self, self.batch_size)
 				Z = tf.matmul(self.X,self.memweights)
 				Z = tf.add(Z, self.membias)
+				print(np.shape(Z))
 			else:
 				weights = self.W
 				bias = self.bias
 				Z = tf.matmul(self.X,self.W)
 				Z = tf.add(Z,self.bias)
-
-
 
 		else:
 		
@@ -72,7 +74,7 @@ class AConnect(tf.keras.layers.Layer):
 		#	for i in range(self.batch_size):
 			Z = tf.matmul(self.X, weights)
 			Z = tf.add(Z, bias)
-
+			
 			
 		return Z
 		

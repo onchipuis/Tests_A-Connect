@@ -2,7 +2,8 @@ import numpy as np
 import tensorflow as tf
 
 def addMismatch(layer, batchSize):
-	ID = np.random.permutation(np.size(layer.Werr,0))
+	ID = range(np.size(layer.Werr,0))
+	ID = tf.random.shuffle(ID)
 
 	if(layer.isBin == "yes"):
 		weights = tf.math.sign(layer.W)
