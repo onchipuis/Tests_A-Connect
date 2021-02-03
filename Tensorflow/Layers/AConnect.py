@@ -22,7 +22,7 @@ class AConnect(tf.keras.layers.Layer):
 		
 	def build(self,input_shape):
 		self.batch_size = input_shape[0]
-
+	
 		self.W = self.add_weight("W",
 										shape = [int(input_shape[-1]),self.output_size],
 										initializer = "glorot_uniform",
@@ -33,7 +33,9 @@ class AConnect(tf.keras.layers.Layer):
 										trainable= True)
 		if(self.Wstd != 0):
 			self.Berr = abs(np.random.normal(scale=self.Wstd,size=[1000,1,self.output_size]))
+			self.Berr = self.Berr.astype('float32')
 			self.Werr = abs(np.random.normal(scale=self.Wstd,size=[1000,int(input_shape[-1]),self.output_size]))
+			self.Werr = self.Werr.astype('float32')
 
 		else:
 			self.Werr = 1
@@ -41,23 +43,19 @@ class AConnect(tf.keras.layers.Layer):
 		
 	def call(self, X, training):
 		self.X = X
-		if self.batch_size == None:
-			self.batch_size = 32
-		else:
-			self.batch_size = self.batch_size
-
+	
 		if(training):
 			if(self.Wstd != 0):
+				self.batch_size = tf.shape(self.X)[0]
+				self.X = tf.reshape(self.X, [self.batch_size,1, np.shape(self.X)[1]])
 				[self.memweights, self.membias, self.memWerr, self.memBerr] = addMismatch.addMismatch(self, self.batch_size)
-				for i in range(self.batch_size):
-					Z = tf.matmul(self.X,self.memweights[i,:,:])
-					Z = tf.add(Z, self.membias[i,:,:])
+				Z = tf.matmul(self.X,self.memweights)
+				Z = tf.add(Z, self.membias)
 			else:
 				weights = self.W
 				bias = self.bias
-				for i in range(self.batch_size):
-					Z = tf.matmul(self.X,self.W)
-					Z = tf.add(Z,self.bias)
+				Z = tf.matmul(self.X,self.W)
+				Z = tf.add(Z,self.bias)
 
 
 
@@ -71,11 +69,9 @@ class AConnect(tf.keras.layers.Layer):
 				Berr = self.Berr
 			weights = tf.multiply(self.W,Werr)
 			bias = tf.multiply(self.bias,Berr)
-			#print(np.shape(weights))
 		#	for i in range(self.batch_size):
 			Z = tf.matmul(self.X, weights)
 			Z = tf.add(Z, bias)
-			#print(np.shape(Z))
 
 			
 		return Z

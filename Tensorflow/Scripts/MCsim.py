@@ -34,7 +34,7 @@ def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,net_name="Network",custom_objects=No
 	#acc_noisy = pool.map(parallel, range(M))
 	#pool.close()
 	print('----------------------------------------------------------------')
-#	print('Median Accuracy: %.1f%%\n' % 100.0*np.median(acc_noisy))
+	print('Median Accuracy: %.1f%%\n' % np.median(acc_noisy))
 	#print('IQR Accuracy: %.1f%%\n',100*iqr(acc_noisy))
 #	print('Min. Accuracy: %.1f%%\n' % 100.0*np.amin(acc_noisy))
 #	print('Max. Accuracy: %.1f%%\n'% 100.0*np.amax(acc_noisy))

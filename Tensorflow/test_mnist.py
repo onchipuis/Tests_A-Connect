@@ -33,9 +33,10 @@ model, fname_test, fname_train = MNIST_mismatch.Test_MNIST(3)
 #			AConnect.AConnect(10),
 #			tf.keras.layers.Softmax()
 #])
+string = "./Models/aconnect_network.h5"
 model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])
 history = model.fit(x_train,y_train,validation_data=(x_test,y_test),epochs = 10)
-#print(np.shape(model.layers[1].Zaux))
+model.save(string,include_optimizer=True)
 
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
