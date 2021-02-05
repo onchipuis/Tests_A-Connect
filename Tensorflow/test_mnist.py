@@ -38,7 +38,7 @@ tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram
 
 string = "./Models/aconnect_network.h5"
 model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])
-history = model.fit(x_train,y_train,validation_data=(x_test,y_test),epochs = 2,callbacks=[tensorboard_callback])
+history = model.fit(x_train,y_train,validation_data=(x_test,y_test),epochs = 2,batch_size=batch_size,callbacks=[tensorboard_callback])
 model.save(string,include_optimizer=True)
 
 #acc = history.history['accuracy']

@@ -49,6 +49,10 @@ class AConnect(tf.keras.layers.Layer):
 			if(self.Wstd != 0):
 				[self.memW, self.membias] = addMismatch.addMismatch(self)
 				Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[-1]])
+				#ID = range(1000)
+				#ID =tf.random.shuffle(ID)
+				#self.memW = self.W*tf.gather(self.Werr,[ID[0]])
+				#self.membias = self.bias*tf.gather(self.Berr,[ID[0]])
 				Z = tf.add(tf.matmul(Xaux, self.memW), self.membias)
 				Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]])
 		
