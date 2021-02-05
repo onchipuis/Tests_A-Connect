@@ -20,62 +20,55 @@ class AConnect(tf.keras.layers.Layer):
 		self.Wstd = Wstd
 		self.isBin = isBin
 		
-	def build(self,input_shape):
-		self.batch_size = input_shape[0]
-	
+	def build(self,input_shape):	
 		self.W = self.add_weight("W",
-										shape = [int(input_shape[-1]),self.output_size],
+										shape = [int(input_shape[1]),self.output_size],
 										initializer = "glorot_uniform",
-										trainable= True)
+										trainable=True)
+
 		self.bias = self.add_weight("bias",
 										shape = [1,self.output_size],
 										initializer = "zeros",
-										trainable= True)
+										trainable=True)
+									
 		if(self.Wstd != 0):
-			self.Berr = abs(np.random.normal(scale=self.Wstd,size=[1000,1,self.output_size]))
-			self.Berr = self.Berr.astype('float32')
-			self.Werr = abs(np.random.normal(scale=self.Wstd,size=[1000,int(input_shape[-1]),self.output_size]))
-			self.Werr = self.Werr.astype('float32')
-
+			self.Berr = abs(tf.random.normal(shape=[1000,1,self.output_size],stddev=self.Wstd))
+			self.Berr = self.Berr.numpy()
+			self.Werr = abs(tf.random.normal(shape=[1000,int(input_shape[1]),self.output_size],stddev=self.Wstd))
+			self.Werr = self.Werr.numpy()
 		else:
-			self.Werr = 1
-			self.Berr = 1
+			self.Werr = tf.constant(1,dtype=tf.float32)
+			self.Berr = tf.constant(1,dtype=tf.float32)
+		super(AConnect, self).build(input_shape)
 		
 	def call(self, X, training):
 		self.X = X
-	
-		if(training):
+		self.batch_size = tf.shape(self.X)[0]
+		
+		if(training):	
 			if(self.Wstd != 0):
-				self.batch_size = tf.shape(self.X)[0]
-				#print(self.batch_size)
-				#print(np.shape(self.X))
-				#print(tf.shape(self.X))
-				self.X = tf.reshape(self.X, [self.batch_size, 1,np.shape(self.X)[1]])
-				[self.memweights, self.membias, self.memWerr, self.memBerr] = addMismatch.addMismatch(self, self.batch_size)
-				Z = tf.matmul(self.X,self.memweights)
-				Z = tf.add(Z, self.membias)
-				print(np.shape(Z))
+				[self.memW, self.membias] = addMismatch.addMismatch(self)
+				Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[-1]])
+				Z = tf.add(tf.matmul(Xaux, self.memW), self.membias)
+				Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]])
+		
 			else:
-				weights = self.W
-				bias = self.bias
-				Z = tf.matmul(self.X,self.W)
-				Z = tf.add(Z,self.bias)
+				Z = tf.add(tf.matmul(self.X,self.W),self.bias)
 
 		else:
 		
 			if(self.Wstd != 0):
 				Werr = self.Werr[1,:,:]
 				Berr = self.Berr[1,:,:]
+				
 			else:
 				Werr = self.Werr
 				Berr = self.Berr
-			weights = tf.multiply(self.W,Werr)
-			bias = tf.multiply(self.bias,Berr)
-		#	for i in range(self.batch_size):
-			Z = tf.matmul(self.X, weights)
-			Z = tf.add(Z, bias)
-			
-			
+				
+			weights = tf.math.multiply(self.W,Werr)
+			bias = tf.math.multiply(self.bias,Berr)
+			Z = tf.add(tf.matmul(self.X, weights), bias)
+					
 		return Z
 		
 	def get_config(self):
@@ -85,5 +78,4 @@ class AConnect(tf.keras.layers.Layer):
 			'Wstd': self.Wstd,
 			'isBin': self.isBin})
 		return config
-		
 

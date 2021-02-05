@@ -12,7 +12,7 @@ class CustomModel(tf.keras.Sequential):
 			loss = self.compiled_loss(y, y_pred, regularization_losses=self.losses)
 			
 		gradients = tape.gradient(loss, self.trainable_variables) #Get the gradients
-		
+		tf.print(np.shape(gradients))
 		self.optimizer.apply_gradients(zip(gradients, self.trainable_variables)) #Update the weights
 		
 		self.compiled_metrics.update_state(y, y_pred) #Update the metrics

@@ -176,26 +176,7 @@ def Test_MNIST(opt):
 		#my.plot_test_imgs(predictions,y_test,x_test, numbers, 5 , 3,fname_test)
 		#my.plot_full_history(history.history['accuracy'],history.history['val_accuracy'],history.history['loss'],history.history['val_loss'],range(epochs),fname_train)
 		#print("Network trained: %d" % opt)
-#	if(opt==7):
-	
-#		model = tf.keras.Sequential([
-#			tf.keras.layers.Flatten(input_shape=(28,28)),
-#			dropconnect2.dropconnect2(128,0.5),
-#			tf.keras.layers.ReLU(),
-#			dropconnect2.dropconnect2(10),
-#			tf.keras.layers.Softmax()
-#		])
-		
-		#model.compile(optimizer='adam',loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])
-		#history = model.fit(x_train,y_train,validation_data=(x_test,y_test,),epochs = epochs)
-#		fname_test = 'MNIST_Dropconnect2_layer'
-		#predictions = model.predict(x_test)
-#		fname_train = 'MNIST_Dropconnect2_layer_test'
-#		return model, fname_test, fname_train
-		#my.plot_test_imgs(predictions,y_test,x_test, numbers, 5 , 3,fname_test)
-		#my.plot_full_history(history.history['accuracy'],history.history['val_accuracy'],history.history['loss'],history.history['val_loss'],range(epochs),fname_train)
-		#print("Network trained: %d" % opt)
-		
+
 	if(opt==3):
 		
 		model = tf.keras.Sequential([

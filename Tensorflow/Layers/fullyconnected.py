@@ -17,12 +17,11 @@ class fullyconnected(tf.keras.layers.Layer):
 		self.W = self.add_weight("W",
 										shape = [int(input_shape[-1]),
 												self.n_neurons],
-										#initializer = "random_normal",
+										initializer = "glorot_uniform",
 										trainable=True)
 		self.bias = self.add_weight("bias",
-										shape = [1,
-												self.n_neurons],
-										#initializer = "random_normal",
+										shape = [self.n_neurons],
+										initializer = "zeros",
 										trainable=True)
 
 ##Feedforward
@@ -30,6 +29,8 @@ class fullyconnected(tf.keras.layers.Layer):
 		self.X = X
 		self.Zaux = tf.matmul(self.X, self.W)
 		Z = tf.add(self.Zaux,self.bias)
+#		tf.print(tf.shape(X))
+		
 		return Z
 
 	def get_config(self):

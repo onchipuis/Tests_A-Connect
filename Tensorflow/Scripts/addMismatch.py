@@ -1,9 +1,11 @@
 import numpy as np
 import tensorflow as tf
 
-def addMismatch(layer, batchSize):
-	ID = range(np.size(layer.Werr,0))
-	ID = tf.random.shuffle(ID)
+def addMismatch(layer):
+	batchSize = layer.batch_size
+	if(layer.Wstd != 0):
+		ID = range(np.size(layer.Werr,0))
+		ID = tf.random.shuffle(ID)
 
 	if(layer.isBin == "yes"):
 		weights = tf.math.sign(layer.W)
@@ -19,7 +21,7 @@ def addMismatch(layer, batchSize):
 	elif(np.size(Werrdb_sz) == 2):
 		Werr = np.tile(layer.Werr,batchSize,1,1)
 	else:
-		Werr = 1
+		Werr = tf.constant(1,dtype=tf.float32)
 		
 	weights = tf.math.multiply(Werr,weights)
 	
@@ -35,10 +37,10 @@ def addMismatch(layer, batchSize):
 	elif(np.size(Berrdb_sz) == 2):
 		Berr = np.tile(layer.Berr,batchSize,1,1)
 	else:
-		Berr = 1
+		Berr = tf.constant(1,dtype=tf.float32)
 		
 	bias = tf.math.multiply(Berr,bias)
 	
-	return [weights, bias, Werr, Berr]
+	return [weights, bias]
 
 
