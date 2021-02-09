@@ -20,7 +20,7 @@ def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,net_name="Network",custom_objects=No
 	print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy\n')
 	print('----------------------------------------------------------------')
 #	global parallel
-
+	loss, acc = local_net.evaluate(Xtest,Ytest)
 
 	for i in range(M):
 		[NetNoisy,Wstdn,Bstdn] = add_Wnoise.add_Wnoise(local_net,Wstd,Bstd,force)
@@ -33,12 +33,13 @@ def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,net_name="Network",custom_objects=No
 	#pool = Pool(mp.cpu_count())
 	#acc_noisy = pool.map(parallel, range(M))
 	#pool.close()
+	media = np.median(acc_noisy)
 	print('----------------------------------------------------------------')
-	print('Median Accuracy: %.1f%%\n' % np.median(acc_noisy))
+	print('Median: %.1f%%\n' % media)
 	#print('IQR Accuracy: %.1f%%\n',100*iqr(acc_noisy))
 #	print('Min. Accuracy: %.1f%%\n' % 100.0*np.amin(acc_noisy))
 #	print('Max. Accuracy: %.1f%%\n'% 100.0*np.amax(acc_noisy))
 
-	np.savetxt(net_name+'.txt',acc_noisy,fmt="%.2f")
-	return acc_noisy
+	np.savetxt('./'+net_name+'.txt',acc_noisy,fmt="%.2f")
+	return acc_noisy, media
 	

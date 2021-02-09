@@ -12,30 +12,31 @@ def addMismatch(layer):
 	else:
 		weights = layer.W
 		
-	Werrdb_sz = np.shape(layer.Werr)
+	Werrdb_sz = tf.shape(layer.Werr)
 	
-	if(np.size(Werrdb_sz) == 3):
+	if(tf.size(Werrdb_sz) == 3):
 		loc_id = tf.slice(ID, [0], [batchSize])
 		Werr = tf.gather(layer.Werr,[loc_id])
 		Werr = tf.squeeze(Werr)
-	elif(np.size(Werrdb_sz) == 2):
-		Werr = np.tile(layer.Werr,batchSize,1,1)
+	#elif(np.size(Werrdb_sz) == 2):
+	#	Werr = tf.tile(layer.Werr,batchSize)
 	else:
 		Werr = tf.constant(1,dtype=tf.float32)
-		
+
 	weights = tf.math.multiply(Werr,weights)
-	
+#	tf.print(weights)
+
 	if(layer.isBin == "yes"):
 		weights = weights/layer.W
 		
-	Berrdb_sz = np.shape(layer.Berr)
+	Berrdb_sz = tf.shape(layer.Berr)
 	bias = layer.bias
 																																																			
-	if(np.size(Berrdb_sz) == 3):
+	if(tf.size(Berrdb_sz) == 3):
 		Berr = tf.gather(layer.Berr, [loc_id])
 		Berr = tf.squeeze(Berr,axis=0)
-	elif(np.size(Berrdb_sz) == 2):
-		Berr = np.tile(layer.Berr,batchSize,1,1)
+	#elif(np.size(Berrdb_sz) == 2):
+	#	Berr = tf.tile(layer.Berr,batchSize)
 	else:
 		Berr = tf.constant(1,dtype=tf.float32)
 		

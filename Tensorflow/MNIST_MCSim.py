@@ -63,7 +63,7 @@ elif N == 4:
 now = datetime.now()
 starttime = now.time()
 #####
-acc_noisy = MCsim.MCsim(net,x_test,y_test,1000,0.5,0.5,"no",name,custom_objects)
+acc_noisy, media = MCsim.MCsim(net,x_test,y_test,1000,0.5,0.5,"no",name,custom_objects)
 #####
 now = datetime.now()
 endtime = now.time()
@@ -74,6 +74,7 @@ print('Simulation finished at: ', endtime)
 
 folder = folder+'/Graphs/'
 plt.title('Validation Accuracy Wstd = ' + Wstd)
+plt.xlabel('Median : %.2f' % media)
 plt.hist(acc_noisy)
 plt.grid(True)
 plt.savefig(folder+name+'.png')

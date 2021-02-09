@@ -14,7 +14,8 @@ class ACModel(tf.keras.Sequential):
 		gradients = tape.gradient(loss, self.trainable_variables) #Get the gradients
 
 		self.optimizer.apply_gradients(zip(gradients, self.trainable_variables)) #Update the weights
-		
+#		tf.print(self.layers[3].W[1,:])
+	#	tf.print(self.layers[1].bias[:])
 		self.compiled_metrics.update_state(y, y_pred) #Update the metrics
 		
 		return {m.name: m.result() for m in self.metrics}

@@ -6,21 +6,21 @@ def add_Wnoise(net,Wstd,Bstd,force,optimizer='Adam',loss=['sparse_categorical_cr
 	Nlayers = np.size(layers)
 	
 	SRAMsz = [1024,1024]
-	SRAMBsz = [1024,1]
+	SRAMBsz = [1024]
 	
 	Merr = np.random.randn(SRAMsz[0],SRAMsz[1])
-	MBerr = np.random.randn(SRAMBsz[0],SRAMBsz[1])
+	MBerr = np.random.randn(SRAMBsz[0])
 
 #	
 	for i in range(Nlayers):
 		if layers[i].count_params() != 0:
-			if hasattr(layers[i],'weights') or hasattr(layers[i],'W'): 
-				
+
+			if hasattr(layers[i],'kernel') or hasattr(layers[i],'W'): 
+
 				Wsz = np.shape(layers[i].weights[0])
 				Bsz = np.shape(layers[i].weights[1])
-				#print(Bsz[0])
 				Merr_aux = Merr[0:Wsz[0], 0:Wsz[1]]
-				MBerr_aux = MBerr[1,0:Bsz[0]]
+				MBerr_aux = MBerr[0:Bsz[0]]
 				
 				if hasattr(layers[i], 'Wstd'):
 					if(layers[i].Wstd != 0):
@@ -42,18 +42,18 @@ def add_Wnoise(net,Wstd,Bstd,force,optimizer='Adam',loss=['sparse_categorical_cr
 #					
 					Werr = abs(1+Wstd*Merr_aux)
 					Berr = abs(1+Bstd*MBerr_aux)
+
+					if(layers[i].Wstd != 0):
+						layers[i].Werr[1,:,:] = Werr
+					else:			
+						layers[i].Werr = Werr					
 					
-					if hasattr(layers[i], 'Werr'):
-						if(layers[i].Wstd != 0):
-							layers[i].Werr[1,:,:] = Werr
-						else:
-							layers[i].Werr = np.random.randn()
-					if hasattr(layers[i], 'Berr'):
-						if(layers[i].Wstd != 0):
-							layers[i].Berr[1,:,:] = Berr
-						else:
-							layers[i].Berr = np.random.randn()
+					if(layers[i].Wstd != 0):
+						layers[i].Berr[1,:] = Berr
+					else:
+						layers[i].Berr = Berr
 				else:
+
 					Werr = abs(1+Wstd*Merr_aux)
 					Berr = abs(1+Bstd*MBerr_aux)
 					weights = layers[i].weights[0]*Werr

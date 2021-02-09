@@ -24,13 +24,13 @@ class DropConnect(tf.keras.layers.Layer):
 										shape = [int(input_shape[-1]),self.output_size], 
 										trainable=True,
 										initializer='glorot_uniform')
-		self.bias = self.add_weight("bias", shape = [1 ,self.output_size], 
+		self.bias = self.add_weight("bias", shape = [self.output_size,], 
 										trainable=True,
 										initializer='zeros')
 		self.dist = tfp.distributions.Bernoulli(probs=self.Wstd, dtype=tf.float32)
 		
 		if(self.Wstd != 0):
-			self.Berr = self.dist.sample([1e3,1,self.output_size])
+			self.Berr = self.dist.sample([1e3,self.output_size])
 			self.Werr = self.dist.sample([1e3,int(input_shape[-1]),self.output_size])
 			self.Werr = self.Werr.numpy()
 			self.Berr = self.Berr.numpy()
@@ -41,18 +41,24 @@ class DropConnect(tf.keras.layers.Layer):
 										
 	def call(self, X, training):
 		self.X = X
-		dim = np.shape(self.X)
-
+		self.batch_size = tf.shape(self.X)[0]
 		if(training):
 			if(self.Wstd != 0):
-				for j in range(int(len(self.X)/np.shape(X)[0])):
-					if(np.size(np.shape(self.X))<2):
-						batchSize = 1
-					else:
-						batchSize = np.shape(X)[0]
-					for i in range(batchSize):
-						[weights,bias,Werr,Berr] = addMismatch.addMismatch(self, batchSize)	
-						Z = tf.matmul(self.X[(j)*batchSize:(j+1)*(batchSize),:],weights) + bias
+				ID = range(np.size(self.Werr,0))
+				ID = tf.random.shuffle(ID)
+				loc_id = tf.slice(ID, [0], [self.batch_size])
+				Werr = tf.gather(self.Werr,[loc_id])
+				Werr = tf.squeeze(Werr)
+				self.memW = tf.multiply(self.W,Werr)
+				Berr = tf.gather(self.Berr, [loc_id])
+				Berr = tf.squeeze(Berr,axis=0)
+				self.membias = tf.multiply(self.bias,Berr)
+				
+				Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[-1]])
+				Z = tf.matmul(Xaux, self.memW)
+				Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]])
+				Z = tf.add(Z,self.membias)
+			
 			else:
 				weights = self.W
 				bias = self.bias
@@ -63,7 +69,7 @@ class DropConnect(tf.keras.layers.Layer):
 			bias = self.bias
 			if(self.Wstd != 0):
 				Werr = self.Werr[1,:,:]
-				Berr = self.Berr[1,:,:]
+				Berr = self.Berr[1,:]
 			else:
 				Werr = self.Werr
 				Berr = self.Berr
