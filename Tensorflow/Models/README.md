@@ -3,7 +3,7 @@
 
 ## General Info
 This folder contains 4 trained models in format hd5 (custom format provided by keras to save trained models). The model architecure is shown below.
-![DNN_Architecure](DNN_Architecure.jpg){width=800 height=500}
+![DNN_Architecure](DNN_Architecure.jpg)
 We have all the models saved(model architecture, weights, and optimizer) and also we have only the model weights saved.
 1. [AConnect full model](aconnect_network.h5)
 2. [AConnect weights](aconnect_nn_weights.h5)
