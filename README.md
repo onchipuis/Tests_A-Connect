@@ -2,10 +2,18 @@
 ***
 All the files needed to develop a library for easy deployment of A-Connect.
 
-## Table of Contents
-1. [Pytorch](/Pytorch/Tutorial)
-2. [Tensorflow](/Tensorflow)
 
-### General Info
+## General Info
+### Algorithm description
+A-Connect is a methodology that provides to the users a statistical way to train their neural networks. One of the A-Connect advantages
+is the mismatch mitigation due to the stochastic variations. This methodology also allows the binarization of the layer weights to reduce 
+the memory footprint of the layer.
 
-This library will contain the A-Connect methodology to train neural networks statistically. The library will be available on Pytorch and Tensorflow. To see the project advance, see the local Readme.
+### Table of Contents
+1. [Tensorflow](/Tensorflow)
+2. [Pytorch](/Pytorch)
+
+### Contents description
+
+Above you can see the name of two popular frameworks for Machine/Deep learning where in a future A-Connect will be available.
+
