@@ -2,4 +2,5 @@
 ***
 ## General Info
 
-Ignore all the scripts :). The only important here is MNIST_mismatch.py. This scripts contains a fully-connected networks with: No regularization, Dropout, Dropconnect, and A-Connect.
+This folder contains only a function that creates the different networks needed to test A-Connect performance against DropConnect, Dropout and 
+no regularization techniques.

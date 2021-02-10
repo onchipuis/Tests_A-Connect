@@ -14,7 +14,7 @@ class DropLayer(tf.keras.layers.Layer):
 
 	def build(self, input_shape):
 
-		self.dist = tfp.distributions.Bernoulli(probs=self.drop_ratio, dtype=tf.float32)
+		self.dist = tfp.distributions.Bernoulli(probs=self.drop_ratio, dtype=tf.float32) #Create a bernoulli distribution to create the mask
 
 		
 	
@@ -22,8 +22,8 @@ class DropLayer(tf.keras.layers.Layer):
 		self.X = X
 		inputshape= np.shape(self.X)
 		if(training):
-			self.mask = self.dist.sample([inputshape[0],inputshape[-1]])/self.drop_ratio
-			Xrand = tf.math.multiply(self.X,self.mask)
+			self.mask = self.dist.sample([inputshape[0],inputshape[-1]])/self.drop_ratio #Get the mask and apply the dropout formula
+			Xrand = tf.math.multiply(self.X,self.mask) #Get the output with activations dropped.
 			return tf.reshape(Xrand, tf.shape(self.X))
 		else:
 			return X

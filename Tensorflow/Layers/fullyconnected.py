@@ -8,6 +8,8 @@ import tensorflow as tf
 
 #Clase fullyconnected
 
+# There is nothing to explain here, is a custom fully connected layer with the template provided by keras
+
 class fullyconnected(tf.keras.layers.Layer):
 	def __init__(self, n_neurons, **kwargs):
 		super(fullyconnected, self).__init__()

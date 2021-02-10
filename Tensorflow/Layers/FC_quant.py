@@ -21,9 +21,9 @@ class FC_quant(tf.keras.layers.Layer):
 
 	def call(self, X):
 		Werr = self.Werr
-		Berr = self.Berr
+		Berr = self.Berr 
 		self.X = X
-		W = tf.math.sign(self.W)*Werr
+		W = tf.math.sign(self.W)*Werr #This layer is the first approach to a layer with weights binarized. Please try to ignore it. Is not tested yet, and maybe is not working ok. :)
 		
 		bias = tf.math.sign(self.bias)*Berr
 		

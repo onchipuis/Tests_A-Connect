@@ -9,6 +9,7 @@ sys.path.append(folder+'/Scripts')
 import Scripts 
 from Scripts import addMismatch
 
+#### This layer is very similar to A-Connect, please, go to AConnect.py to see the explanation of the layer.
 class DropConnect(tf.keras.layers.Layer):
 	def __init__(self, output_size,Wstd=0, isBin="no", **kwargs):
 		super(DropConnect, self).__init__()
