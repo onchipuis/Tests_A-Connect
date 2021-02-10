@@ -2,18 +2,29 @@
 
 ***
 
-All the actual work done to support A-Connect using TensorFlow.
+## General Info
 
-## Table of Contents
+All the work done to provide an A-Connect layer that works on Keras/Tensorflow is available here.
 
-1. [Graphs](/Tensorflow/Graphs)
-2. [Layers](/Tensorflow/Layers)
-3. [Networks](/Tensorflow/Networks)
-4. [Useful Scripts](/Tensorflow/Scripts)
+### Table of Contents
 
-### General Info
+1. [Layers](/Tensorflow/Layers): All the layer created to test the algorithm. Incluiding the source code for an A-Connect layer. Please see local readme.
+2. [Networks](/Tensorflow/Networks): All the networks used for testing purpose. Please see local readme.
+3. [Useful Scripts](/Tensorflow/Scripts): Some useful scripts for training and training. Please see local readme.
+4. [Graphs](/Tensorflow/Graphs): Some graphs that shows the algorithm performance and many other results.
+5. [Trained models](/Tensorflow/Models): Finally, here you can find some trained networks to test. Please see local readme.
 
-The table above shows the contents of this folder. Some graphics of the testing process can be seen in the Graphs folder. In Layers, you can find some custom layers that were made for testing purposes (See local readme). There are some scripts with different types of DNN (Deep Neural Networks) that was used to test the library (See local Readme). Finally, in Useful Scripts, there are many scripts used to perform all the tests (See local Readme).
+### Contents description and instructions.
+
+Firstly run config.sh if you are using any Linux distribution. If you are not a Linux user, please run get_dir.py.
+
+1. test_mnist.py: Script to train any neural network using the standard MNIST dataset. Also with this script you can use a custom training loop.
+2. handwirtten.py: Provides a way to train a simple neural network using the standard MNIST dataset.
+3. Train_Networks.py: Script to train 4 different neural networks. Without regularizations, with dropout after the first FC layer, with dropconnect on the first FC layer
+and finally, with A-Connect. This scripts needs > 8GB RAM installed to run properly. Also could run in parallel using python Pool function.
+4. MNIST_MCSim.py: This script performs a Monte Carlo simulation of the neural networks trained and saved in the layer Models.
+
+
 
 
 
