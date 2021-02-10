@@ -13,8 +13,8 @@ All the work here it was done using Python 3.8 and Tensorflow 2.4.X, so please, 
 1. Install Python 3.X.
 2. Install Numpy.
 3. Install Matplotlib.
-4. [Install Tensorflow 2.4.1] (https://www.tensorflow.org/install)
-5. [Install Tensorflow Probability] (https://www.tensorflow.org/probability/install)
+4. [Install Tensorflow 2.4.1](https://www.tensorflow.org/install)
+5. [Install Tensorflow Probability](https://www.tensorflow.org/probability/install)
 6. Finally run config.sh (if you are a Linux user if not, please run get_dir.py).
 
 
