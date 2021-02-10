@@ -6,6 +6,19 @@
 
 All the work done to provide an A-Connect layer that works on Keras/Tensorflow is available here.
 
+### Instructions and dependencies
+
+All the work here it was done using Python 3.8 and Tensorflow 2.4.X, so please, in order to avoid some compatibility problems, try to work using the same version. (At least Python 3.X and Tensorflow 2.4.1). Also, you will need Python libraries like ***Numpy*** and ***Matplotlib*** and the ***Tensorflow Probability*** library. Finally, a instruction list is shown below.
+
+1. Install Python 3.X.
+2. Install Numpy.
+3. Install Matplotlib.
+4. Install Tensorflow 2.4.1. (https://www.tensorflow.org/install)
+5. Install Tensorflow Probability. (https://www.tensorflow.org/probability/install)
+6. Finally run config.sh (if you are a Linux user if not, please run get_dir.py).
+
+
+
 ### Table of Contents
 
 1. [Layers](/Tensorflow/Layers): All the layer created to test the algorithm. Incluiding the source code for an A-Connect layer. Please see local readme.
