@@ -32,9 +32,9 @@ class AConnect(tf.keras.layers.Layer):
 										trainable=True)					
 		if(self.Wstd != 0):
 			self.Berr = tf.random.normal(shape=[1000,self.output_size],stddev=self.Wstd)
-			self.Berr = abs(self.Berr.numpy())
+			self.Berr = abs(1+self.Berr.numpy())
 			self.Werr = tf.random.normal(shape=[1000,int(input_shape[-1]),self.output_size],stddev=self.Wstd)
-			self.Werr = abs(self.Werr.numpy())
+			self.Werr = abs(1+self.Werr.numpy())
 		else:
 			self.Werr = tf.constant(1,dtype=tf.float32)
 			self.Berr = tf.constant(1,dtype=tf.float32)

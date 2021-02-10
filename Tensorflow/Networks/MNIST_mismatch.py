@@ -187,7 +187,7 @@ def Test_MNIST(opt):
 			AConnect.AConnect(128,0.5),
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.ReLU(),
-			AConnect.AConnect(10,0.5),
+			AConnect.AConnect(10, 0.5),
 			tf.keras.layers.Softmax()
 		])
 		fname_test = 'MNIST_AConnect_layer'

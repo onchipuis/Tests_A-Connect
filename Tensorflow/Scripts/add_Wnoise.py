@@ -46,12 +46,12 @@ def add_Wnoise(net,Wstd,Bstd,force,optimizer='Adam',loss=['sparse_categorical_cr
 					if(layers[i].Wstd != 0):
 						layers[i].Werr[1,:,:] = Werr
 					else:			
-						layers[i].Werr = Werr					
+						layers[i].Werr = 1					
 					
 					if(layers[i].Wstd != 0):
 						layers[i].Berr[1,:] = Berr
 					else:
-						layers[i].Berr = Berr
+						layers[i].Berr = 1
 				else:
 
 					Werr = abs(1+Wstd*Merr_aux)
