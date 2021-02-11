@@ -31,10 +31,8 @@ def Test_MNIST(opt):
 			tf.keras.layers.Softmax()
 		])
 		
-		fname_test = 'MNIST_keras_layers'
-		fname_train = 'MNIST_keras_layers_test'
 
-		return model, fname_test, fname_train
+		return model
 
 	#Keras dense network with dropout
 	
@@ -51,10 +49,7 @@ def Test_MNIST(opt):
 		])
 		
 
-		fname_test = 'MNIST_dropout_keras_layers'
-		fname_train = 'MNIST_dropout_keras_layers_test'
-
-		return model, fname_test, fname_train
+		return model
 
 	
 	#Custom Dropconnect layer with mismatch
@@ -71,22 +66,47 @@ def Test_MNIST(opt):
 		])
 		
 
-		fname_test = 'MNIST_Dropconnect_layer'
-		fname_train = 'MNIST_Dropconnect_layer_test'
-
-		return model, fname_test, fname_train
+		return model
 	
 	#A-Connect with mismatch, no binarization
 	if(opt==3):
 		
 		model = tf.keras.Sequential([
 			tf.keras.layers.Flatten(input_shape=(28,28)),	
-			AConnect.AConnect(128,0.5),
+			AConnect.AConnect(128,0.5,0.5),
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.ReLU(),
-			AConnect.AConnect(10, 0.5),
+			AConnect.AConnect(10, 0.5,0.5),
 			tf.keras.layers.Softmax()
 		])
-		fname_test = 'MNIST_AConnect_layer'
-		fname_train = 'MNIST_AConnect_layer_test'
-		return model, fname_test, fname_train		
+
+		return model	
+
+	#Custom FC layer with weights binarization.
+	if(opt==4):
+		
+		model = tf.keras.Sequential([
+			tf.keras.layers.Flatten(input_shape=(28,28)),	
+			FC_quant.FC_quant(128,isBin="yes"),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.ReLU(),
+			FC_quant.FC_quant(10,isBin="yes"),
+			tf.keras.layers.Softmax()
+		])
+
+		return model	
+
+	#AConnect with weights binarization
+	if(opt==5):
+		
+		model = tf.keras.Sequential([
+			tf.keras.layers.Flatten(input_shape=(28,28)),	
+			AConnect.AConnect(128,0.5,0.5,isBin="yes"),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.ReLU(),
+			AConnect.AConnect(10,0.5,0.5,isBin="yes"),
+			tf.keras.layers.Softmax()
+		])
+
+		return model	
+	

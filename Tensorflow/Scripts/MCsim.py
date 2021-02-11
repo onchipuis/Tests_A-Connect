@@ -17,10 +17,10 @@ def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,net_name="Network",custom_objects=No
 	#f = open(net_name,'w')
 	local_net = tf.keras.models.load_model(net,custom_objects = custom_objects)
 	local_net.save_weights(filepath=('./Models/'+net_name+'_weights.h5'))
+	print(local_net.summary())
 	print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy\n')
 	print('----------------------------------------------------------------')
 #	global parallel
-	loss, acc = local_net.evaluate(Xtest,Ytest)
 
 	for i in range(M):
 		[NetNoisy,Wstdn,Bstdn] = add_Wnoise.add_Wnoise(local_net,Wstd,Bstd,force)

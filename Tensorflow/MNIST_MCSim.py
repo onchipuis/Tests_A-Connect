@@ -7,8 +7,9 @@ import time
 from Scripts import MCsim
 from Layers import DropConnect
 from Layers import AConnect
-from Scripts import classify
 from Layers import fullyconnected
+from Layers import FC_quant
+from Scripts import classify
 from datetime import datetime
 import matplotlib.pyplot as plt
 config = open('config.txt','r')
@@ -41,7 +42,7 @@ history = [[],[],[],[]]
 #		model[i] = tf.keras.models.load_model("./Models/aconnect_network.h5", custom_objects = {'AConnect':AConnect.AConnect})
 
 acc_noisy = np.zeros((1000,1))
-N = 4
+N = 6
 Wstd = '50%'
 if N == 1:
 	net = "./Models/no_reg_network.h5"
@@ -59,6 +60,16 @@ elif N == 4:
 	net = "./Models/aconnect_network.h5"
 	custom_objects = {'AConnect':AConnect.AConnect}
 	name = "aconnect_nn"
+elif N == 5:
+	net = "./Models/FCquant_network.h5"
+	custom_objects = {'FC_quant':FC_quant.FC_quant}
+	name = "FC_quant"
+elif N == 6:
+	net = "./Models/aconnect_network_bw.h5"
+	custom_objects = {'AConnect':AConnect.AConnect}
+	name = "aconnect_bw_nn"
+
+
 
 now = datetime.now()
 starttime = now.time()

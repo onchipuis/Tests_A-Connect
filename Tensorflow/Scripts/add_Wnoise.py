@@ -38,20 +38,24 @@ def add_Wnoise(net,Wstd,Bstd,force,optimizer='Adam',loss=['sparse_categorical_cr
 						Bstd = Bstd
 				else:
 					Bstd = Bstd
-				if hasattr(layers[i],'Werr'):
+				if hasattr(layers[i],'Werr') or hasattr(layers[i],'Berr'):
 #					
 					Werr = abs(1+Wstd*Merr_aux)
 					Berr = abs(1+Bstd*MBerr_aux)
-
-					if(layers[i].Wstd != 0):
-						layers[i].Werr[1,:,:] = Werr
-					else:			
-						layers[i].Werr = 1					
-					
-					if(layers[i].Wstd != 0):
-						layers[i].Berr[1,:] = Berr
+					if hasattr(layers[i], 'Wstd'):
+						if(layers[i].Wstd != 0):
+							layers[i].Werr[1,:,:] = Werr
+						else:			
+							layers[i].Werr = Werr
 					else:
-						layers[i].Berr = 1
+							layers[i].Werr = Werr					
+					if hasattr(layers[i], 'Bstd'):
+						if(layers[i].Bstd != 0):
+							layers[i].Berr[1,:] = Berr
+						else:
+							layers[i].Berr = Berr
+					else:
+						layers[i].Berr = Berr
 				else:
 
 					Werr = abs(1+Wstd*Merr_aux)

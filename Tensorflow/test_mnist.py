@@ -19,11 +19,23 @@ batch_size = 256
 
 x_train = x_train/255.0
 x_test = x_test/255.0
-
+N = 5
+if(N==0):
+	string = "no_reg_network"
+elif(N==1):
+	string = "dropout_network"
+elif(N==2):
+	string = "dropconnect_network"
+elif(N==3):
+	string = "aconnect_network"
+elif(N==4):
+	string = "FCquant_network"	
+else:
+	string = "aconnect_network_bw"
 optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
-model, fname_test, fname_train = MNIST_mismatch.Test_MNIST(3)
-log_dir = "./logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+model = MNIST_mismatch.Test_MNIST(N)
+#log_dir = "./logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+#tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 #model = ACModel([
 #			tf.keras.layers.Flatten(input_shape=(28,28)),
 #			AConnect.AConnect(256),
@@ -34,14 +46,16 @@ tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram
 #			tf.keras.layers.Softmax()
 #])
 
-string = "./Models/aconnect_network.h5"
+
 model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])
 history = model.fit(x_train,y_train,validation_data=(x_test,y_test),epochs = 20,batch_size=batch_size)
-model.save(string,include_optimizer=True)
+acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+## Saving the training data
+np.savetxt('./Models/Training data/'+string+'_acc'+'.txt',acc,fmt="%.2f")
+np.savetxt('./Models/Training data/'+string+'_val_acc'+'.txt',val_acc,fmt="%.2f")
 
-#acc = history.history['accuracy']
-#val_acc = history.history['val_accuracy']
-#loss = history.history['loss']
-#val_loss = history.history['val_loss']
+model.save('./Models/'+string+'.h5',include_optimizer=True)
+
 #my.plot_full_history(acc,val_acc,loss,val_loss,range(10))
 
