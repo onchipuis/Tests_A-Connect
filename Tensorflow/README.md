@@ -17,9 +17,9 @@ All the work here it was done using Python 3.8 and Tensorflow 2.4.X, so please, 
 5. [Install Tensorflow Probability](https://www.tensorflow.org/probability/install)
 6. Finally run config.sh (if you are a Linux user if not, please run get_dir.py).
 7. If you wanna start testing the networks, run [start_sim.sh](start_sim.sh), this script provides you 3 different options for running scripts.
-  1. Train a network from [test_mnist.py](test_mnist.py)
-  2. Run the Monte Carlo method for a pre-trained model.
-  3. Train a network and after that, run the Monte Carlo method for this network.
+    1. Train a network from [test_mnist.py](test_mnist.py)
+    2. Run the Monte Carlo method for a pre-trained model.
+    3. Train a network and after that, run the Monte Carlo method for this network.
 
 
 
