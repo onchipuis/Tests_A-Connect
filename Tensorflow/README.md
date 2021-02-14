@@ -31,9 +31,7 @@ All the work here it was done using Python 3.8 and Tensorflow 2.4.X, so please, 
 4. [Graphs](/Tensorflow/Graphs): Some graphs that shows the algorithm performance and many other results.
 5. [Trained models](/Tensorflow/Models): Finally, here you can find some trained networks to test. Please see local readme.
 
-### Contents description and instructions.
-
-Firstly run config.sh if you are using any Linux distribution. If you are not a Linux user, please run get_dir.py.
+### Contents description
 
 1. [Test a neural network with MNIST 28X28](test_mnist.py): Script to train any neural network using the standard MNIST dataset. Also with this script you can use a custom training loop.
 2. [Train in serial/parallel 4 NN](Train_Networks.py): Script to train 4 different neural networks. Without regularizations, with dropout after the first FC layer, with dropconnect on the first FC layer
