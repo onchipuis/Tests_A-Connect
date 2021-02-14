@@ -17,13 +17,13 @@ from Layers import AConnect
 
 #This scripts define the different network architecture for the training and testing.
 
-def Test_MNIST(opt):
+def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no"):
 
 	#Keras dense network with no regularization
 	if(opt==0):
 
 		model = tf.keras.Sequential([
-			tf.keras.layers.Flatten(input_shape=(28,28)),
+			tf.keras.layers.Flatten(input_shape=imgsize),
 			tf.keras.layers.Dense(128),
 			tf.keras.layers.BatchNormalization(),			
 			tf.keras.layers.ReLU(),
@@ -39,7 +39,7 @@ def Test_MNIST(opt):
 	elif(opt==1):
 	
 		model = tf.keras.Sequential([
-			tf.keras.layers.Flatten(input_shape=(28,28)),
+			tf.keras.layers.Flatten(input_shape=imgsize),
 			tf.keras.layers.Dense(128),
 			tf.keras.layers.BatchNormalization(),			
 			tf.keras.layers.ReLU(),
@@ -57,7 +57,7 @@ def Test_MNIST(opt):
 	if(opt==2):
 	
 		model = tf.keras.Sequential([
-			tf.keras.layers.Flatten(input_shape=(28,28)),
+			tf.keras.layers.Flatten(input_shape=imgsize),
 			DropConnect.DropConnect(128,0.5),
 			tf.keras.layers.BatchNormalization(),			
 			tf.keras.layers.ReLU(),
@@ -72,11 +72,11 @@ def Test_MNIST(opt):
 	if(opt==3):
 		
 		model = tf.keras.Sequential([
-			tf.keras.layers.Flatten(input_shape=(28,28)),	
-			AConnect.AConnect(128,0.5,0.5),
+			tf.keras.layers.Flatten(input_shape=imgsize),	
+			AConnect.AConnect(128,Wstd,Bstd,isBin),
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.ReLU(),
-			AConnect.AConnect(10, 0.5,0.5),
+			AConnect.AConnect(10,Wstd,Bstd,isBin),
 			tf.keras.layers.Softmax()
 		])
 
@@ -86,27 +86,14 @@ def Test_MNIST(opt):
 	if(opt==4):
 		
 		model = tf.keras.Sequential([
-			tf.keras.layers.Flatten(input_shape=(28,28)),	
-			FC_quant.FC_quant(128,isBin="yes"),
+			tf.keras.layers.Flatten(input_shape=imgsize),	
+			FC_quant.FC_quant(128,isBin),
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.ReLU(),
-			FC_quant.FC_quant(10,isBin="yes"),
+			FC_quant.FC_quant(10,isBin),
 			tf.keras.layers.Softmax()
 		])
 
 		return model	
 
-	#AConnect with weights binarization
-	if(opt==5):
-		
-		model = tf.keras.Sequential([
-			tf.keras.layers.Flatten(input_shape=(28,28)),	
-			AConnect.AConnect(128,0.5,0.5,isBin="yes"),
-			tf.keras.layers.BatchNormalization(),
-			tf.keras.layers.ReLU(),
-			AConnect.AConnect(10,0.5,0.5,isBin="yes"),
-			tf.keras.layers.Softmax()
-		])
-
-		return model	
 	

@@ -9,8 +9,9 @@ def add_Wnoise(net,Wstd,Bstd,force,optimizer='Adam',loss=['sparse_categorical_cr
 	SRAMBsz = [1024]
 	
 	Merr = np.random.randn(SRAMsz[0],SRAMsz[1])
+	Merr = Merr.astype('float32')	
 	MBerr = np.random.randn(SRAMBsz[0])
-
+	MBerr = MBerr.astype('float32')	
 #	
 	for i in range(Nlayers):
 		if layers[i].count_params() != 0:
@@ -44,14 +45,14 @@ def add_Wnoise(net,Wstd,Bstd,force,optimizer='Adam',loss=['sparse_categorical_cr
 					Berr = abs(1+Bstd*MBerr_aux)
 					if hasattr(layers[i], 'Wstd'):
 						if(layers[i].Wstd != 0):
-							layers[i].Werr[1,:,:] = Werr
+							layers[i].infWerr = Werr
 						else:			
 							layers[i].Werr = Werr
 					else:
 							layers[i].Werr = Werr					
 					if hasattr(layers[i], 'Bstd'):
 						if(layers[i].Bstd != 0):
-							layers[i].Berr[1,:] = Berr
+							layers[i].infBerr = Berr
 						else:
 							layers[i].Berr = Berr
 					else:

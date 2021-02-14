@@ -34,14 +34,18 @@ class AConnect(tf.keras.layers.Layer):
 										trainable=True)					
 		if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
 			if(self.Bstd != 0):
-				self.Berr = tf.random.normal(shape=[1000,self.output_size],stddev=self.Bstd) #"Pool" of bias error vectors
-				self.Berr = abs(1+self.Berr.numpy()) #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
+				self.infBerr = abs(1+tf.random.normal(shape=[self.output_size],stddev=self.Bstd)) #Bias error vector for inference
+				self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
 													 #This was necessary to change the error matrix/array when Monte Carlo was running.
+				self.Berr = abs(1+tf.random.normal(shape=[1000,self.output_size],stddev=self.Bstd)) #"Pool" of bias error vectors
+																	
 			else:
 				self.Berr = tf.constant(1,dtype=tf.float32)
-			if(self.Wstd): 										 
-				self.Werr = tf.random.normal(shape=[1000,int(input_shape[-1]),self.output_size],stddev=self.Wstd) #"Pool" of weights error matrices.
-				self.Werr = abs(1+self.Werr.numpy()) 
+			if(self.Wstd): 
+				self.infWerr = abs(1+tf.random.normal(shape=[int(input_shape[-1]),self.output_size],stddev=self.Wstd)) #Weight matrix for inference
+				self.infWerr = self.infWerr.numpy()										 
+				self.Werr = abs(1+tf.random.normal(shape=[1000,int(input_shape[-1]),self.output_size],stddev=self.Wstd)) #"Pool" of weights error matrices.
+				 
 			else:
 				self.Werr = tf.constant(1,dtype=tf.float32)
 		else:
@@ -63,11 +67,7 @@ class AConnect(tf.keras.layers.Layer):
 													#will not have the numbers sorted from 0 to 999. Now the numbers are in random position of the vector.
 													#Before the shuffle ID[0]=0, the, after the shuffle ID[0]=could be any number between 0-999.
 				loc_id = tf.slice(ID, [0], [self.batch_size])	#This takes a portion of the ID vector of size batch_size. Which means if we defined 	
-																	#batch_size=256. We will take only the numbers in ID in the indexes 0-255. Remeber, the numbers are sorted randomly.													
-				if(self.isBin=='yes'):
-					weights = sign(self.W)			#This lines binarize the weights if the attribute isBin is yes
-				else:
-					weights = self.W						   		
+																	#batch_size=256. We will take only the numbers in ID in the indexes 0-255. Remeber, the numbers are sorted randomly.						   		
 										   																  	
 				if(self.Wstd !=0):							
 					Werr = tf.gather(self.Werr,[loc_id])		#Finally, this line will take only N matrices from the "Pool" of error matrices. Where N is the batch size.          
@@ -75,11 +75,13 @@ class AConnect(tf.keras.layers.Layer):
 																#That means, with a weights shape of [784,128] and a batch size of 256. Werr should be a tensor with shape	
 																#[256,784,128], but gather return us a tensor with shape [1,256,784,128], so we remove that 1 with squeeze.
 				else:
-					Werr = self.Werr						 
-
+					Werr = self.Werr
+				if(self.isBin=='yes'):
+					weights = self.sign(self.W)			#Binarize the weights and multiply them element wise with Werr mask
+				else:
+					weights = self.W	
 				self.memW = tf.multiply(weights,Werr)         	#Finally we multiply element-wise the error matrix with the weights.
-				
-					
+						
 				
 				if(self.Bstd !=0):								#For the bias is exactly the same situation
 					Berr = tf.gather(self.Berr, [loc_id])  		 
@@ -100,30 +102,28 @@ class AConnect(tf.keras.layers.Layer):
 																					
 				Z = tf.matmul(Xaux, self.memW) 	#Matrix multiplication between input and mask. With output shape [batchsize,1,128]
 				Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
-				Z = tf.add(Z,self.membias) #FInally, we add the mask error of bias.
-				if(self.isBin=='yes'):		#Computes weights error mask
-					self.memW = self.memW/self.W
+				Z = tf.add(Z,self.membias) #FInally, we add the bias error mask 
+		
 					
 			else:
 				if(self.isBin=='yes'):
-					weights = sign(self.W)*Werr 
-					Werr = Werr/weights
+					self.memW = self.sign(self.W)*self.Werr 
 				else:
-					weights = self.W*Werr
-				bias = self.bias*Berr
-				Z = tf.add(tf.matmul(self.X,weights,bias)) #Custom FC layer operation when we don't have Wstd or Bstd.
+					self.memW = self.W*self.Werr
+				bias = self.bias*self.Berr
+				Z = tf.add(tf.matmul(self.X,self.memW),bias) #Custom FC layer operation when we don't have Wstd or Bstd.
 
 		else:
 		    #This part of the code will be executed during the inference
 			if(self.Wstd != 0):
-				Werr = self.Werr[1,:,:]
-				Berr = self.Berr[1,:]			
+				Werr = self.infWerr
+				Berr = self.infBerr
 			else:
 				Werr = self.Werr
 				Berr = self.Berr
 			
 			if(self.isBin=='yes'):
-				weights =sign(self.W)*Werr
+				weights =tf.math.sign(self.W)*Werr
 			else:
 				weights = self.W*Werr
 			bias = self.bias*Berr		
@@ -140,11 +140,12 @@ class AConnect(tf.keras.layers.Layer):
 			'Bstd': self.Bstd,
 			'isBin': self.isBin})
 		return config
-@tf.custom_gradient
-def sign(x):
-	y = tf.math.sign(x)
-	def grad(dy):
-		dydx = dy*1
-		return dydx
-	return y, grad
+		
+	@tf.custom_gradient
+	def sign(self,x):
+		y = tf.math.sign(x)
+		def grad(dy):
+			dydx = tf.divide(dy,abs(self.W))
+			return dydx
+		return y, grad
 
