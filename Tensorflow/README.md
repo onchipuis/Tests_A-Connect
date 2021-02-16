@@ -30,6 +30,7 @@ All the work here it was done using Python 3.8 and Tensorflow 2.4.X, so please, 
 3. [Useful Scripts](/Tensorflow/Scripts): Some useful scripts for training and training. Please see local readme.
 4. [Graphs](/Tensorflow/Graphs): Some graphs that shows the algorithm performance and many other results.
 5. [Trained models](/Tensorflow/Models): Finally, here you can find some trained networks to test. Please see local readme.
+6. [Results](/Tensorflow/Results): This folder contains the results of the Monte Carlo simulations.
 
 ### Contents description
 

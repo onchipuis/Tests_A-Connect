@@ -22,7 +22,7 @@ Opt = int(options[0])
 Wstd = float(options[1])	
 Bstd = float(options[2])	
 isBin = int(options[3])
-isAconnect = int(options[4])
+isNet = int(options[4])
 
 batch_size = 256
 if(Opt == 1): #For standard MNIST 28x28 8 bits
@@ -55,13 +55,66 @@ if(normalize == 'yes'):
 
 
 acc_noisy = np.zeros((1000,1))
+if(isNet == 0):
+	string = "no_reg_network"
+	N = 1
+	if(Opt == 1 or Opt == 2):
+		string = string+"_28x28"
+		if(Opt == 1):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	else:
+		string = string +"_11x11"
+		if(Opt == 3):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	name = string			
+	string = string+".h5"
+	
+if(isNet == 1):
+	string = "dropout_network"
+	N = 2
+	if(Opt == 1 or Opt == 2):
+		string = string+"_28x28"
+		if(Opt == 1):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	else:
+		string = string +"_11x11"
+		if(Opt == 3):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	name = string			
+	string = string+".h5"
 
-if(isAconnect == 1):
+if(isNet == 2):
+	string = "dropconnect_network"
+	N = 3
+	if(Opt == 1 or Opt == 2):
+		string = string+"_28x28"
+		if(Opt == 1):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	else:
+		string = string +"_11x11"
+		if(Opt == 3):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	name = string			
+	string = string+".h5"		
+
+if(isNet == 3):
 	string = "aconnect_network"
 	
 	if(isBin == 1):
 		string = string+"_bw"
-		N = 6
+		N = 5
 	elif(isBin == 0):
 		N = 4
 	else:
@@ -82,17 +135,17 @@ if(isAconnect == 1):
 		
 
 if N == 1:
-	net = "./Models/no_reg_network.h5"
+	net = "./Models/"+string
 	custom_objects = None
-	name = "noreg_nn"
+	name = name
 elif N == 2:
-	net = "./Models/dropout_network.h5"
+	net = "./Models/"+string
 	custom_objects = None
-	name = "dropout_nn"
+	name = name
 elif N == 3:
-	net = "./Models/dropconnect_network.h5"
+	net = "./Models/"+string
 	custom_objects = {'DropConnect':DropConnect.DropConnect}
-	name = "dropconnect_nn"
+	name = name
 elif N == 4:
 	if(imgsize == [11,11]):
 		if(Q==4):
@@ -112,7 +165,7 @@ elif N == 4:
 			net = "./Models/"+string
 			custom_objects = {'AConnect':AConnect.AConnect}
 			name = "aconnect_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
-		
+"""		
 elif N == 5:
 	if(imgsize == [11,11]):
 		if(Q==4):
@@ -131,9 +184,9 @@ elif N == 5:
 		else:
 			net = "./Models/FCquant_network_28x28_8b.h5"
 			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "FC_quant_nn_28x28_8b"				
+			name = "FC_quant_nn_28x28_8b" """				
 		
-elif N == 6:
+elif N == 5:
 	if(imgsize == [11,11]):
 		if(Q==4):
 			net = "./Models/"+string

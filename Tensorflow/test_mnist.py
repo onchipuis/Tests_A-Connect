@@ -64,10 +64,15 @@ else:
 #### Select network to train
 N = input("Please select the network you want to train: \n 0. No reg \n 1. With Dropout \n 2. With DropConnect \n 3. With A-Connect \n Option: ")
 N = int(N)
-if(N==3):
-	isAconnect = 1
-else:
-	isAconnect = 0
+if(N==0):
+	isNet = 0	#For no reg
+elif N==1:
+	isNet = 1  #For dropout
+elif N==2:
+	isNet = 2  #For dropconnect
+elif N==3:
+	isNet = 3  #For Aconnect		
+	
 
 if(N==0):
 	string = "no_reg_network"
@@ -77,7 +82,7 @@ elif(N==2):
 	string = "dropconnect_network"
 elif(N==3):
 	string = "aconnect_network"
-	if(isBin=="yes"):
+	if(isBin==1):
 		if(Wstd !=0 or Bstd !=0):
 			string = string+'_bw'
 		else:
@@ -122,7 +127,7 @@ np.savetxt('./Models/Training data/'+string+'_val_acc'+'.txt',val_acc,fmt="%.2f"
 string = './Models/'+string+'.h5'
 model.save(string,include_optimizer=True)
 
-options = [str(Opt), str(Wstd), str(Bstd), str(isBin), str(isAconnect)]
+options = [str(Opt), str(Wstd), str(Bstd), str(isBin), str(isNet)]
 data = "Train_Options.txt"
 f = open(data,"w")
 for i in options:
