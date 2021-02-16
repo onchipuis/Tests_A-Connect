@@ -165,6 +165,26 @@ elif N == 4:
 			net = "./Models/"+string
 			custom_objects = {'AConnect':AConnect.AConnect}
 			name = "aconnect_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+			
+elif N == 5:
+	if(imgsize == [11,11]):
+		if(Q==4):
+			net = "./Models/"+string
+			custom_objects = {'AConnect':AConnect.AConnect}
+			name = "aconnect_bw_nn_11x11_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+		else:
+			net = "./Models/"+string
+			custom_objects = {'AConnect':AConnect.AConnect}
+			name = "aconnect_bw_nn_11x11_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+	else:			
+		if(Q==4):
+			net = "./Models/"+string
+			custom_objects = {'AConnect':AConnect.AConnect}
+			name = "aconnect_bw_nn_28x28_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+		else:
+			net = "./Models/"+string
+			custom_objects = {'AConnect':AConnect.AConnect}
+			name = "aconnect_bw_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))			
 """		
 elif N == 5:
 	if(imgsize == [11,11]):
@@ -186,25 +206,7 @@ elif N == 5:
 			custom_objects = {'AConnect':AConnect.AConnect}
 			name = "FC_quant_nn_28x28_8b" """				
 		
-elif N == 5:
-	if(imgsize == [11,11]):
-		if(Q==4):
-			net = "./Models/"+string
-			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_bw_nn_11x11_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
-		else:
-			net = "./Models/"+string
-			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_bw_nn_11x11_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
-	else:			
-		if(Q==4):
-			net = "./Models/"+string
-			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_bw_nn_28x28_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
-		else:
-			net = "./Models/"+string
-			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_bw_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+
 
 
 
@@ -216,7 +218,7 @@ starttime = now.time()
 print('\n\n*******************************************************************************************\n\n')
 print('TESTING NETWORK: ', name)
 print('\n\n*******************************************************************************************')
-acc_noisy, media = MCsim.MCsim(net,x_test,y_test,1000,0.5,0.5,"no",name,custom_objects)
+acc_noisy, media = MCsim.MCsim(net,x_test,y_test,1000,0.5,0.5,"no",0.9,name,custom_objects)
 #####
 now = datetime.now()
 endtime = now.time()
