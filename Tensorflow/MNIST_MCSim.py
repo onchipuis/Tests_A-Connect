@@ -4,6 +4,7 @@ from Networks import MNIST_mismatch
 import multiprocessing as mp
 from multiprocessing import Pool
 import time
+
 from Scripts import MCsim
 from Layers import DropConnect
 from Layers import AConnect
@@ -15,8 +16,14 @@ import matplotlib.pyplot as plt
 config = open('config.txt','r')
 folder = config.read()
 
+f = open("Train_Options.txt",'r')
+options = f.readlines()
+Opt = int(options[0])
+Wstd = float(options[1])	
+Bstd = float(options[2])	
+isBin = int(options[3])
+isAconnect = int(options[4])
 
-Opt = 3 
 batch_size = 256
 if(Opt == 1): #For standard MNIST 28x28 8 bits
 	imgsize = [28,28]
@@ -35,7 +42,7 @@ else:
 
 (x_train, y_train), (x_test, y_test) = load_ds.load_ds(imgsize,Q)
 ##### Normalize dataset
-normalize = 'yes' #DO you want to normalize the input data?
+normalize = 'no' #DO you want to normalize the input data?
 if(normalize == 'yes'):
 	if(Q==8):
 		x_train = x_train/255
@@ -48,8 +55,31 @@ if(normalize == 'yes'):
 
 
 acc_noisy = np.zeros((1000,1))
-N = 6
-Wstd = '50%'
+
+if(isAconnect == 1):
+	string = "aconnect_network"
+	
+	if(isBin == 1):
+		string = string+"_bw"
+		N = 6
+	elif(isBin == 0):
+		N = 4
+	else:
+		print('F')
+	if(Opt == 1 or Opt == 2):
+		string = string+"_28x28"
+		if(Opt == 1):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	else:
+		string = string +"_11x11"
+		if(Opt == 3):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
+		
 
 if N == 1:
 	net = "./Models/no_reg_network.h5"
@@ -66,22 +96,22 @@ elif N == 3:
 elif N == 4:
 	if(imgsize == [11,11]):
 		if(Q==4):
-			net = "./Models/aconnect_network_11x11_4b.h5"
+			net = "./Models/"+string
 			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_nn_11x11_4b"
+			name = "aconnect_nn_11x11_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 		else:
-			net = "./Models/aconnect_network_11x11_8b.h5"
+			net = "./Models/"+string
 			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_nn_11x11_8b"
+			name = "aconnect_nn_11x11_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 	else:			
 		if(Q==4):
-			net = "./Models/aconnect_network_28x28_4b.h5"
+			net = "./Models/"+string
 			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_nn_28x28_4b"
+			name = "aconnect_nn_28x28_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 		else:
-			net = "./Models/aconnect_network_28x28_8b.h5"
+			net = "./Models/"+string
 			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_nn_28x28_8b"
+			name = "aconnect_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 		
 elif N == 5:
 	if(imgsize == [11,11]):
@@ -106,22 +136,22 @@ elif N == 5:
 elif N == 6:
 	if(imgsize == [11,11]):
 		if(Q==4):
-			net = "./Models/aconnect_network_bw_11x11_4b.h5"
+			net = "./Models/"+string
 			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_bw_nn_11x11_4b"
+			name = "aconnect_bw_nn_11x11_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 		else:
-			net = "./Models/aconnect_network_bw_11x11_8b.h5"
+			net = "./Models/"+string
 			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_bw_nn_11x11_8b"
+			name = "aconnect_bw_nn_11x11_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 	else:			
 		if(Q==4):
-			net = "./Models/aconnect_network_bw_28x28_4b.h5"
+			net = "./Models/"+string
 			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_bw_nn_28x28_4b"
+			name = "aconnect_bw_nn_28x28_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 		else:
-			net = "./Models/aconnect_network_bw_28x28_8b.h5"
+			net = "./Models/"+string
 			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_bw_nn_28x28_8b"
+			name = "aconnect_bw_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 
 
 

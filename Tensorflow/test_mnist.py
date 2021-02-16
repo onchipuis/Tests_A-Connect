@@ -13,7 +13,10 @@ import datetime
 
 ##### Test options configuration
 
-Opt = 3 
+print("Please follow the intructions to configure the dataset you want to use\n")
+
+Opt = input("Please select which dataset do you want to test: \n 1. MNIST 28x28 8 bits \n 2. MNIST 28x28 4 bits \n 3. MNIST 11x11 8 bits \n 4. MNIST 11x11 4 bits \n Option: ")
+Opt = int(Opt)
 batch_size = 256
 if(Opt == 1): #For standard MNIST 28x28 8 bits
 	imgsize = [28,28]
@@ -34,7 +37,7 @@ else:
 
 
 ##### Normalize dataset
-normalize = 'yes' #DO you want to normalize the input data?
+normalize = 'no' #DO you want to normalize the input data?
 if(normalize == 'yes'):
 	if(Q==8):
 		x_train = x_train/255
@@ -46,13 +49,25 @@ if(normalize == 'yes'):
 		print ("Not supported matrix quantization")
 
 ##### Define your Weights and biases standard deviation for training
-Wstd=0.5
-Bstd=0.5
+Wstd=input("Please define the weights standard deviation for training: ")
+Bstd=input("Please define the bias standard deviation for training: ")
+
+Wstd = float(Wstd)
+Bstd = float(Bstd)
 
 #### Do you want binary weights?
-isBin = "yes"
+isBin = input("Do you want binary weights? yes or no: ")
+if(isBin == 'yes'):
+	isBin = 1
+else:
+	isBin = 0
 #### Select network to train
-N = 3
+N = input("Please select the network you want to train: \n 0. No reg \n 1. With Dropout \n 2. With DropConnect \n 3. With A-Connect \n Option: ")
+N = int(N)
+if(N==3):
+	isAconnect = 1
+else:
+	isAconnect = 0
 
 if(N==0):
 	string = "no_reg_network"
@@ -82,21 +97,38 @@ else:
 		string=string+'_28x28_4b'
 	else:
 		string = string+'_28x28_8b'
-	
+
+if(Wstd !=0 or Bstd !=0):
+	if(Wstd != 0):
+		string = string+'_'+str(int(100*Wstd))
+	if(Bstd != 0):
+		string = string+'_'+str(int(100*Bstd))
 	
 optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
 model = MNIST_mismatch.Test_MNIST(N,imgsize,Wstd,Bstd,isBin)
+
+
 print('\n\n*******************************************************************************************\n\n')
 print('TRAINING NETWORK: ', string)
 print('\n\n*******************************************************************************************')
 model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])
-history = model.fit(x_train,y_train,validation_data=(x_test,y_test),epochs = 20,batch_size=batch_size)
+history = model.fit(x_train,y_train,validation_split=0.2,epochs = 20,batch_size=batch_size)
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
 ## Saving the training data
 np.savetxt('./Models/Training data/'+string+'_acc'+'.txt',acc,fmt="%.2f")
 np.savetxt('./Models/Training data/'+string+'_val_acc'+'.txt',val_acc,fmt="%.2f")
 
-model.save('./Models/'+string+'.h5',include_optimizer=True)
+string = './Models/'+string+'.h5'
+model.save(string,include_optimizer=True)
+
+options = [str(Opt), str(Wstd), str(Bstd), str(isBin), str(isAconnect)]
+data = "Train_Options.txt"
+f = open(data,"w")
+for i in options:
+	f.write(i+'\n')
+f.close()
+
+
 
 

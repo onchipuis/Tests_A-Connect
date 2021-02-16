@@ -27,6 +27,8 @@ def add_Wnoise(net,Wstd,Bstd,force,optimizer='Adam',loss=['sparse_categorical_cr
 					if(layers[i].Wstd != 0):
 						if force == "no":
 							Wstd = layers[i].Wstd
+						else:
+							Wstd = Wstd
 					else:
 						Wstd = Wstd
 				else:
@@ -35,6 +37,8 @@ def add_Wnoise(net,Wstd,Bstd,force,optimizer='Adam',loss=['sparse_categorical_cr
 					if(layers[i].Bstd != 0):
 						if force == "no":
 							Bstd = layers[i].Bstd
+						else:
+							Bstd = Bstd
 					else:
 						Bstd = Bstd
 				else:

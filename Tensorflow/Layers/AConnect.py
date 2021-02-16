@@ -62,7 +62,7 @@ class AConnect(tf.keras.layers.Layer):
 		#This code will train the network. For inference, please go to the else part
 		if(training):	
 			if(self.Wstd != 0 or self.Bstd != 0):
-				ID = range(np.size(self.Werr,0)) 	#This line creates a vector with numbers from 0-999 (1000 numbers)
+				"""ID = range(np.size(self.Werr,0)) 	#This line creates a vector with numbers from 0-999 (1000 numbers)
 				ID = tf.random.shuffle(ID) 			#Here is applied a shuffle or permutation of the vector numbers i.e. the output vector
 													#will not have the numbers sorted from 0 to 999. Now the numbers are in random position of the vector.
 													#Before the shuffle ID[0]=0, the, after the shuffle ID[0]=could be any number between 0-999.
@@ -71,26 +71,26 @@ class AConnect(tf.keras.layers.Layer):
 										   																  	
 				if(self.Wstd !=0):							
 					Werr = tf.gather(self.Werr,[loc_id])		#Finally, this line will take only N matrices from the "Pool" of error matrices. Where N is the batch size.          
-					Werr = tf.squeeze(Werr, axis=0)				#This is necessary because gather add an extra dimension. Squeeze remove this dimension.			 
+					self.mWerr = tf.squeeze(Werr, axis=0)				#This is necessary because gather add an extra dimension. Squeeze remove this dimension.			 
 																#That means, with a weights shape of [784,128] and a batch size of 256. Werr should be a tensor with shape	
 																#[256,784,128], but gather return us a tensor with shape [1,256,784,128], so we remove that 1 with squeeze.
 				else:
-					Werr = self.Werr
+					self.mWerr = self.Werr
 				if(self.isBin=='yes'):
 					weights = self.sign(self.W)			#Binarize the weights and multiply them element wise with Werr mask
 				else:
 					weights = self.W	
-				self.memW = tf.multiply(weights,Werr)         	#Finally we multiply element-wise the error matrix with the weights.
+				self.memW = tf.multiply(weights,Werr)			         	#Finally we multiply element-wise the error matrix with the weights.
 						
 				
-				if(self.Bstd !=0):								#For the bias is exactly the same situation
-					Berr = tf.gather(self.Berr, [loc_id])  		 
-					Berr = tf.squeeze(Berr,axis=0)
-				else:
-					Berr = self.Berr
-				self.membias = tf.multiply(self.bias,Berr)
+			#	if(self.Bstd !=0):								#For the bias is exactly the same situation
+			#		Berr = tf.gather(self.Berr, [loc_id])  		 
+			#		self.mBerr = tf.squeeze(Berr,axis=0)
+			#	else:
+			#		self.mBerr = self.Berr
+			#	self.membias = tf.multiply(self.mBerr,self.bias)	"""
 				
-				Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[-1]]) #We need this reshape, beacuse the input data is a column vector with
+				self.Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[-1]]) #We need this reshape, beacuse the input data is a column vector with
 																					# 2 dimension, e.g. in the first layer using MNIST we will have a vector with
 																					#shape [batchsize,784], and we need to do a matrix multiplication.
 																					#Which means the last dimension of the first matrix and the first dimension of the
@@ -100,10 +100,10 @@ class AConnect(tf.keras.layers.Layer):
 																					#Thats why we add an extra dimension, and transpose the vector. At the end we will have a vector with shape [batchsize,1,784].
 																					#And the multiplication result will be correct.
 																					
-				Z = tf.matmul(Xaux, self.memW) 	#Matrix multiplication between input and mask. With output shape [batchsize,1,128]
-				Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
-				Z = tf.add(Z,self.membias) #FInally, we add the bias error mask 
-		
+				#Z = tf.matmul(Xaux, self.memW) 	#Matrix multiplication between input and mask. With output shape [batchsize,1,128]
+				#Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
+				#Z = tf.add(Z,self.membias) #FInally, we add the bias error mask 
+				Z = self.forward(self.W,self.bias,self.Xaux)
 					
 			else:
 				if(self.isBin=='yes'):
@@ -145,7 +145,51 @@ class AConnect(tf.keras.layers.Layer):
 	def sign(self,x):
 		y = tf.math.sign(x)
 		def grad(dy):
-			dydx = tf.divide(dy,abs(self.W))
+			dydx = tf.divide(dy,abs(x))
 			return dydx
 		return y, grad
+	@tf.custom_gradient
+	def forward(self,W,bias,X):
+		ID = range(np.size(self.Werr,0))			#Generate and shuffle a vector of 1000 elements between 0.999
+		ID = tf.random.shuffle(ID)  
+		loc_id = tf.slice(ID, [0], [self.batch_size]) #Take a portion of size batch_size from ID
+		if(self.Wstd !=0):							
+			Werr = tf.gather(self.Werr,[loc_id])		#Finally, this line will take only N matrices from the "Pool" of error matrices. Where N is the batch size.          
+			self.mWerr = tf.squeeze(Werr, axis=0)		
+		else:
+			self.mWerr = self.Werr
+		if(self.isBin=='yes'):
+			weights = tf.math.sign(W)			#Binarize the weights
+		else:
+			weights = W
+		if(self.Bstd !=0):								#For the bias is exactly the same situation
+			Berr = tf.gather(self.Berr, [loc_id])  		 
+			self.mBerr = tf.squeeze(Berr,axis=0)
+		else:
+			self.mBerr = self.Berr
+		weights = tf.reshape(weights, [1,tf.shape(weights)[0],tf.shape(weights)[1]])
+		loc_W = weights*self.mWerr 				#Get the weights with the error matrix included. Also takes the binarization error when isBin=yes
+		bias = tf.reshape(bias, [1,tf.shape(bias)[0]])
+		loc_bias = bias*self.mBerr
+		Z = tf.matmul(X,loc_W)
+		Z = tf.reshape(Z, [self.batch_size,tf.shape(Z)[-1]]) #Reshape Z to column vector
+		Z = tf.add(Z, loc_bias) # Add the bias error mask
+		def grad(dy):
+			if(self.isBin=="yes"):
+				layerW = tf.reshape(W, [1,tf.shape(W)[0],tf.shape(W)[1]])
+				Werr = loc_W/layerW		#If the layer is binary we use Werr as W*/layer.W as algorithm 3 describes.
+			else:
+				Werr = self.mWerr  #If not, Werr will be the same matrices that we multiplied before
+			dy = tf.reshape(dy, [self.batch_size,1,tf.shape(dy)[-1]]) #Reshape dy to [batch,1,outputsize]
+			dX = tf.matmul(dy,loc_W, transpose_b=True) #Activations gradient
+			dX = tf.reshape(dX, [self.batch_size, tf.shape(dX)[-1]])
+			dWerr = tf.matmul(X,dy,transpose_a=True) #Gradient for the error mask of weights
+			dBerr = tf.reshape(dy, [self.batch_size,tf.shape(dy)[-1] ]) #Get the gradient of the error mask of bias with property shape
+			dW = dWerr*Werr #Get the property weights gradient
+			dW = tf.reduce_sum(dW, axis=0)
+			dB = dBerr*self.mBerr #Get the property bias gradient
+			dB = tf.reduce_sum(dB, axis=0)
+			return dW,dB,dX
+		return Z, grad
+			
 
