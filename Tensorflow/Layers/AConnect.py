@@ -62,7 +62,7 @@ class AConnect(tf.keras.layers.Layer):
 		#This code will train the network. For inference, please go to the else part
 		if(training):	
 			if(self.Wstd != 0 or self.Bstd != 0):
-				"""ID = range(np.size(self.Werr,0)) 	#This line creates a vector with numbers from 0-999 (1000 numbers)
+				ID = range(np.size(self.Werr,0)) 	#This line creates a vector with numbers from 0-999 (1000 numbers)
 				ID = tf.random.shuffle(ID) 			#Here is applied a shuffle or permutation of the vector numbers i.e. the output vector
 													#will not have the numbers sorted from 0 to 999. Now the numbers are in random position of the vector.
 													#Before the shuffle ID[0]=0, the, after the shuffle ID[0]=could be any number between 0-999.
@@ -83,12 +83,12 @@ class AConnect(tf.keras.layers.Layer):
 				self.memW = tf.multiply(weights,Werr)			         	#Finally we multiply element-wise the error matrix with the weights.
 						
 				
-			#	if(self.Bstd !=0):								#For the bias is exactly the same situation
-			#		Berr = tf.gather(self.Berr, [loc_id])  		 
-			#		self.mBerr = tf.squeeze(Berr,axis=0)
-			#	else:
-			#		self.mBerr = self.Berr
-			#	self.membias = tf.multiply(self.mBerr,self.bias)	"""
+				if(self.Bstd !=0):								#For the bias is exactly the same situation
+					Berr = tf.gather(self.Berr, [loc_id])  		 
+					self.mBerr = tf.squeeze(Berr,axis=0)
+				else:
+					self.mBerr = self.Berr
+				self.membias = tf.multiply(self.mBerr,self.bias)	
 				
 				self.Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[-1]]) #We need this reshape, beacuse the input data is a column vector with
 																					# 2 dimension, e.g. in the first layer using MNIST we will have a vector with
@@ -100,10 +100,10 @@ class AConnect(tf.keras.layers.Layer):
 																					#Thats why we add an extra dimension, and transpose the vector. At the end we will have a vector with shape [batchsize,1,784].
 																					#And the multiplication result will be correct.
 																					
-				#Z = tf.matmul(Xaux, self.memW) 	#Matrix multiplication between input and mask. With output shape [batchsize,1,128]
-				#Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
-				#Z = tf.add(Z,self.membias) #FInally, we add the bias error mask 
-				Z = self.forward(self.W,self.bias,self.Xaux)
+				Z = tf.matmul(self.Xaux, self.memW) 	#Matrix multiplication between input and mask. With output shape [batchsize,1,128]
+				Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
+				Z = tf.add(Z,self.membias) #FInally, we add the bias error mask 
+				#Z = self.forward(self.W,self.bias,self.Xaux)
 					
 			else:
 				if(self.isBin=='yes'):
@@ -148,6 +148,7 @@ class AConnect(tf.keras.layers.Layer):
 			dydx = tf.divide(dy,abs(x))
 			return dydx
 		return y, grad
+	"""
 	@tf.custom_gradient
 	def forward(self,W,bias,X):
 		ID = range(np.size(self.Werr,0))			#Generate and shuffle a vector of 1000 elements between 0.999
@@ -190,6 +191,6 @@ class AConnect(tf.keras.layers.Layer):
 			dB = dBerr*self.mBerr #Get the property bias gradient
 			dB = tf.reduce_sum(dB, axis=0)
 			return dW,dB,dX
-		return Z, grad
+		return Z, grad """
 			
 

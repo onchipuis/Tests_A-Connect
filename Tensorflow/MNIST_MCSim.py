@@ -218,7 +218,7 @@ starttime = now.time()
 print('\n\n*******************************************************************************************\n\n')
 print('TESTING NETWORK: ', name)
 print('\n\n*******************************************************************************************')
-acc_noisy, media = MCsim.MCsim(net,x_test,y_test,1000,0.5,0.5,"no",0.9,name,custom_objects)
+acc_noisy, media = MCsim.MCsim(net,x_test,y_test,1000,0.5,0.5,"no",0,name,custom_objects)
 #####
 now = datetime.now()
 endtime = now.time()

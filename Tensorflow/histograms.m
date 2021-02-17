@@ -97,6 +97,22 @@ f = figure;
         xlabel('Validation Accuracy'), ylabel('Samples')
         annotation(f,'textbox',[0.59 0.03 0.4 0.4],'String',str4,'FitBoxToText','on');
         
+%%
+acc1 = load('Derr_aconnect_bw_nn_28x28_8b_50_50.txt');
+str1 = strcat('M/IQR:',' ',num2str(median(acc1)),'/',num2str(iqr(acc1)));
+red_fill = [255 213 213]/255;
+f = figure;
 
-        
+        histogram(acc1,'LineWidth',3,'FaceColor',red_fill), title('MC for MNIST 28x28 8 bits @Simerr=50%'),
+        xlabel('Validation Accuracy'), ylabel('Samples')
+        annotation(f,'textbox',[0.15 0.5 0.4 0.4],'String',str1,'FitBoxToText','on');
+%%
+acc1 = load('aconnect_bw_nn_28x28_8b_50_50.txt');
+str1 = strcat('M/IQR:',' ',num2str(median(acc1)),'/',num2str(iqr(acc1)));
+red_fill = [255 213 213]/255;
+f = figure;
+
+        histogram(acc1,'LineWidth',3,'FaceColor',red_fill), title('MC for MNIST 28x28 8 bits @Simerr=50%'),
+        xlabel('Validation Accuracy'), ylabel('Samples')
+        annotation(f,'textbox',[0.15 0.5 0.4 0.4],'String',str1,'FitBoxToText','on');
 

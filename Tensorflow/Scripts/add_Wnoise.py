@@ -47,19 +47,14 @@ def add_Wnoise(net,Wstd,Bstd,force,Derr,optimizer='Adam',loss=['sparse_categoric
 #					
 					Werr = abs(1+Wstd*Merr_aux)
 					Berr = abs(1+Bstd*MBerr_aux)
-					if(Derr != 0):
-						weights = layers[i].weights[0]
-						bias = layers[i].weights[1].numpy()
-						w_shape = np.shape(weights)
-						temp = np.zeros((w_shape[0],w_shape[1]))
-						for rows in range(w_shape[0]):
-							for cols in range(w_shape[1]):
-								if weights[rows][cols] < 0:
-									temp[rows][cols] = weights[rows][cols]*Derr
-								else:
-									temp[rows][cols] = weights[rows][cols]
-						local_weights = (temp,bias)			
-						layers[i].set_weights(local_weights)
+					if(layers[i].isBin == 'yes'):
+						if(Derr != 0):
+							weights = layers[i].weights[0]
+							wp = weights > 0
+							wn = weights <= 0 
+							wn = wn.numpy()
+							wp = wp.numpy()
+							Werr = Derr*wn*Werr + Werr*wp
 					if hasattr(layers[i], 'Wstd'):
 						if(layers[i].Wstd != 0):
 							layers[i].infWerr = Werr

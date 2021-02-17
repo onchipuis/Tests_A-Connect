@@ -59,8 +59,10 @@ Bstd = float(Bstd)
 isBin = input("Do you want binary weights? yes or no: ")
 if(isBin == 'yes'):
 	isBin = 1
+	isBin2 = 'yes'
 else:
 	isBin = 0
+	isBin2 = 'no'	
 #### Select network to train
 N = input("Please select the network you want to train: \n 0. No reg \n 1. With Dropout \n 2. With DropConnect \n 3. With A-Connect \n Option: ")
 N = int(N)
@@ -110,7 +112,7 @@ if(Wstd !=0 or Bstd !=0):
 		string = string+'_'+str(int(100*Bstd))
 	
 optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
-model = MNIST_mismatch.Test_MNIST(N,imgsize,Wstd,Bstd,isBin)
+model = MNIST_mismatch.Test_MNIST(N,imgsize,Wstd,Bstd,isBin2)
 
 
 print('\n\n*******************************************************************************************\n\n')
