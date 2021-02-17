@@ -41,6 +41,6 @@ def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,Derr=0,net_name="Network",custom_obj
 #	print('Min. Accuracy: %.1f%%\n' % 100.0*np.amin(acc_noisy))
 #	print('Max. Accuracy: %.1f%%\n'% 100.0*np.amax(acc_noisy))
 
-	np.savetxt('../Results/'+net_name+'.txt',acc_noisy,fmt="%.2f")
+	np.savetxt('./Results/'+net_name+'.txt',acc_noisy,fmt="%.2f")
 	return acc_noisy, media
 	
