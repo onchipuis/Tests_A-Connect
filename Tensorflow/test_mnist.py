@@ -15,8 +15,8 @@ import datetime
 
 print("Please follow the intructions to configure the dataset you want to use\n")
 
-Opt = input("Please select which dataset do you want to test: \n 1. MNIST 28x28 8 bits \n 2. MNIST 28x28 4 bits \n 3. MNIST 11x11 8 bits \n 4. MNIST 11x11 4 bits \n Option: ")
-Opt = int(Opt)
+#Opt = input("Please select which dataset do you want to test: \n 1. MNIST 28x28 8 bits \n 2. MNIST 28x28 4 bits \n 3. MNIST 11x11 8 bits \n 4. MNIST 11x11 4 bits \n Option: ")
+Opt = 1#int(Opt)
 batch_size = 256
 if(Opt == 1): #For standard MNIST 28x28 8 bits
 	imgsize = [28,28]
@@ -49,14 +49,14 @@ if(normalize == 'yes'):
 		print ("Not supported matrix quantization")
 
 ##### Define your Weights and biases standard deviation for training
-Wstd=input("Please define the weights standard deviation for training: ")
-Bstd=input("Please define the bias standard deviation for training: ")
+Wstd=0.5#input("Please define the weights standard deviation for training: ")
+Bstd=0.5#input("Please define the bias standard deviation for training: ")
 
-Wstd = float(Wstd)
-Bstd = float(Bstd)
+#Wstd = float(Wstd)
+#Bstd = float(Bstd)
 
 #### Do you want binary weights?
-isBin = input("Do you want binary weights? yes or no: ")
+isBin = 'no'#input("Do you want binary weights? yes or no: ")
 if(isBin == 'yes'):
 	isBin = 1
 	isBin2 = 'yes'
@@ -64,8 +64,8 @@ else:
 	isBin = 0
 	isBin2 = 'no'	
 #### Select network to train
-N = input("Please select the network you want to train: \n 0. No reg \n 1. With Dropout \n 2. With DropConnect \n 3. With A-Connect \n 4. With FC_Quant \n 5. With Conv2D \n 6. With Custom Conv2D \n 7. With ConvAConnect \n Option: ")
-N = int(N)
+#N = input("Please select the network you want to train: \n 0. No reg \n 1. With Dropout \n 2. With DropConnect \n 3. With A-Connect \n 4. With FC_Quant \n 5. With Conv2D \n 6. With Custom Conv2D \n 7. With ConvAConnect \n Option: ")
+N = 3#int(N)
 if(N==0):
 	isNet = 0	#For no reg
 elif N==1:
