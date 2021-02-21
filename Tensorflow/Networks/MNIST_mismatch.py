@@ -11,7 +11,6 @@ sys.path.append(folder+'/Layers/')
 sys.path.append(folder+'/Scripts/')
 from Layers import FC_quant
 from Layers import DropConnect
-from Layers import DropLayer
 from Layers import fullyconnected
 from Layers import AConnect
 from Layers import Conv
