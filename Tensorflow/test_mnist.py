@@ -64,7 +64,7 @@ else:
 	isBin = 0
 	isBin2 = 'no'	
 #### Select network to train
-N = input("Please select the network you want to train: \n 0. No reg \n 1. With Dropout \n 2. With DropConnect \n 3. With A-Connect \n Option: ")
+N = input("Please select the network you want to train: \n 0. No reg \n 1. With Dropout \n 2. With DropConnect \n 3. With A-Connect \n 4. With FC_Quant \n 5. With Conv2D \n 6. With Custom Conv2D \n 7. With ConvAConnect \n Option: ")
 N = int(N)
 if(N==0):
 	isNet = 0	#For no reg
@@ -73,8 +73,13 @@ elif N==1:
 elif N==2:
 	isNet = 2  #For dropconnect
 elif N==3:
-	isNet = 3  #For Aconnect		
-	
+	isNet = 3  #For Aconnect	
+elif N==4:
+	isNet = 4 #For Fc quant
+elif N==5:
+	isNet = 5 #For Convolutional network
+elif N==6:		
+	isNet = 6 #For custom conv network
 
 if(N==0):
 	string = "no_reg_network"
@@ -93,6 +98,12 @@ elif(N==3):
 		string = string
 elif(N==4):
 	string = "FCquant_network"	
+elif(N==5):
+	string = "Conv_network"
+elif(N==6):
+	string = "Custom_Conv_network"
+elif(N==7):
+	string = "AConnect_Conv_network"	
 
 if(imgsize==[11,11]):
 	if(Q == 4):

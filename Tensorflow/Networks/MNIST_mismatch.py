@@ -14,6 +14,8 @@ from Layers import DropConnect
 from Layers import DropLayer
 from Layers import fullyconnected
 from Layers import AConnect
+from Layers import Conv
+from Layers import ConvAConnect
 
 #This scripts define the different network architecture for the training and testing.
 
@@ -95,5 +97,60 @@ def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no"):
 		])
 
 		return model	
-
+	#Convolutional network 
+	if(opt==5):
+	
+		model = tf.keras.Sequential([
+			tf.keras.layers.InputLayer(input_shape=imgsize),
+			tf.keras.layers.Reshape((imgsize[0],imgsize[1],1)),
+			tf.keras.layers.Conv2D(8, kernel_size=(5,5), padding ='same'),
+			tf.keras.layers.BatchNormalization(name='BN1'),
+			tf.keras.layers.ReLU(),
+			tf.keras.layers.Flatten(),
+			tf.keras.layers.Dense(128),
+			tf.keras.layers.BatchNormalization(name='BN2'),
+			tf.keras.layers.ReLU(),
+			tf.keras.layers.Dense(10),
+			tf.keras.layers.Softmax()
+		])
+		
+		return model
+	#Custom Convolutional Network
+	
+	if(opt==6):
+	
+		model = tf.keras.Sequential([
+			tf.keras.layers.InputLayer(input_shape=imgsize),
+			tf.keras.layers.Reshape((imgsize[0],imgsize[1],1)),
+			Conv.Conv(8, kernel_size=(5,5), padding ="valid"),
+			tf.keras.layers.BatchNormalization(name='BN1'),
+			tf.keras.layers.ReLU(),
+			tf.keras.layers.Flatten(),
+			tf.keras.layers.Dense(128),
+			tf.keras.layers.BatchNormalization(name='BN2'),
+			tf.keras.layers.ReLU(),
+			tf.keras.layers.Dense(10),
+			tf.keras.layers.Softmax()
+		])
+		
+		return model
+		
+	if(opt==7):
+	
+		model = tf.keras.Sequential([
+			tf.keras.layers.InputLayer(input_shape=imgsize),
+			tf.keras.layers.Reshape((imgsize[0],imgsize[1],1)),
+			ConvAConnect.ConvAConnect(8, kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin, padding ="valid"),
+			tf.keras.layers.BatchNormalization(name='BN1'),
+			tf.keras.layers.ReLU(),
+			tf.keras.layers.Flatten(),
+			tf.keras.layers.Dense(128),
+			tf.keras.layers.BatchNormalization(name='BN2'),
+			tf.keras.layers.ReLU(),
+			tf.keras.layers.Dense(10),
+			tf.keras.layers.Softmax()
+		])
+		
+		return model		
+	
 	
