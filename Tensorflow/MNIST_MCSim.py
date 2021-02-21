@@ -132,7 +132,29 @@ if(isNet == 3):
 		else:
 			string = string +"_4b"
 	string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
-		
+if(isNet == 7):	
+	string = "AConnect_Conv_network"
+	
+	if(isBin == 1):
+		string = string+"_bw"
+		N = 5
+	elif(isBin == 0):
+		N = 4
+	else:
+		print('F')
+	if(Opt == 1 or Opt == 2):
+		string = string+"_28x28"
+		if(Opt == 1):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	else:
+		string = string +"_11x11"
+		if(Opt == 3):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"	
 
 if N == 1:
 	net = "./Models/"+string
@@ -184,7 +206,26 @@ elif N == 5:
 		else:
 			net = "./Models/"+string
 			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_bw_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))			
+			name = "aconnect_bw_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+elif N == 6:
+	if(imgsize == [11,11]):
+		if(Q==4):
+			net = "./Models/"+string
+			custom_objects = {'ConvAConnect':ConvAConnect.ConvAConnect}
+			name = "aconnect_conv_nn_11x11_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+		else:
+			net = "./Models/"+string
+			custom_objects = {'ConvAConnect':ConvAConnect.ConvAConnect}
+			name = "aconnect_conv_nn_11x11_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+	else:			
+		if(Q==4):
+			net = "./Models/"+string
+			custom_objects = {'ConvAConnect':ConvAConnect.ConvAConnect}
+			name = "aconnect_conv_nn_28x28_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+		else:
+			net = "./Models/"+string
+			custom_objects = {'ConvAConnect':ConvAConnect.ConvAConnect}
+			name = "aconnect_conv_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))							
 """		
 elif N == 5:
 	if(imgsize == [11,11]):

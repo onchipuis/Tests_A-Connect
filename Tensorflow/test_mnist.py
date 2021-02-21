@@ -80,6 +80,8 @@ elif N==5:
 	isNet = 5 #For Convolutional network
 elif N==6:		
 	isNet = 6 #For custom conv network
+elif N==7:
+	isNet = 7 #For convolutional A-Connect	
 
 if(N==0):
 	string = "no_reg_network"

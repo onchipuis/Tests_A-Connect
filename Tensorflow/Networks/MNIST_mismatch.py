@@ -133,7 +133,7 @@ def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no"):
 		])
 		
 		return model
-		
+   #Convolutional network with Aconnect		
 	if(opt==7):
 	
 		model = tf.keras.Sequential([
@@ -149,6 +149,8 @@ def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no"):
 			tf.keras.layers.Dense(10),
 			tf.keras.layers.Softmax()
 		])
+		
+		return model
 		
 		return model		
 	
