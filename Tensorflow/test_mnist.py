@@ -65,7 +65,7 @@ else:
 	isBin2 = 'no'	
 #### Select network to train
 #N = input("Please select the network you want to train: \n 0. No reg \n 1. With Dropout \n 2. With DropConnect \n 3. With A-Connect \n 4. With FC_Quant \n 5. With Conv2D \n 6. With Custom Conv2D \n 7. With ConvAConnect \n Option: ")
-N = 3#int(N)
+N = 7#int(N)
 if(N==0):
 	isNet = 0	#For no reg
 elif N==1:

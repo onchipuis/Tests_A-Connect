@@ -13,10 +13,8 @@ class ConvAConnect(tf.keras.layers.Layer):
 		self.padding = padding	
 		
 	def build(self,input_shape):
-		if(len(input_shape)==4):
-			shape = self.kernel_size + (int(input_shape[-1]),self.filters) ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Ch] RGB
-		else:															   ### THe kernel shape must be [H,W,Channels,#Filters]
-			shape = self.kernel_size + (1,self.filters)
+		shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters)) ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Ch] RGB
+
 		self.W = self.add_weight('kernel',
 								  shape = shape,
 								  initializer = "glorot_uniform",
@@ -30,14 +28,14 @@ class ConvAConnect(tf.keras.layers.Layer):
 				self.infBerr = abs(1+tf.random.normal(shape=[self.filters,],stddev=self.Bstd)) #Bias error vector for inference
 				self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
 													 #This was necessary to change the error matrix/array when Monte Carlo was running.
-				self.Berr = abs(1+tf.random.normal(shape=[500,self.filters],stddev=self.Bstd)) #"Pool" of bias error vectors
+				self.Berr = abs(1+tf.random.normal(shape=[1000,self.filters],stddev=self.Bstd)) #"Pool" of bias error vectors
 																	
 			else:
 				self.Berr = tf.constant(1,dtype=tf.float32)
 			if(self.Wstd): 
 				self.infWerr = abs(1+tf.random.normal(shape=shape,stddev=self.Wstd)) #Weight matrix for inference
 				self.infWerr = self.infWerr.numpy()										 
-				self.Werr = abs(1+tf.random.normal(shape=(1,500)+shape,stddev=self.Wstd)) #"Pool" of weights error matrices. Here I need to add an extra dimension. So I concatenate it. But to concatenate, the two elements must be the same type, in this cases, the two elements must be a list
+				self.Werr = abs(1+tf.random.normal(shape=list((1,1000))+shape,stddev=self.Wstd)) #"Pool" of weights error matrices. Here I need to add an extra dimension. So I concatenate it. But to concatenate, the two elements must be the same type, in this cases, the two elements must be a list
 				self.Werr = tf.squeeze(self.Werr, axis=0) # Remove the extra dimension
 				 
 			else:
@@ -70,8 +68,7 @@ class ConvAConnect(tf.keras.layers.Layer):
 					weights=self.sign(self.W)
 				else:
 					weights=self.W
-				memW = tf.multiply(weights, Werr)
-#				print(np.shape(memW))
+				memW = tf.multiply(weights,Werr)
 				if(self.Bstd != 0):
 					Berr = tf.gather(self.Berr, [loc_id])
 					Berr = tf.squeeze(Berr, axis=0)
@@ -106,7 +103,8 @@ class ConvAConnect(tf.keras.layers.Layer):
 				weights=tf.math.sign(self.W)*Werr
 			else:
 				weights=self.W*Werr	
-			Z = self.bias*Berr+tf.nn.convolution(self.X,weights,self.strides,self.padding)						
+			X = float(self.X)
+			Z = self.bias*Berr+tf.nn.convolution(X,weights,self.strides,self.padding)						
 		return Z
 		
 	def get_config(self):

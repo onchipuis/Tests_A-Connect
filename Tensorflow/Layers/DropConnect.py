@@ -47,12 +47,11 @@ class DropConnect(tf.keras.layers.Layer):
 		else:
 			self.Werr = tf.constant(1,dtype=tf.float32) #We need to define the number 1 as a float32.
 			self.Berr = tf.constant(1,dtype=tf.float32)	
-        self.mWerr = 1.0
-        self.mBerr = 1.0
-        self.membias = 1.0
-        self.memW = 1.0
-        self.Xaux = 1.0	
-        super(DropConnect, self).build(input_shape)				
+		self.mWerr = 1.0
+		self.mBerr = 1.0
+		self.membias = 1.0
+		self.Xaux = 1.0	
+		super(DropConnect, self).build(input_shape)				
 	def call(self, X, training):
 		self.X = X
 		self.batch_size = tf.shape(self.X)[0]

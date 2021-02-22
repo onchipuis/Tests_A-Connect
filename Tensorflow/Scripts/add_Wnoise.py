@@ -5,8 +5,8 @@ def add_Wnoise(net,Wstd,Bstd,force,Derr,optimizer='Adam',loss=['sparse_categoric
 	layers = net.layers 
 	Nlayers = np.size(layers)
 	
-	SRAMsz = [1024,1024]
-	SRAMBsz = [1024]
+	SRAMsz = [8192,8192]
+	SRAMBsz = [8192]
 	
 	Merr = np.random.randn(SRAMsz[0],SRAMsz[1])
 	Merr = Merr.astype('float32')	
@@ -22,6 +22,9 @@ def add_Wnoise(net,Wstd,Bstd,force,Derr,optimizer='Adam',loss=['sparse_categoric
 				Bsz = np.shape(layers[i].weights[1])
 				Merr_aux = Merr[0:Wsz[0], 0:Wsz[1]]
 				MBerr_aux = MBerr[0:Bsz[0]]
+				#print(np.shape(Merr_aux)
+				if hasattr(layers[i],'strides'):
+					Merr_aux = np.reshape(Merr_aux,[Wsz[0],Wsz[1],1,1])
 				
 				if hasattr(layers[i], 'Wstd'):
 					if(layers[i].Wstd != 0):

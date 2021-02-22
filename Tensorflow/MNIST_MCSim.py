@@ -10,6 +10,7 @@ from Layers import DropConnect
 from Layers import AConnect
 from Layers import fullyconnected
 from Layers import FC_quant
+from Layers import ConvAConnect
 from Scripts import load_ds
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -132,14 +133,33 @@ if(isNet == 3):
 		else:
 			string = string +"_4b"
 	string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
+
+if(isNet == 6):
+	string = "Custom_Conv_network"
+	N = 3
+	if(Opt == 1 or Opt == 2):
+		string = string+"_28x28"
+		if(Opt == 1):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	else:
+		string = string +"_11x11"
+		if(Opt == 3):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	name = string			
+	string = string+".h5"	
+		
 if(isNet == 7):	
 	string = "AConnect_Conv_network"
 	
 	if(isBin == 1):
 		string = string+"_bw"
-		N = 5
+		N = 6
 	elif(isBin == 0):
-		N = 4
+		N = 6
 	else:
 		print('F')
 	if(Opt == 1 or Opt == 2):

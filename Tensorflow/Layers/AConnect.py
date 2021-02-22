@@ -51,11 +51,10 @@ class AConnect(tf.keras.layers.Layer):
 		else:
 			self.Werr = tf.constant(1,dtype=tf.float32) #We need to define the number 1 as a float32.
 			self.Berr = tf.constant(1,dtype=tf.float32)
-        self.mWerr = 1.0
-        self.mBerr = 1.0
-        self.membias = 1.0
-        self.memW = 1.0
-        self.Xaux = 1.0			
+		self.mWerr = 1.0
+		self.mBerr = 1.0
+		self.membias = 1.0
+		self.Xaux = 1.0			
 		super(AConnect, self).build(input_shape)
 		
 	def call(self, X, training=None): #With call we can define all the operations that the layer do in the forward propagation.
