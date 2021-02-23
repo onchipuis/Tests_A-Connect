@@ -13,10 +13,7 @@ class Conv(tf.keras.layers.Layer):
 		self.padding = padding	
 		
 	def build(self,input_shape):
-		if(len(input_shape)==4):
-			shape = self.kernel_size + (int(input_shape[-1]),self.filters) ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Ch] RGB
-		else:															   ### THe kernel shape must be [H,W,Channels,#Filters]
-			shape = self.kernel_size + (1,self.filters)
+		shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters)) ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Ch] RGB
 		self.W = self.add_weight('kernel',
 								  shape = shape,
 								  initializer = "glorot_uniform",
@@ -31,7 +28,7 @@ class Conv(tf.keras.layers.Layer):
 			self.padding = "VALID"
 		super(Conv, self).build(input_shape)
 	def call(self,X,training):
-		self.X = X
+		self.X = float(X)
 		Z = tf.nn.convolution(self.X,self.W,self.strides,self.padding)
 		Z = self.bias+Z
 		return Z

@@ -11,6 +11,7 @@ from Layers import AConnect
 from Layers import fullyconnected
 from Layers import FC_quant
 from Layers import ConvAConnect
+from Layers import Conv
 from Scripts import load_ds
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -134,9 +135,27 @@ if(isNet == 3):
 			string = string +"_4b"
 	string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
 
+if(isNet == 5):
+	string = "Conv_network"
+	N = 7
+	if(Opt == 1 or Opt == 2):
+		string = string+"_28x28"
+		if(Opt == 1):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	else:
+		string = string +"_11x11"
+		if(Opt == 3):
+			string = string +"_8b"
+		else:
+			string = string +"_4b"
+	name = string			
+	string = string+".h5"	
+
 if(isNet == 6):
 	string = "Custom_Conv_network"
-	N = 3
+	N = 8
 	if(Opt == 1 or Opt == 2):
 		string = string+"_28x28"
 		if(Opt == 1):
@@ -245,7 +264,15 @@ elif N == 6:
 		else:
 			net = "./Models/"+string
 			custom_objects = {'ConvAConnect':ConvAConnect.ConvAConnect}
-			name = "aconnect_conv_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))							
+			name = "aconnect_conv_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))	
+elif N == 7:
+	net = "./Models/"+string
+	custom_objects = None
+	name = name		
+elif N == 8:
+	net = "./Models/"+string
+	custom_objects = {'Conv':Conv.Conv}
+	name = name										
 """		
 elif N == 5:
 	if(imgsize == [11,11]):

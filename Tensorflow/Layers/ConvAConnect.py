@@ -35,8 +35,8 @@ class ConvAConnect(tf.keras.layers.Layer):
 			if(self.Wstd): 
 				self.infWerr = abs(1+tf.random.normal(shape=shape,stddev=self.Wstd)) #Weight matrix for inference
 				self.infWerr = self.infWerr.numpy()										 
-				self.Werr = abs(1+tf.random.normal(shape=list((1,1000))+shape,stddev=self.Wstd)) #"Pool" of weights error matrices. Here I need to add an extra dimension. So I concatenate it. But to concatenate, the two elements must be the same type, in this cases, the two elements must be a list
-				self.Werr = tf.squeeze(self.Werr, axis=0) # Remove the extra dimension
+				self.Werr = abs(1+tf.random.normal(shape=list((1000,))+shape,stddev=self.Wstd)) #"Pool" of weights error matrices. Here I need to add an extra dimension. So I concatenate it. But to concatenate, the two elements must be the same type, in this cases, the two elements must be a list
+				#self.Werr = tf.squeeze(self.Werr, axis=0) # Remove the extra dimension
 				 
 			else:
 				self.Werr = tf.constant(1,dtype=tf.float32)
@@ -68,13 +68,15 @@ class ConvAConnect(tf.keras.layers.Layer):
 					weights=self.sign(self.W)
 				else:
 					weights=self.W
+				weights = tf.expand_dims(weights,axis=0)
 				memW = tf.multiply(weights,Werr)
 				if(self.Bstd != 0):
 					Berr = tf.gather(self.Berr, [loc_id])
 					Berr = tf.squeeze(Berr, axis=0)
 				else:
 					Berr = self.Berr
-				membias = tf.multiply(self.bias,Berr)
+				bias = tf.expand_dims(self.bias,axis=0)
+				membias = tf.multiply(bias,Berr)
 				membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])
 				Xaux = tf.reshape(self.X, [1,self.batch_size,tf.shape(self.X)[1],tf.shape(self.X)[2],tf.shape(self.X)[3]])
 				Z = tf.nn.convolution(Xaux,memW,self.strides,self.padding)
