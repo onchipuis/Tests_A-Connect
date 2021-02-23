@@ -105,7 +105,7 @@ elif(N==5):
 elif(N==6):
 	string = "Custom_Conv_network"
 elif(N==7):
-	string = "AConnect_Conv_network"	
+	string = "AConnect_Conv_network_2FC"	
 
 if(imgsize==[11,11]):
 	if(Q == 4):

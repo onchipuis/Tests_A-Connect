@@ -143,10 +143,10 @@ def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no"):
 			tf.keras.layers.BatchNormalization(name='BN1'),
 			tf.keras.layers.ReLU(),
 			tf.keras.layers.Flatten(),
-			tf.keras.layers.Dense(128),
+			AConnect.AConnect(128,Wstd,Bstd,isBin),
 			tf.keras.layers.BatchNormalization(name='BN2'),
 			tf.keras.layers.ReLU(),
-			tf.keras.layers.Dense(10),
+			AConnect.AConnect(10,Wstd,Bstd,isBin),
 			tf.keras.layers.Softmax()
 		])
 		

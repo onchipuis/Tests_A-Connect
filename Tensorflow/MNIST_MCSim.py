@@ -172,7 +172,7 @@ if(isNet == 6):
 	string = string+".h5"	
 		
 if(isNet == 7):	
-	string = "AConnect_Conv_network"
+	string = "AConnect_Conv_network_2FC"
 	
 	if(isBin == 1):
 		string = string+"_bw"
@@ -263,8 +263,8 @@ elif N == 6:
 			name = "aconnect_conv_nn_28x28_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 		else:
 			net = "./Models/"+string
-			custom_objects = {'ConvAConnect':ConvAConnect.ConvAConnect}
-			name = "aconnect_conv_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))	
+			custom_objects = {'ConvAConnect':ConvAConnect.ConvAConnect,'AConnect':AConnect.AConnect}
+			name = "aconnect_conv_2FC_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))	
 elif N == 7:
 	net = "./Models/"+string
 	custom_objects = None
