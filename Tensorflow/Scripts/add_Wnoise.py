@@ -5,8 +5,8 @@ def add_Wnoise(net,Wstd,Bstd,force,Derr,optimizer='Adam',loss=['sparse_categoric
 	layers = net.layers 
 	Nlayers = np.size(layers)
 	
-	SRAMsz = [8192,8192]
-	SRAMBsz = [8192]
+	SRAMsz = [1024,1024]
+	SRAMBsz = [1024]
 	
 	Merr = np.random.randn(SRAMsz[0],SRAMsz[1])
 	Merr = Merr.astype('float32')	
