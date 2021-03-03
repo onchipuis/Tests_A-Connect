@@ -124,7 +124,7 @@ if(Wstd !=0 or Bstd !=0):
 	if(Bstd != 0):
 		string = string+'_'+str(int(100*Bstd))
 	
-optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
+optimizer = tf.keras.optimizers.SGD(learning_rate=0.01,momentum=0.9)
 model = MNIST_mismatch.Test_MNIST(N,imgsize,Wstd,Bstd,isBin2)
 
 

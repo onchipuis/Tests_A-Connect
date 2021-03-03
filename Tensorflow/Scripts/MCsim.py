@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from Layers import fullyconnected
 import tensorflow as tf
 
-def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,Derr=0,net_name="Network",custom_objects=None,optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy']):
+def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,Derr=0,net_name="Network",custom_objects=None,optimizer=tf.keras.optimizers.SGD(learning_rate=0.01,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy']):
 	acc_noisy = np.zeros((M,1))
 	#f = open(net_name,'w')
 	local_net = tf.keras.models.load_model(net,custom_objects = custom_objects)

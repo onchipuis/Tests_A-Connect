@@ -1,12 +1,12 @@
 import numpy as np
 import tensorflow as tf
 
-def add_Wnoise(net,Wstd,Bstd,force,Derr,optimizer='Adam',loss=['sparse_categorical_crossentropy'],metrics=['accuracy']):
+def add_Wnoise(net,Wstd,Bstd,force,Derr,SRAMsz=[1024,1024]],SRAMBsz=[1024]):
 	layers = net.layers 
 	Nlayers = np.size(layers)
 	
-	SRAMsz = [1024,1024]
-	SRAMBsz = [1024]
+	SRAMsz = SRAMsz
+	SRAMBsz = SRAMBsz
 	
 	Merr = np.random.randn(SRAMsz[0],SRAMsz[1])
 	Merr = Merr.astype('float32')	
@@ -24,7 +24,7 @@ def add_Wnoise(net,Wstd,Bstd,force,Derr,optimizer='Adam',loss=['sparse_categoric
 				MBerr_aux = MBerr[0:Bsz[0]]
 				#print(np.shape(Merr_aux)
 				if hasattr(layers[i],'strides'):
-					Merr_aux = np.reshape(Merr_aux,[Wsz[0],Wsz[1],1,1])
+					Merr_aux = np.reshape(Merr_aux,[Wsz[0],Wsz[1],Wsz[2],Wsz[3]])
 				
 				if hasattr(layers[i], 'Wstd'):
 					if(layers[i].Wstd != 0):
