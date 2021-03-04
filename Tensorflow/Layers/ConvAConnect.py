@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 class ConvAConnect(tf.keras.layers.Layer):
-	def __init__(self,filters,kernel_size,Wstd=0,Bstd=0,isBin='no',strides=1,padding='same',**kwargs):
+	def __init__(self,filters,kernel_size,Wstd=0,Bstd=0,isBin='no',strides=1,padding='same',activation=None,**kwargs):
 		super(ConvAConnect, self).__init__()
 		self.filters = filters
 		self.kernel_size = kernel_size
@@ -10,7 +10,8 @@ class ConvAConnect(tf.keras.layers.Layer):
 		self.Bstd = Bstd
 		self.isBin = isBin
 		self.strides = strides
-		self.padding = padding	
+		self.padding = padding
+		self.activation = tf.keras.activations.get(activation) 	
 		
 	def build(self,input_shape):
 		shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters)) ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Ch] RGB
@@ -80,15 +81,22 @@ class ConvAConnect(tf.keras.layers.Layer):
 				membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])
 				Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[1],tf.shape(self.X)[2],tf.shape(self.X)[3]])
 				Z = tf.nn.convolution(Xaux,memW,self.strides,self.padding)
-				#tf.print(np.shape(Z))  
 				Z = tf.reshape(Z, [self.batch_size, tf.shape(Z)[2],tf.shape(Z)[3],tf.shape(Z)[4]])
 				Z = membias+Z
+				if(self.activation==None):
+					Z=Z
+				else:
+					Z=self.activation(Z)					
 			else:
 				if(self.isBin=='yes'):
 					weights=self.sign(self.W)*self.Werr
 				else:
 					weights=self.W*self.Werr
 				Z = self.bias*self.Berr+tf.nn.convolution(self.X,weights,self.strides,self.padding)
+				if(self.activation==None):
+					Z=Z
+				else:
+					Z=self.activation(Z)					
 		else:
 			if(self.Wstd != 0 or self.Bstd !=0):
 				if(self.Wstd !=0):
@@ -107,7 +115,11 @@ class ConvAConnect(tf.keras.layers.Layer):
 			else:
 				weights=self.W*Werr	
 			X = float(self.X)
-			Z = self.bias*Berr+tf.nn.convolution(X,weights,self.strides,self.padding)						
+			Z = self.bias*Berr+tf.nn.convolution(X,weights,self.strides,self.padding)
+			if(self.activation==None):
+				Z=Z
+			else:
+				Z=self.activation(Z)										
 		return Z
 		
 	def get_config(self):
@@ -119,7 +131,8 @@ class ConvAConnect(tf.keras.layers.Layer):
 			'Bstd': self.Bstd,
 			'isBin': self.isBin,
 			'strides': self.strides,
-			'padding': self.padding})
+			'padding': self.padding,
+			'activation':self.activation})
 		return config
 	@tf.custom_gradient
 	def sign(self,x):
