@@ -108,9 +108,7 @@ class AConnect(tf.keras.layers.Layer):
 				Z = tf.matmul(self.Xaux, self.memW) 	#Matrix multiplication between input and mask. With output shape [batchsize,1,128]
 				Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
 				Z = tf.add(Z,self.membias) #FInally, we add the bias error mask 
-				if(self.activation==None):
-					Z=Z
-				else:
+				if(self.activation is not None):
 					Z=self.activation(Z)
 				#Z = self.forward(self.W,self.bias,self.Xaux)
 					
@@ -121,9 +119,7 @@ class AConnect(tf.keras.layers.Layer):
 					self.memW = self.W*self.Werr
 				bias = self.bias*self.Berr
 				Z = tf.add(tf.matmul(self.X,self.memW),bias) #Custom FC layer operation when we don't have Wstd or Bstd.
-				if(self.activation==None):
-					Z=Z
-				else:
+				if(self.activation is not None):
 					Z=self.activation(Z)				
 
 		else:
@@ -140,11 +136,7 @@ class AConnect(tf.keras.layers.Layer):
 			else:
 				weights = self.W*Werr
 			bias = self.bias*Berr		
-			Z = tf.add(tf.matmul(self.X, weights), bias)
-			if(self.activation==None):
-				Z=Z
-			else:
-				Z=self.activation(Z)			
+			Z = tf.add(tf.matmul(self.X, weights), bias)		
 					
 		return Z
 		

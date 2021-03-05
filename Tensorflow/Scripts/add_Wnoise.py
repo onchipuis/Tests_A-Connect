@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
-def add_Wnoise(net,Wstd,Bstd,force,Derr,SRAMsz=[1024,1024]],SRAMBsz=[1024]):
+def add_Wnoise(net,Wstd,Bstd,force,Derr,SRAMsz=[1024,1024],SRAMBsz=[1024]):
 	layers = net.layers 
 	Nlayers = np.size(layers)
 	

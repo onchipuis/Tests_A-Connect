@@ -16,7 +16,7 @@ import datetime
 print("Please follow the intructions to configure the dataset you want to use\n")
 
 #Opt = input("Please select which dataset do you want to test: \n 1. MNIST 28x28 8 bits \n 2. MNIST 28x28 4 bits \n 3. MNIST 11x11 8 bits \n 4. MNIST 11x11 4 bits \n Option: ")
-Opt = 3#int(Opt)
+Opt = 4#int(Opt)
 batch_size = 256
 if(Opt == 1): #For standard MNIST 28x28 8 bits
 	imgsize = [28,28]
@@ -124,7 +124,7 @@ if(Wstd !=0 or Bstd !=0):
 	if(Bstd != 0):
 		string = string+'_'+str(int(100*Bstd))
 	
-optimizer = tf.keras.optimizers.SGD(learning_rate=0.01,momentum=0.9)
+optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
 model = MNIST_mismatch.Test_MNIST(N,imgsize,Wstd,Bstd,isBin2)
 
 
