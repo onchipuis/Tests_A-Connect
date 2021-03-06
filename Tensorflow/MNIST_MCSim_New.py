@@ -1,4 +1,3 @@
-
 import numpy as np
 import multiprocessing as mp
 from multiprocessing import Pool
@@ -15,7 +14,7 @@ import matplotlib.pyplot as plt
 config = open('config.txt','r')
 folder = config.read()
 
-def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,Derr=0,net_name="Network",custom_objects=None,optimizer=tf.keras.optimizers.SGD(learning_rate=0.001,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy']):
+def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,Derr=0,net_name="Network",custom_objects=None,optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy']):
 	acc_noisy = np.zeros((M,1))
 	#f = open(net_name,'w')
 	local_net = tf.keras.models.load_model(net,custom_objects = custom_objects)
@@ -70,20 +69,29 @@ for Opt in range(4):
 	
 			if(isBin == 1):
 				string = string+"_bw"
+				string = string+"_28x28"
+				string = string +"_8b"
+				string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
+			
+				net = "./Models_New/"+string
+				custom_objects = {'AConnect':AConnect.AConnect}
+				name = "aconnect_bw_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 				N = 5
 			elif(isBin == 0):
+				#string = string
+				string = string+"_28x28"
+				string = string +"_8b"
+				string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
+			
+				net = "./Models_New/"+string
+				custom_objects = {'AConnect':AConnect.AConnect}
+				name = "aconnect_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 				N = 4
 			else:
 				print('F')
 		
 		
-			string = string+"_28x28"
-			string = string +"_8b"
-			string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
 			
-			net = "./Models_New/"+string
-			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_bw_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 			
 		now = datetime.now()
 		starttime = now.time()
@@ -91,7 +99,7 @@ for Opt in range(4):
 		print('\n\n*******************************************************************************************\n\n')
 		print('TESTING NETWORK: ', name)
 		print('\n\n*******************************************************************************************')
-		acc_noisy, media = MCsim(net,x_test,y_test,1000,0.5,0.5,"no",0,name,custom_objects)
+		acc_noisy, media = MCsim(net,x_test,y_test,1000,0.0,0.0,"no",0,name,custom_objects)
 		#####
 		now = datetime.now()
 		endtime = now.time()
@@ -119,20 +127,28 @@ for Opt in range(4):
 	
 			if(isBin == 1):
 				string = string+"_bw"
+				string = string+"_28x28"
+				string = string +"_4b"
+				string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
+			
+				net = "./Models_New/"+string
+				custom_objects = {'AConnect':AConnect.AConnect}
+				name = "aconnect_bw_nn_28x28_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 				N = 5
 			elif(isBin == 0):
+				string = string+"_28x28"
+				string = string +"_4b"
+				string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
+			
+				net = "./Models_New/"+string
+				custom_objects = {'AConnect':AConnect.AConnect}
+				name = "aconnect_nn_28x28_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 				N = 4
 			else:
 				print('F')
 		
 		
-			string = string+"_28x28"
-			string = string +"_4b"
-			string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
 			
-			net = "./Models_New/"+string
-			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_bw_nn_28x28_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 	
 		now = datetime.now()
 		starttime = now.time()
@@ -140,7 +156,7 @@ for Opt in range(4):
 		print('\n\n*******************************************************************************************\n\n')
 		print('TESTING NETWORK: ', name)
 		print('\n\n*******************************************************************************************')
-		acc_noisy, media = MCsim(net,x_test,y_test,1000,0.5,0.5,"no",0,name,custom_objects)
+		acc_noisy, media = MCsim(net,x_test,y_test,1000,0.0,0.0,"no",0,name,custom_objects)
 		#####
 		now = datetime.now()
 		endtime = now.time()
@@ -169,20 +185,28 @@ for Opt in range(4):
 	
 			if(isBin == 1):
 				string = string+"_bw"
+				string = string+"_11x11"
+				string = string +"_8b"
+				string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
+			
+				net = "./Models_New/"+string
+				custom_objects = {'AConnect':AConnect.AConnect}
+				name = "aconnect_bw_nn_11x11_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 				N = 5
 			elif(isBin == 0):
+				string = string+"_11x11"
+				string = string +"_8b"
+				string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
+				
+				net = "./Models_New/"+string
+				custom_objects = {'AConnect':AConnect.AConnect}
+				name = "aconnect_nn_11x11_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 				N = 4
 			else:
 				print('F')
 		
 		
-			string = string+"_11x11"
-			string = string +"_4b"
-			string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
 			
-			net = "./Models_New/"+string
-			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_bw_nn_11x11_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 	
 		now = datetime.now()
 		starttime = now.time()
@@ -190,7 +214,7 @@ for Opt in range(4):
 		print('\n\n*******************************************************************************************\n\n')
 		print('TESTING NETWORK: ', name)
 		print('\n\n*******************************************************************************************')
-		acc_noisy, media = MCsim(net,x_test,y_test,1000,0.5,0.5,"no",0,name,custom_objects)
+		acc_noisy, media = MCsim(net,x_test,y_test,1000,0.0,0.0,"no",0,name,custom_objects)
 		#####
 		now = datetime.now()
 		endtime = now.time()
@@ -219,20 +243,28 @@ for Opt in range(4):
 	
 			if(isBin == 1):
 				string = string+"_bw"
+				string = string+"_11x11"
+				string = string +"_4b"
+				string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
+			
+				net = "./Models_New/"+string
+				custom_objects = {'AConnect':AConnect.AConnect}
+				name = "aconnect_bw_nn_11x11_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 				N = 5
 			elif(isBin == 0):
+				string = string+"_11x11"
+				string = string +"_4b"
+				string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
+			
+				net = "./Models_New/"+string
+				custom_objects = {'AConnect':AConnect.AConnect}
+				name = "aconnect_nn_11x11_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 				N = 4
 			else:
 				print('F')
 		
 		
-			string = string+"_11x11"
-			string = string +"_4b"
-			string = string+"_"+str(int(100*Wstd))+"_"+str(int(100*Bstd))+".h5"
 			
-			net = "./Models_New/"+string
-			custom_objects = {'AConnect':AConnect.AConnect}
-			name = "aconnect_bw_nn_11x11_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 	
 		now = datetime.now()
 		starttime = now.time()
@@ -240,7 +272,7 @@ for Opt in range(4):
 		print('\n\n*******************************************************************************************\n\n')
 		print('TESTING NETWORK: ', name)
 		print('\n\n*******************************************************************************************')
-		acc_noisy, media = MCsim(net,x_test,y_test,1000,0.5,0.5,"no",0,name,custom_objects)
+		acc_noisy, media = MCsim(net,x_test,y_test,1000,0.0,0.0,"no",0,name,custom_objects)
 		#####
 		now = datetime.now()
 		endtime = now.time()
@@ -252,10 +284,6 @@ for Opt in range(4):
 		
 	else:
 		raise "Wrong option" 
-
-
-	
-
 
 	
 		

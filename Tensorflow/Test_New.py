@@ -70,7 +70,7 @@ for Opt in range(4):
 			if(Bstd != 0):
 				string = string+'_'+str(int(100*Bstd))
 	
-		optimizer = tf.keras.optimizers.SGD(learning_rate=0.001,momentum=0.9)
+		optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
 		model = Test_MNIST(imgsize,Wstd,Bstd,isBin2)
 
 
@@ -130,7 +130,7 @@ for Opt in range(4):
 			if(Bstd != 0):
 				string = string+'_'+str(int(100*Bstd))
 	
-		optimizer = tf.keras.optimizers.SGD(learning_rate=0.001,momentum=0.9)
+		optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
 		model = Test_MNIST(imgsize,Wstd,Bstd,isBin2)
 
 
@@ -191,7 +191,7 @@ for Opt in range(4):
 			if(Bstd != 0):
 				string = string+'_'+str(int(100*Bstd))
 	
-		optimizer = tf.keras.optimizers.SGD(learning_rate=0.001,momentum=0.9)
+		optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
 		model = Test_MNIST(imgsize,Wstd,Bstd,isBin2)
 
 
@@ -251,7 +251,7 @@ for Opt in range(4):
 			if(Bstd != 0):
 				string = string+'_'+str(int(100*Bstd))
 	
-		optimizer = tf.keras.optimizers.SGD(learning_rate=0.001,momentum=0.9)
+		optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
 		model = Test_MNIST(imgsize,Wstd,Bstd,isBin2)
 
 
