@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 class ConvAConnect(tf.keras.layers.Layer):
-	def __init__(self,filters,kernel_size,Wstd=0,Bstd=0,isBin='no',strides=1,padding='same',activation=None,**kwargs):
+	def __init__(self,filters,kernel_size,Wstd=0,Bstd=0,isBin='no',strides=1,padding="SAME",activation=None,**kwargs):
 		super(ConvAConnect, self).__init__()
 		self.filters = filters
 		self.kernel_size = kernel_size
@@ -44,11 +44,6 @@ class ConvAConnect(tf.keras.layers.Layer):
 		else:
 			self.Werr = tf.constant(1,dtype=tf.float32) #We need to define the number 1 as a float32.
 			self.Berr = tf.constant(1,dtype=tf.float32)
-									
-		if self.padding == 'same' or "same":
-			self.padding = "SAME"
-		elif self.padding == 'valid' or "valid":
-			self.padding = "VALID"
 		super(ConvAConnect, self).build(input_shape)
 	def call(self,X,training):
 		self.X = X
@@ -79,9 +74,9 @@ class ConvAConnect(tf.keras.layers.Layer):
 				bias = tf.expand_dims(self.bias,axis=0)
 				membias = tf.multiply(bias,Berr)                
 				membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])
-				Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[1],tf.shape(self.X)[2],tf.shape(self.X)[3]])
-				Z = tf.nn.convolution(Xaux,memW,self.strides,self.padding)
-				Z = tf.reshape(Z, [self.batch_size, tf.shape(Z)[2],tf.shape(Z)[3],tf.shape(Z)[4]])
+				Xaux = self.X#tf.reshape(self.X, [self.batch_size,tf.shape(self.X)[1],tf.shape(self.X)[2],tf.shape(self.X)[3]])
+				Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(Xaux,1),memW),dtype=tf.float32),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
+				#Z = tf.reshape(Z, [self.batch_size, tf.shape(Z)[2],tf.shape(Z)[3],tf.shape(Z)[4]])
 				Z = membias+Z
 				if(self.activation==None):
 					Z=Z
@@ -121,7 +116,9 @@ class ConvAConnect(tf.keras.layers.Layer):
 			else:
 				Z=self.activation(Z)										
 		return Z
-		
+	def conv(self,tupla):
+		x,kernel = tupla
+		return tf.nn.convolution(x,kernel,strides=self.strides,padding=self.padding)    
 	def get_config(self):
 		config = super(ConvAConnect, self).get_config()
 		config.update({

@@ -20,11 +20,13 @@ def add_Wnoise(net,Wstd,Bstd,force,Derr,SRAMsz=[1024,1024],SRAMBsz=[1024]):
 
 				Wsz = np.shape(layers[i].weights[0])
 				Bsz = np.shape(layers[i].weights[1])
-				Merr_aux = Merr[0:Wsz[0], 0:Wsz[1]]
 				MBerr_aux = MBerr[0:Bsz[0]]
-				#print(np.shape(Merr_aux)
+				#print(Wsz)
 				if hasattr(layers[i],'strides'):
+					Merr_aux = Merr[0:Wsz[0]*Wsz[1], 0:Wsz[2]*Wsz[3]]
 					Merr_aux = np.reshape(Merr_aux,[Wsz[0],Wsz[1],Wsz[2],Wsz[3]])
+				else:
+					Merr_aux = Merr[0:Wsz[0], 0:Wsz[1]]
 				
 				if hasattr(layers[i], 'Wstd'):
 					if(layers[i].Wstd != 0):
