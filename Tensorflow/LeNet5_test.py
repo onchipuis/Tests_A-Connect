@@ -8,6 +8,7 @@ from Scripts import MCsim
 from Layers import AConnect
 from Layers import ConvAConnect
 identifier = [False,True]
+Sim_err = [0, 30, 70, 50]
 for i in range(len(identifier)):
     (x_train, y_train), (x_test, y_test) = load_ds.load_ds()
     x_test = np.float32(x_test)
@@ -35,14 +36,25 @@ for i in range(len(identifier)):
         custom_objects = None
         np.savetxt('./Models/Training data/'+'LeNet5'+'_acc'+'.txt',acc,fmt="%.2f")
         np.savetxt('./Models/Training data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")      
-
+for i in range(len(identifier)):
+    isAConnect = identifier[i]
+    for j in range(len(Sim_err)):
+        Err = Sim_err[j]
+    if Err != 0.5:
+        force = "yes"
+    else:
+        force = "no"
+    if Err == 0:
+        N = 1
+    else:
+        N = 1000
     now = datetime.now()
     starttime = now.time()
     #####
     print('\n\n*******************************************************************************************\n\n')
     print('TESTING NETWORK: ', name)
     print('\n\n*******************************************************************************************')
-    acc_noisy, media = MCsim.MCsim(string,x_test,y_test,1000,0.5,0.5,"no",0,name,custom_objects,SRAMsz=[1024,1024],SRAMBsz=[1024])
+    acc_noisy, media = MCsim.MCsim(string,x_test,y_test,N,Err,Eerr,force,0,name,custom_objects,SRAMsz=[1024,1024],SRAMBsz=[1024])
     #####
     now = datetime.now()
     endtime = now.time()
