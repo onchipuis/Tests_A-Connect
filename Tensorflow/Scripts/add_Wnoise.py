@@ -74,8 +74,7 @@ def add_Wnoise(net,Wstd,Bstd,force,Derr,SRAMsz=[1024,1024],SRAMBsz=[1024]):
 							layers[i].Berr = Berr
 					else:
 						layers[i].Berr = Berr
-				else:
-
+				else:                
 					Werr = abs(1+Wstd*Merr_aux)
 					Berr = abs(1+Bstd*MBerr_aux)
 					weights = layers[i].weights[0]*Werr

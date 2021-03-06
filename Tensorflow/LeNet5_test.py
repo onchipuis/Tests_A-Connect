@@ -1,10 +1,12 @@
 import tensorflow as tf
 import numpy as np
+import time
 from Networks import LeNet5
 from Scripts import load_ds
-import time
 from datetime import datetime
 from Scripts import MCsim
+from Layers import AConnect
+from Layers import ConvAConnect
 identifier = [False,True]
 for i in range(len(identifier)):
     (x_train, y_train), (x_test, y_test) = load_ds.load_ds()

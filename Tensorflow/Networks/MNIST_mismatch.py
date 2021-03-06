@@ -139,7 +139,7 @@ def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no"):
 		model = tf.keras.Sequential([
 			tf.keras.layers.InputLayer(input_shape=imgsize),
 			tf.keras.layers.Reshape((imgsize[0],imgsize[1],1)),
-			ConvAConnect.ConvAConnect(8, kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin, padding ="valid"),
+			ConvAConnect.ConvAConnect(8, kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin, padding ="SAME"),
 			tf.keras.layers.BatchNormalization(name='BN1'),
 			tf.keras.layers.ReLU(),
 			tf.keras.layers.Flatten(),
