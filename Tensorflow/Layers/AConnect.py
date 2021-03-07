@@ -51,11 +51,7 @@ class AConnect(tf.keras.layers.Layer):
 				self.Werr = tf.constant(1,dtype=tf.float32)
 		else:
 			self.Werr = tf.constant(1,dtype=tf.float32) #We need to define the number 1 as a float32.
-			self.Berr = tf.constant(1,dtype=tf.float32)
-		self.mWerr = 1.0
-		self.mBerr = 1.0
-		self.membias = 1.0
-		self.Xaux = 1.0			
+			self.Berr = tf.constant(1,dtype=tf.float32)		
 		super(AConnect, self).build(input_shape)
 		
 	def call(self, X, training=None): #With call we can define all the operations that the layer do in the forward propagation.
@@ -136,8 +132,9 @@ class AConnect(tf.keras.layers.Layer):
 			else:
 				weights = self.W*Werr
 			bias = self.bias*Berr		
-			Z = tf.add(tf.matmul(self.X, weights), bias)		
-					
+			Z = tf.add(tf.matmul(self.X, weights), bias)
+			if(self.activation is not None):
+				Z=self.activation(Z)               				
 		return Z
 		
 	#THis is only for saving purposes. Does not affect the layer performance.	

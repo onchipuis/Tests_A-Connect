@@ -78,9 +78,7 @@ class ConvAConnect(tf.keras.layers.Layer):
 				Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(Xaux,1),memW),dtype=tf.float32),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
 				#Z = tf.reshape(Z, [self.batch_size, tf.shape(Z)[2],tf.shape(Z)[3],tf.shape(Z)[4]])
 				Z = membias+Z
-				if(self.activation==None):
-					Z=Z
-				else:
+				if(self.activation is not None):
 					Z=self.activation(Z)					
 			else:
 				if(self.isBin=='yes'):
@@ -88,9 +86,7 @@ class ConvAConnect(tf.keras.layers.Layer):
 				else:
 					weights=self.W*self.Werr
 				Z = self.bias*self.Berr+tf.nn.convolution(self.X,weights,self.strides,self.padding)
-				if(self.activation==None):
-					Z=Z
-				else:
+				if(self.activation is not None):
 					Z=self.activation(Z)					
 		else:
 			if(self.Wstd != 0 or self.Bstd !=0):
@@ -109,12 +105,10 @@ class ConvAConnect(tf.keras.layers.Layer):
 				weights=tf.math.sign(self.W)*Werr
 			else:
 				weights=self.W*Werr	
-			X = float(self.X)
-			Z = self.bias*Berr+tf.nn.convolution(X,weights,self.strides,self.padding)
-			if(self.activation==None):
-				Z=Z
-			else:
-				Z=self.activation(Z)										
+			bias = self.bias*Berr                
+			Z = bias+tf.nn.convolution(self.X,weights,self.strides,self.padding)	
+			if(self.activation is not None):
+				Z=self.activation(Z)            								
 		return Z
 	def conv(self,tupla):
 		x,kernel = tupla
