@@ -8,19 +8,18 @@ import sys
 config = open('config.txt','r')
 folder = config.read()
 sys.path.append(folder)
-
+sys.path.append(folder+'/Scripts')
+import Scripts 
+from Scripts import addMismatch
 ############ This layer was made using the template provided by Keras. For more info, go to the official site.
 
 class AConnect(tf.keras.layers.Layer): 
-	def __init__(self,output_size,Wstd=0,Bstd=0,isBin = "no",activation=None,**kwargs): #__init__ method is the first method used for an object in python to initialize the ...
+	def __init__(self,output_size,Wstd=0,Bstd=0,isBin = "no",**kwargs): #__init__ method is the first method used for an object in python to initialize the ...
 		super(AConnect, self).__init__()						 		#...object attributes
 		self.output_size = output_size							 		#output_size is the number of neurons of the layer
 		self.Wstd = Wstd										 		#Wstd standard deviation of the weights(number between 0-1. By default is 0)
 		self.Bstd = Bstd										 		#Bstd standard deviation of the bias(number between 0-1. By default is 0)
-		self.isBin = isBin												#if the layer will binarize the weights(String yes or no. By default is no)
-		
-		self.activation = tf.keras.activations.get(activation)          #Do you want to use a non-linear activation function? By default is none. Use string identifiers to use keras activations.
-		                             		
+		self.isBin = isBin                                       		#if the layer will binarize the weights(String yes or no. By default is no)
 		
 	def build(self,input_shape):								 #This method is used for initialize the layer variables that depend on input_shape
 																 #input_shape is automatically computed by tensorflow
@@ -51,7 +50,7 @@ class AConnect(tf.keras.layers.Layer):
 				self.Werr = tf.constant(1,dtype=tf.float32)
 		else:
 			self.Werr = tf.constant(1,dtype=tf.float32) #We need to define the number 1 as a float32.
-			self.Berr = tf.constant(1,dtype=tf.float32)		
+			self.Berr = tf.constant(1,dtype=tf.float32)
 		super(AConnect, self).build(input_shape)
 		
 	def call(self, X, training=None): #With call we can define all the operations that the layer do in the forward propagation.
@@ -104,8 +103,6 @@ class AConnect(tf.keras.layers.Layer):
 				Z = tf.matmul(self.Xaux, self.memW) 	#Matrix multiplication between input and mask. With output shape [batchsize,1,128]
 				Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
 				Z = tf.add(Z,self.membias) #FInally, we add the bias error mask 
-				if(self.activation is not None):
-					Z=self.activation(Z)
 				#Z = self.forward(self.W,self.bias,self.Xaux)
 					
 			else:
@@ -115,8 +112,6 @@ class AConnect(tf.keras.layers.Layer):
 					self.memW = self.W*self.Werr
 				bias = self.bias*self.Berr
 				Z = tf.add(tf.matmul(self.X,self.memW),bias) #Custom FC layer operation when we don't have Wstd or Bstd.
-				if(self.activation is not None):
-					Z=self.activation(Z)				
 
 		else:
 		    #This part of the code will be executed during the inference
@@ -133,8 +128,7 @@ class AConnect(tf.keras.layers.Layer):
 				weights = self.W*Werr
 			bias = self.bias*Berr		
 			Z = tf.add(tf.matmul(self.X, weights), bias)
-			if(self.activation is not None):
-				Z=self.activation(Z)               				
+					
 		return Z
 		
 	#THis is only for saving purposes. Does not affect the layer performance.	
@@ -144,8 +138,7 @@ class AConnect(tf.keras.layers.Layer):
 			'output_size': self.output_size,
 			'Wstd': self.Wstd,
 			'Bstd': self.Bstd,
-			'isBin': self.isBin,
-			'activation': self.activation})
+			'isBin': self.isBin})
 		return config
 		
 	@tf.custom_gradient

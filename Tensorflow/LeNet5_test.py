@@ -7,12 +7,12 @@ from datetime import datetime
 from Scripts import MCsim
 from Layers import AConnect
 from Layers import ConvAConnect
-identifier = [False,True]
+identifier = [True]
 Sim_err = [0, 0.3, 0.7, 0.5]
 (x_train, y_train), (x_test, y_test) = load_ds.load_ds()
-_,_,x_test=LeNet5.LeNet5(x_train,x_test)
+#_,_,x_test=LeNet5.LeNet5(x_train,x_test)
 x_test = np.float32(x_test)
-"""
+
 for i in range(len(identifier)):
     #print(type(x_test))
     isAConnect = identifier[i]
@@ -35,7 +35,7 @@ for i in range(len(identifier)):
         name = 'LeNet5'
         model.save(string,include_optimizer=True)
         np.savetxt('./Models/Training data/'+'LeNet5'+'_acc'+'.txt',acc,fmt="%.2f")
-        np.savetxt('./Models/Training data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f") """     
+        np.savetxt('./Models/Training data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")    
 for k in range(len(identifier)):
     isAConnect = identifier[k]
     if isAConnect:       
