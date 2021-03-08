@@ -32,6 +32,22 @@ def Test_MNIST(imgsize=[28,28],Wstd=0,Bstd=0,isBin="no"):
 ## Elegir que dataset se va a utilizar	
 #Opt = input("Please select which dataset do you want to test: \n 1. MNIST 28x28 8 bits \n 2. MNIST 28x28 4 bits \n 3. MNIST 11x11 8 bits \n 4. MNIST 11x11 4 bits \n Option: ")
 #Opt = int(Opt)
+
+##### Define your Weights and biases standard deviation for training
+Wstd= input("Please define the weights standard deviation for training: ")
+Bstd= input("Please define the bias standard deviation for training: ")
+Wstd = float(Wstd)
+Bstd = float(Bstd)
+
+#### Do you want binary weights?
+isBin = input("Do you want binary weights? yes or no: ")
+if(isBin == 'yes'):
+	isBin = 1
+	isBin2 = 'yes'
+else:
+	isBin = 0
+	isBin2 = 'no'
+
 batch_size = 256
 for Opt in range(4):
 	
@@ -39,10 +55,10 @@ for Opt in range(4):
 		imgsize = [28,28]
 		Q = 8
 		(x_train, y_train), (x_test, y_test) = load_ds.load_ds(imgsize,Q)
-		Wstd = 0.5
-		Bstd = 0.5
-		isBin = 1
-		isBin2 = 'yes'
+		#Wstd = 0.5
+		#Bstd = 0.5
+		##isBin = 1
+		##isBin2 = 'yes'
 		
 		string = "aconnect_network"
 		if(isBin==1):
@@ -99,10 +115,10 @@ for Opt in range(4):
 		imgsize = [28,28]
 		Q = 4
 		(x_train, y_train), (x_test, y_test) = load_ds.load_ds(imgsize,Q)
-		Wstd = 0.5
-		Bstd = 0.5
-		isBin = 1
-		isBin2 = 'yes'
+		#Wstd = 0.5
+		#Bstd = 0.5
+		#isBin = 1
+		#isBin2 = 'yes'
 		
 		string = "aconnect_network"
 		if(isBin==1):
@@ -160,10 +176,10 @@ for Opt in range(4):
 		imgsize = [11,11] 
 		Q = 8
 		(x_train, y_train), (x_test, y_test) = load_ds.load_ds(imgsize,Q)
-		Wstd = 0.5
-		Bstd = 0.5
-		isBin = 1
-		isBin2 = 'yes'
+		#Wstd = 0.5
+		#Bstd = 0.5
+		#isBin = 1
+		#isBin2 = 'yes'
 		
 		string = "aconnect_network"
 		if(isBin==1):
@@ -220,10 +236,10 @@ for Opt in range(4):
 		imgsize = [11,11] 
 		Q = 4
 		(x_train, y_train), (x_test, y_test) = load_ds.load_ds(imgsize,Q)
-		Wstd = 0.5
-		Bstd = 0.5
-		isBin = 1
-		isBin2 = 'yes'
+		#Wstd = 0.5
+		#Bstd = 0.5
+		#isBin = 1
+		#isBin2 = 'yes'
 		
 		string = "aconnect_network"
 		if(isBin==1):

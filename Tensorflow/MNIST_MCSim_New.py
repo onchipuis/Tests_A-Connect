@@ -46,8 +46,11 @@ def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,Derr=0,net_name="Network",custom_obj
 	np.savetxt('./Results_New/'+net_name+'.txt',acc_noisy,fmt="%.2f")
 	return acc_noisy, media
 	
-	
+
+Simerr = input("Please select which Simerr do you want to do inference: ")
+Simerr = float(Simerr)	
 batch_size = 256
+
 for Opt in range(4):
 
 	if(Opt == 0): #For standard MNIST 28x28 8 bits
@@ -62,6 +65,7 @@ for Opt in range(4):
 		Bstd = float(options1[2])	
 		isBin = int(options1[3])
 		isNet = int(options1[4])
+        
 		
 		acc_noisy = np.zeros((1000,1))
 		if(isNet == 3):
@@ -75,7 +79,7 @@ for Opt in range(4):
 			
 				net = "./Models_New/"+string
 				custom_objects = {'AConnect':AConnect.AConnect}
-				name = "aconnect_bw_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+				name = "aconnect_bw_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+"_"+str(int(100*Simerr))
 				N = 5
 			elif(isBin == 0):
 				#string = string
@@ -85,7 +89,7 @@ for Opt in range(4):
 			
 				net = "./Models_New/"+string
 				custom_objects = {'AConnect':AConnect.AConnect}
-				name = "aconnect_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+				name = "aconnect_nn_28x28_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+"_"+str(int(100*Simerr))
 				N = 4
 			else:
 				print('F')
@@ -99,7 +103,7 @@ for Opt in range(4):
 		print('\n\n*******************************************************************************************\n\n')
 		print('TESTING NETWORK: ', name)
 		print('\n\n*******************************************************************************************')
-		acc_noisy, media = MCsim(net,x_test,y_test,1000,0.0,0.0,"no",0,name,custom_objects)
+		acc_noisy, media = MCsim(net,x_test,y_test,1000,Simerr,Simerr,"yes",0,name,custom_objects)
 		#####
 		now = datetime.now()
 		endtime = now.time()
@@ -121,6 +125,7 @@ for Opt in range(4):
 		isBin = int(options2[3])
 		isNet = int(options2[4])
 		
+		
 		acc_noisy = np.zeros((1000,1))
 		if(isNet == 3):
 			string = "aconnect_network"
@@ -133,7 +138,7 @@ for Opt in range(4):
 			
 				net = "./Models_New/"+string
 				custom_objects = {'AConnect':AConnect.AConnect}
-				name = "aconnect_bw_nn_28x28_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+				name = "aconnect_bw_nn_28x28_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+"_"+str(int(100*Simerr))
 				N = 5
 			elif(isBin == 0):
 				string = string+"_28x28"
@@ -142,7 +147,7 @@ for Opt in range(4):
 			
 				net = "./Models_New/"+string
 				custom_objects = {'AConnect':AConnect.AConnect}
-				name = "aconnect_nn_28x28_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+				name = "aconnect_nn_28x28_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+"_"+str(int(100*Simerr))
 				N = 4
 			else:
 				print('F')
@@ -156,7 +161,7 @@ for Opt in range(4):
 		print('\n\n*******************************************************************************************\n\n')
 		print('TESTING NETWORK: ', name)
 		print('\n\n*******************************************************************************************')
-		acc_noisy, media = MCsim(net,x_test,y_test,1000,0.0,0.0,"no",0,name,custom_objects)
+		acc_noisy, media = MCsim(net,x_test,y_test,1000,Simerr,Simerr,"yes",0,name,custom_objects)
 		#####
 		now = datetime.now()
 		endtime = now.time()
@@ -179,6 +184,7 @@ for Opt in range(4):
 		isBin = int(options3[3])
 		isNet = int(options3[4])
 		
+		
 		acc_noisy = np.zeros((1000,1))
 		if(isNet == 3):
 			string = "aconnect_network"
@@ -191,7 +197,7 @@ for Opt in range(4):
 			
 				net = "./Models_New/"+string
 				custom_objects = {'AConnect':AConnect.AConnect}
-				name = "aconnect_bw_nn_11x11_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+				name = "aconnect_bw_nn_11x11_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+"_"+str(int(100*Simerr))
 				N = 5
 			elif(isBin == 0):
 				string = string+"_11x11"
@@ -200,7 +206,7 @@ for Opt in range(4):
 				
 				net = "./Models_New/"+string
 				custom_objects = {'AConnect':AConnect.AConnect}
-				name = "aconnect_nn_11x11_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+				name = "aconnect_nn_11x11_8b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+"_"+str(int(100*Simerr))
 				N = 4
 			else:
 				print('F')
@@ -214,7 +220,7 @@ for Opt in range(4):
 		print('\n\n*******************************************************************************************\n\n')
 		print('TESTING NETWORK: ', name)
 		print('\n\n*******************************************************************************************')
-		acc_noisy, media = MCsim(net,x_test,y_test,1000,0.0,0.0,"no",0,name,custom_objects)
+		acc_noisy, media = MCsim(net,x_test,y_test,1000,Simerr,Simerr,"yes",0,name,custom_objects)
 		#####
 		now = datetime.now()
 		endtime = now.time()
@@ -237,6 +243,7 @@ for Opt in range(4):
 		isBin = int(options4[3])
 		isNet = int(options4[4])
 		
+		
 		acc_noisy = np.zeros((1000,1))
 		if(isNet == 3):
 			string = "aconnect_network"
@@ -249,7 +256,7 @@ for Opt in range(4):
 			
 				net = "./Models_New/"+string
 				custom_objects = {'AConnect':AConnect.AConnect}
-				name = "aconnect_bw_nn_11x11_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+				name = "aconnect_bw_nn_11x11_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+"_"+str(int(100*Simerr))
 				N = 5
 			elif(isBin == 0):
 				string = string+"_11x11"
@@ -258,7 +265,7 @@ for Opt in range(4):
 			
 				net = "./Models_New/"+string
 				custom_objects = {'AConnect':AConnect.AConnect}
-				name = "aconnect_nn_11x11_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
+				name = "aconnect_nn_11x11_4b"+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+"_"+str(int(100*Simerr))
 				N = 4
 			else:
 				print('F')
@@ -272,7 +279,7 @@ for Opt in range(4):
 		print('\n\n*******************************************************************************************\n\n')
 		print('TESTING NETWORK: ', name)
 		print('\n\n*******************************************************************************************')
-		acc_noisy, media = MCsim(net,x_test,y_test,1000,0.0,0.0,"no",0,name,custom_objects)
+		acc_noisy, media = MCsim(net,x_test,y_test,1000,Simerr,Simerr,"yes",0,name,custom_objects)
 		#####
 		now = datetime.now()
 		endtime = now.time()
