@@ -11,7 +11,7 @@ identifier = [True]
 Sim_err = [0, 0.3, 0.5, 0.7]
 Wstd = [0.3, 0.5,0.7]
 Bstd = Wstd
-isBin = "yes"
+isBin = "no"
 (x_train, y_train), (x_test, y_test) = load_ds.load_ds()
 _,x_train,x_test=LeNet5.LeNet5(x_train,x_test)
 x_test = np.float32(x_test)
@@ -66,7 +66,7 @@ for k in range(len(identifier)):
             custom_objects = {'ConvAConnect':ConvAConnect.ConvAConnect,'AConnect':AConnect.AConnect}
             for j in range(len(Sim_err)):
                 Err = Sim_err[j]
-                if Err != 0.5:
+                if Err != Wstd[m]:
                     force = "yes"
                 else:
                     force = "no"

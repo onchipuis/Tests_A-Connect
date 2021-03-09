@@ -73,9 +73,19 @@ class ConvAConnect(tf.keras.layers.Layer):
 				bias = tf.expand_dims(self.bias,axis=0)
 				membias = tf.multiply(bias,Berr)                
 				membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])
-				Xaux = self.X#tf.reshape(self.X, [self.batch_size,tf.shape(self.X)[1],tf.shape(self.X)[2],tf.shape(self.X)[3]])
-				Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(Xaux,1),memW),dtype=tf.float32),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
+				#Xaux = self.X#tf.reshape(self.X, [self.batch_size,tf.shape(self.X)[1],tf.shape(self.X)[2],tf.shape(self.X)[3]])
+				#Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(Xaux,1),memW),dtype=tf.float32),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
 				#Z = tf.reshape(Z, [self.batch_size, tf.shape(Z)[2],tf.shape(Z)[3],tf.shape(Z)[4]])
+				strides = [self.strides,self.strides,self.strides,self.strides]
+				inp_r, F = reshape(self.X,memW,self.batch_size)
+				Z = tf.nn.depthwise_conv2d(
+                        inp_r,
+                        filter=F,
+                        strides=strides,
+                        padding=self.padding)
+				Z = Z_reshape(Z,memW,self.X,self.padding)
+				Z = tf.transpose(Z, [2, 0, 1, 3, 4])
+				Z = tf.reduce_sum(Z, axis=3)                                                        
 				Z = membias+Z					
 			else:
 				if(self.isBin=='yes'):
@@ -124,3 +134,34 @@ class ConvAConnect(tf.keras.layers.Layer):
 			dydx = tf.divide(dy,abs(x))
 			return dydx
 		return y, grad		
+
+def reshape(X,F,batch_size):
+    inp = X
+    F = F
+    batch_size=batch_size
+    H = tf.shape(X)[1]
+    W = tf.shape(X)[2]
+    channels_img = tf.shape(X)[3]
+    channels = channels_img
+    fh = tf.shape(F)[1]
+    fw = tf.shape(F)[2]    
+    out_channels = tf.shape(F)[-1]
+    F = tf.transpose(F, [1, 2, 0, 3, 4])
+    F = tf.reshape(F, [fh, fw, channels*batch_size, out_channels]) 
+    inp_r = tf.transpose(inp, [1, 2, 0, 3])
+    inp_r = tf.reshape(inp_r, [1, H, W, batch_size*channels_img])
+    return inp_r, F          
+def Z_reshape(Z,F,X,padding):
+    batch_size=tf.shape(X)[0]
+    H = tf.shape(X)[1]
+    W = tf.shape(X)[2]
+    channels_img = tf.shape(X)[3]
+    channels = channels_img
+    fh = tf.shape(F)[1]
+    fw = tf.shape(F)[2]    
+    out_channels = tf.shape(F)[-1]
+    if padding == "SAME":
+        out = tf.reshape(Z, [H, W, batch_size, channels, out_channels])
+    if padding == "VALID":
+        out = tf.reshape(Z, [H-fh+1, W-fw+1, batch_size, channels, out_channels])
+    return out         
