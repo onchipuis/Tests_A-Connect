@@ -53,7 +53,7 @@ class ConvAConnect(tf.keras.layers.Layer):
 				ID = tf.random.shuffle(ID)
 				
 				loc_id = tf.slice(ID,[0],[self.batch_size])
-				
+																#All this code works exactly as A-Connect fullyconnected layer.
 				if(self.Wstd != 0):
 					Werr = tf.gather(self.Werr,[loc_id])
 					Werr = tf.squeeze(Werr, axis=0)
@@ -73,20 +73,27 @@ class ConvAConnect(tf.keras.layers.Layer):
 				bias = tf.expand_dims(self.bias,axis=0)
 				membias = tf.multiply(bias,Berr)                
 				membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])
+				#################################WORST OPTION TO DO THE CONVOLUTION###############################################################
 				#Xaux = self.X#tf.reshape(self.X, [self.batch_size,tf.shape(self.X)[1],tf.shape(self.X)[2],tf.shape(self.X)[3]])
 				#Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(Xaux,1),memW),dtype=tf.float32),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
 				#Z = tf.reshape(Z, [self.batch_size, tf.shape(Z)[2],tf.shape(Z)[3],tf.shape(Z)[4]])
-				strides = [self.strides,self.strides,self.strides,self.strides]
-				inp_r, F = reshape(self.X,memW,self.batch_size)
+				##################################################################################################################################
+				#OPTIMIZED LAYER
+				strides = [1,self.strides,self.strides,1]
+				inp_r, F = reshape(self.X,memW,self.batch_size) #Makes the reshape from [batch,H,W,ch] to [1,H,W,Ch*batch] for input. For filters from [batch,fh,fw,Ch,out_ch]  to
+																#[fh,fw,ch*batch,out_ch]
 				Z = tf.nn.depthwise_conv2d(
                         inp_r,
                         filter=F,
                         strides=strides,
                         padding=self.padding)
-				Z = Z_reshape(Z,memW,self.X,self.padding)
-				Z = tf.transpose(Z, [2, 0, 1, 3, 4])
-				Z = tf.reduce_sum(Z, axis=3)                                                        
-				Z = membias+Z					
+				Z = Z_reshape(Z,memW,self.X,self.padding) #Output shape from convolution is [1,newH,newW,batch*Ch*out_ch] so it is reshaped to [newH,newW,batch,Ch,out_ch]
+														  #Where newH and newW are the new image dimensions. This depends on the value of padding
+														  #Padding same: newH = H  and newW = W
+														  #Padding valid: newH = H-fh+1 and newW = W-fw+1
+				Z = tf.transpose(Z, [2, 0, 1, 3, 4]) #Get the property output shape [batch,nH,nW,Ch,out_ch]
+				Z = tf.reduce_sum(Z, axis=3)		#Removes the input channel dimension by adding all this elements                                                        
+				Z = membias+Z					#Add the bias
 			else:
 				if(self.isBin=='yes'):
 					weights=self.sign(self.W)*self.Werr
@@ -134,8 +141,8 @@ class ConvAConnect(tf.keras.layers.Layer):
 			dydx = tf.divide(dy,abs(x))
 			return dydx
 		return y, grad		
-
-def reshape(X,F,batch_size):
+############################AUXILIAR FUNCTIONS##################################################
+def reshape(X,F,batch_size): #Used to reshape the input data and the noisy filters
     inp = X
     F = F
     batch_size=batch_size
@@ -151,7 +158,7 @@ def reshape(X,F,batch_size):
     inp_r = tf.transpose(inp, [1, 2, 0, 3])
     inp_r = tf.reshape(inp_r, [1, H, W, batch_size*channels_img])
     return inp_r, F          
-def Z_reshape(Z,F,X,padding):
+def Z_reshape(Z,F,X,padding): #Used to reshape the output of the layer
     batch_size=tf.shape(X)[0]
     H = tf.shape(X)[1]
     W = tf.shape(X)[2]

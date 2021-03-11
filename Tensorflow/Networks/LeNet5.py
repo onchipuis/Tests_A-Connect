@@ -1,3 +1,6 @@
+
+
+#############################Script to define the LeNet-5 models. With and without A-Connect################3
 import tensorflow as tf
 import numpy as np
 import sys

@@ -1,44 +1,57 @@
+### Script to change the error matrix during inference or introduce the error to the layer weights
+### HOw to
+"""
+Input Parameters
+net: Loaded model
+Wstd: Weights standard deviation for simulation
+Bstd: Bias standard deviation for simulation
+force: When you want to use the training deviation or the simulation deviation
+Derr: Deterministic error
+SRAMsz: ERror matrix size
+SRAMBsz: Error vector size
+This function returns a NoisyNet and the values of Wstd and Bstd used
+"""
 import numpy as np
 import tensorflow as tf
 
 def add_Wnoise(net,Wstd,Bstd,force,Derr,SRAMsz=[1024,1024],SRAMBsz=[1024]):
-	layers = net.layers 
-	Nlayers = np.size(layers)
+	layers = net.layers #Get the list of layers used in the model
+	Nlayers = np.size(layers) #Get the number of layers
 	
-	SRAMsz = SRAMsz
+	SRAMsz = SRAMsz #Takes the size values for the error matrices
 	SRAMBsz = SRAMBsz
 	
-	Merr = np.random.randn(SRAMsz[0],SRAMsz[1])
+	Merr = np.random.randn(SRAMsz[0],SRAMsz[1]) #Takes from a normal distribution a matrix with the defined dimensions
 	Merr = Merr.astype('float32')	
-	MBerr = np.random.randn(SRAMBsz[0])
+	MBerr = np.random.randn(SRAMBsz[0]) #Takes from a normal distribution a vector with the defined dimensions
 	MBerr = MBerr.astype('float32')	
 #	
-	for i in range(Nlayers):
-		if layers[i].count_params() != 0:
+	for i in range(Nlayers): #Iterate over the number of layers
+		if layers[i].count_params() != 0: #If the layer does not have training parameters it is omitted
 
-			if hasattr(layers[i],'kernel') or hasattr(layers[i],'W'): 
+			if hasattr(layers[i],'kernel') or hasattr(layers[i],'W'):  #Does the layer have weights or kernel?
 
-				Wsz = np.shape(layers[i].weights[0])
-				Bsz = np.shape(layers[i].weights[1])
-				MBerr_aux = MBerr[0:Bsz[0]]
+				Wsz = np.shape(layers[i].weights[0]) #Takes the weights/kernel size
+				Bsz = np.shape(layers[i].weights[1]) #Takes the bias size
+				MBerr_aux = MBerr[0:Bsz[0]] #Takes a sample from MBerr of size Bias_size
 				#print(Wsz)
-				if hasattr(layers[i],'strides'):
-					Merr_aux = Merr[0:Wsz[0]*Wsz[1], 0:Wsz[2]*Wsz[3]]
-					Merr_aux = np.reshape(Merr_aux,[Wsz[0],Wsz[1],Wsz[2],Wsz[3]])
+				if hasattr(layers[i],'strides'): #If the layer have the attribute strides means that it is a convolutional layer
+					Merr_aux = Merr[0:Wsz[0]*Wsz[1], 0:Wsz[2]*Wsz[3]] #Takes the sample from Merr of size [Wsz[0]*Wsz[1],Wsz[2]*Wsz[3]]. This is used to get the property number of elementes
+					Merr_aux = np.reshape(Merr_aux,[Wsz[0],Wsz[1],Wsz[2],Wsz[3]]) #Then this matrix is reshaped to the property dimensions
 				else:
-					Merr_aux = Merr[0:Wsz[0], 0:Wsz[1]]
+					Merr_aux = Merr[0:Wsz[0], 0:Wsz[1]] #If the layer does not have strides, it is a FC layer
 				
-				if hasattr(layers[i], 'Wstd'):
-					if(layers[i].Wstd != 0):
-						if force == "no":
+				if hasattr(layers[i], 'Wstd'): #Does the layer have Wstd? if it is true is an A-Connect or DropConnect network
+					if(layers[i].Wstd != 0): #IF the value it is different from zero, the layer is working with the algorithm
+						if force == "no": #Do you want to take the training or simulation Wstd value?
 							Wstd = layers[i].Wstd
 						else:
 							Wstd = Wstd
-					else:
+					else: #If it is false, it means that is working as a normal FC layer
 						Wstd = Wstd
 				else:
-					Wstd = Wstd
-				if hasattr(layers[i], 'Bstd'):
+					Wstd = Wstd #If it is false, is a FC layers
+				if hasattr(layers[i], 'Bstd'): #The same logic is applied for Bstd
 					if(layers[i].Bstd != 0):
 						if force == "no":
 							Bstd = layers[i].Bstd
@@ -48,12 +61,12 @@ def add_Wnoise(net,Wstd,Bstd,force,Derr,SRAMsz=[1024,1024],SRAMBsz=[1024]):
 						Bstd = Bstd
 				else:
 					Bstd = Bstd
-				if hasattr(layers[i],'Werr') or hasattr(layers[i],'Berr'):
+				if hasattr(layers[i],'Werr') or hasattr(layers[i],'Berr'): #Now if the layer have Werr or Berr is an A-Conenct or DropConnect layer
 #					
-					Werr = abs(1+Wstd*Merr_aux)
+					Werr = abs(1+Wstd*Merr_aux) #Create the error matrix taking into account the Wstd and Bstd
 					Berr = abs(1+Bstd*MBerr_aux)
-					if(layers[i].isBin == 'yes'):
-						if(Derr != 0):
+					if(layers[i].isBin == 'yes'): 
+						if(Derr != 0): #Introduce the deterministic error when BW are used
 							weights = layers[i].weights[0]
 							wp = weights > 0
 							wn = weights <= 0 
@@ -62,25 +75,25 @@ def add_Wnoise(net,Wstd,Bstd,force,Derr,SRAMsz=[1024,1024],SRAMBsz=[1024]):
 							Werr = Derr*wn*Werr + Werr*wp
 					if hasattr(layers[i], 'Wstd'):
 						if(layers[i].Wstd != 0):
-							layers[i].infWerr = Werr
+							layers[i].infWerr = Werr #Change the inference error matrix
 						else:			
 							layers[i].Werr = Werr
 					else:
 							layers[i].Werr = Werr					
 					if hasattr(layers[i], 'Bstd'):
 						if(layers[i].Bstd != 0):
-							layers[i].infBerr = Berr
+							layers[i].infBerr = Berr #Change the inference error matrix
 						else:
 							layers[i].Berr = Berr
 					else:
 						layers[i].Berr = Berr
-				else:                
-					Werr = abs(1+Wstd*Merr_aux)
+				else:                #if the layer is not A-Conenct or DropCOnnect the error must be introduced to the weights because it is a normal FC or normal Conv layer
+					Werr = abs(1+Wstd*Merr_aux) #Error matrices
 					Berr = abs(1+Bstd*MBerr_aux)
-					weights = layers[i].weights[0]*Werr
-					bias = layers[i].weights[1]*Berr
-					local_weights = [weights,bias]
-					layers[i].set_weights(local_weights)
+					weights = layers[i].weights[0]*Werr #Introduce the mismatch to the weights
+					bias = layers[i].weights[1]*Berr #Introduce the mismatch to the bias
+					local_weights = [weights,bias] #Create the tuple of modified values
+					layers[i].set_weights(local_weights) #Update the values of the weights
 
 	
 
