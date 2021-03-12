@@ -4,6 +4,8 @@ folder = config.read()
 sys.path.append(folder)
 sys.path.append(folder+'/Layers/')
 sys.path.append(folder+'/Scripts/')
+from Layers import ConvAConnect
+from Layers import AConnect
 
 import tensorflow as tf
 
@@ -41,17 +43,17 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
-		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(5,5), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="same"),
+		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(5,5), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME"),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
-		    ConvAConnect.ConvAConnect(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="same"),
+		    ConvAConnect.ConvAConnect(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME"),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
-		    ConvAConnect.ConvAConnect(filters=384, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="same"),
+		    ConvAConnect.ConvAConnect(filters=384, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME"),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
-		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="same"),
+		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME"),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
@@ -75,12 +77,13 @@ CLASS_NAMES= ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'h
 
 
 
-model=model_creation(isAConnect=False)
+model=model_creation(isAConnect=False,Wstd=0.5,Bstd=0.5)
 #parametros para el entrenamiento
-model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9), metrics=['accuracy'])
+model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.001,momentum=0.9), metrics=['accuracy'])
 print(model.summary())
 model.fit(train_images,train_labels,
-          batch_size=256,epochs=25,
+          batch_size=256,epochs=50,
           validation_split=0.2
           )
+model.evaluate(test_images,test_labels)          
 
