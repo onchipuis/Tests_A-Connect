@@ -14,15 +14,15 @@ from Scripts import addMismatch
 ############ This layer was made using the template provided by Keras. For more info, go to the official site.
 
 class AConnect(tf.keras.layers.Layer): 
-	def __init__(self,output_size,Wstd=0,Bstd=0,isBin = "no",mul=1,**kwargs): #__init__ method is the first method used for an object in python to initialize the ...
+	def __init__(self,output_size,Wstd=0,Bstd=0,isBin = "no",pool=1000,**kwargs): #__init__ method is the first method used for an object in python to initialize the ...
 		super(AConnect, self).__init__()						 		#...object attributes
 		self.output_size = output_size							 		#output_size is the number of neurons of the layer
 		self.Wstd = Wstd										 		#Wstd standard deviation of the weights(number between 0-1. By default is 0)
 		self.Bstd = Bstd										 		#Bstd standard deviation of the bias(number between 0-1. By default is 0)
 		self.isBin = isBin                                       		#if the layer will binarize the weights(String yes or no. By default is no)
-		self.mul = mul                                                  #Multiplier for the pool of error matrices, by default is 1
+		self.pool = pool                                                  #Multiplier for the pool of error matrices, by default is 1
 	def build(self,input_shape):								 #This method is used for initialize the layer variables that depend on input_shape
-																 #input_shape is automatically computed by tensorflow
+								                                    #input_shape is automatically computed by tensorflow
 		self.W = self.add_weight("W",							
 										shape = [int(input_shape[-1]),self.output_size], #Weights matrix 
 										initializer = "glorot_uniform",
@@ -37,14 +37,14 @@ class AConnect(tf.keras.layers.Layer):
 				self.infBerr = abs(1+tf.random.normal(shape=[self.output_size],stddev=self.Bstd)) #Bias error vector for inference
 				self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
 													 #This was necessary to change the error matrix/array when Monte Carlo was running.
-				self.Berr = abs(1+tf.random.normal(shape=[1000,self.output_size],stddev=self.Bstd)) #"Pool" of bias error vectors
+				self.Berr = abs(1+tf.random.normal(shape=[self.pool,self.output_size],stddev=self.Bstd)) #"Pool" of bias error vectors
 																	
 			else:
 				self.Berr = tf.constant(1,dtype=tf.float32)
 			if(self.Wstd): 
 				self.infWerr = abs(1+tf.random.normal(shape=[int(input_shape[-1]),self.output_size],stddev=self.Wstd)) #Weight matrix for inference
 				self.infWerr = self.infWerr.numpy()										 
-				self.Werr = abs(1+tf.random.normal(shape=[1000,int(input_shape[-1]),self.output_size],stddev=self.Wstd)) #"Pool" of weights error matrices.
+				self.Werr = abs(1+tf.random.normal(shape=[self.pool,int(input_shape[-1]),self.output_size],stddev=self.Wstd)) #"Pool" of weights error matrices.
 				 
 			else:
 				self.Werr = tf.constant(1,dtype=tf.float32)
@@ -139,7 +139,7 @@ class AConnect(tf.keras.layers.Layer):
 			'Wstd': self.Wstd,
 			'Bstd': self.Bstd,
 			'isBin': self.isBin,
-            'mul': self.mul})
+            'pool': self.pool})
 		return config
 		
 	@tf.custom_gradient

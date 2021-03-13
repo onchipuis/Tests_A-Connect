@@ -18,7 +18,7 @@ from Layers import ConvAConnect
 
 #This scripts define the different network architecture for the training and testing.
 
-def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no"):
+def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no",pool=1000):
 
 	#Keras dense network with no regularization
 	if(opt==0):
@@ -74,10 +74,10 @@ def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no"):
 		
 		model = tf.keras.Sequential([
 			tf.keras.layers.Flatten(input_shape=imgsize),	
-			AConnect.AConnect(128,Wstd,Bstd,isBin),
+			AConnect.AConnect(128,Wstd,Bstd,isBin,pool),
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.ReLU(),
-			AConnect.AConnect(10,Wstd,Bstd,isBin),
+			AConnect.AConnect(10,Wstd,Bstd,isBin,pool),
 			tf.keras.layers.Softmax()
 		])
 
