@@ -22,9 +22,9 @@ for p in range(len(mul)):
                     wstd = str(int(100*Wstd[l]))
                     bstd = str(int(100*Bstd[l]))
                     if(imgSize[i]==[28,28]):                    
-                        name = 'AConnect_'+'28x28_Wstd'+'_'+wstd+'_'+'pool_'+str(mul[p])+'xbatch' 
+                        name = 'AConnect_'+'28x28'+str(Q[j])+'b'+'_Wstd'+'_'+wstd+'_'+'pool_'+str(mul[p])+'xbatch' 
                     else:
-                        name = 'AConnect_'+'11x11_Bstd'+'_'+wstd+'_'+'pool_'+str(mul[p])+'xbatch' 
+                        name = 'AConnect_'+'11x11'+str(Q[j])+'b'+'_Wstd'+'_'+wstd+'_'+'pool_'+str(mul[p])+'xbatch' 
                     if(isBin[k]=="yes"):
                         name = name+'_BW'
                     (x_train,y_train),(x_test,y_test) = load_ds.load_ds(imgSize=imgSize[i],Quant=Q[j])
@@ -50,9 +50,9 @@ for p in range(len(mul)):
                     wstd = str(int(100*Wstd[l]))
                     bstd = str(int(100*Bstd[l]))
                     if(imgSize[i]==[28,28]):                    
-                        name = 'AConnect_'+'28x28_Wstd'+'_'+wstd+'_'+'pool_'+str(mul[p])+'xbatch' 
+                        name = 'AConnect_'+'28x28'+str(Q[j])+'b'+'_Wstd'+'_'+wstd+'_'+'pool_'+str(mul[p])+'xbatch' 
                     else:
-                        name = 'AConnect_'+'11x11_Wstd'+'_'+wstd+'_'+'pool_'+str(mul[p])+'xbatch'                                                 
+                        name = 'AConnect_'+'11x11'+str(Q[j])+'b'+'_Wstd'+'_'+wstd+'_'+'pool_'+str(mul[p])+'xbatch' 
                     if(isBin[k]=="yes"):
                         name = name+'_BW'
                     (x_train,y_train),(x_test,y_test) = load_ds.load_ds(imgSize=imgSize[i],Quant=Q[j])
