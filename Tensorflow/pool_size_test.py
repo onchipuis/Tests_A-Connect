@@ -14,6 +14,7 @@ isBin = ["no","yes"]
 imgSize = [[28,28],[11,11]]
 Q = [8,4]
 mul = [1,2,4]
+"""
 for p in range(len(mul)):
     for i in range(len(imgSize)):
         for j in range(len(Q)):
@@ -40,7 +41,7 @@ for p in range(len(mul)):
                     string = './Models/'+name+'.h5'#Define the folder and the name of the model to be saved
                     model.save(string,include_optimizer=True)#Save the model
                     np.savetxt('./Models/Training data/'+name+'_acc'+'.txt',acc,fmt="%.2f")#Save in a txt the accuracy and the validation accuracy for further analysis
-                    np.savetxt('./Models/Training data/'+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
+                    np.savetxt('./Models/Training data/'+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")"""
 
 for p in range(len(mul)):
     for i in range(len(imgSize)):
@@ -60,7 +61,7 @@ for p in range(len(mul)):
                     custom_objects = {'AConnect':AConnect.AConnect} #Custom objects for model loading purposes                    
                     for j in range(len(Sim_err)): #Iterate over the sim error vector
                         Err = Sim_err[j]
-                        if Err != Wstd[m]: #If the sim error is different from the training error, do not force the error
+                        if Err != Wstd[l]: #If the sim error is different from the training error, do not force the error
                             force = "yes"
                         else:
                             force = "no"
