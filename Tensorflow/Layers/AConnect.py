@@ -80,7 +80,7 @@ class AConnect(tf.keras.layers.Layer):
 					weights = self.sign(self.W)			#Binarize the weights and multiply them element wise with Werr mask
 				else:
 					weights = self.W	
-				self.memW = tf.multiply(weights,Werr)			         	#Finally we multiply element-wise the error matrix with the weights.
+				self.memW = tf.multiply(weights,self.mWerr)			         	#Finally we multiply element-wise the error matrix with the weights.
 						
 				
 				if(self.Bstd !=0):								#For the bias is exactly the same situation
