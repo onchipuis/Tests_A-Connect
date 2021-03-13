@@ -7,7 +7,7 @@ from Layers import AConnect
 import time
 from datetime import datetime
 
-Wstd = [0.3,0.5,0.7]
+Wstd = [0.5,0.7]
 Bstd = Wstd
 Sim_err = [0,0.3,0.5,0.7]
 isBin = ["no","yes"]
