@@ -28,7 +28,7 @@ for p in range(len(mul)):
                     if(isBin[k]=="yes"):
                         name = name+'_BW'
                     (x_train,y_train),(x_test,y_test) = load_ds.load_ds(imgSize=imgSize[i],Quant=Q[j])
-                    model = MNIST_mismatch.Test_MNIST(3,Wstd=Wstd[l],Bstd=Bstd[l],isBin=isBin[k],pool=256*mul[p])                                                                    
+                    model = MNIST_mismatch.Test_MNIST(3,imgsize=imgSize[i],Wstd=Wstd[l],Bstd=Bstd[l],isBin=isBin[k],pool=256*mul[p])                                                                    
                     optimizer= tf.keras.optimizers.SGD(lr=0.1,momentum=0.9)
                     print("*****************************TRAINING NETWORK*********************")
                     print("\n\t\t\t", name)
