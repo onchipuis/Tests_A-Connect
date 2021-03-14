@@ -7,12 +7,12 @@ from Layers import AConnect
 import time
 from datetime import datetime
 
-Wstd = [0.3,0.5,0.7]
+Wstd = [0.5]
 Bstd = Wstd
 Sim_err = [0,0.3,0.5,0.7]
-isBin = ["no","yes"]
-imgSize = [[28,28],[11,11]]
-Q = [8,4]
+isBin = ["yes"]
+imgSize = [[11,11]]
+Q = [4]
 mul = [1,2,4]
 """
 for p in range(len(mul)):
