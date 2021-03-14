@@ -7,7 +7,7 @@ from Layers import AConnect
 import time
 from datetime import datetime
 
-Wstd = [0.5,0.7]
+Wstd = [0.3,0.5,0.7]
 Bstd = Wstd
 Sim_err = [0,0.3,0.5,0.7]
 isBin = ["no","yes"]
@@ -45,18 +45,18 @@ for p in range(len(mul)):
 
 for p in range(len(mul)):
     for i in range(len(imgSize)):
-        for j in range(len(Q)):
+        for d in range(len(Q)):
             for k in range(len(isBin)):
                 for l in range(len(Wstd)):
                     wstd = str(int(100*Wstd[l]))
                     bstd = str(int(100*Bstd[l]))
                     if(imgSize[i]==[28,28]):                    
-                        name = 'AConnect_'+'28x28_'+str(Q[j])+'b'+'_Wstd'+'_'+wstd+'_'+'pool_'+str(mul[p])+'xbatch' 
+                        name = 'AConnect_'+'28x28_'+str(Q[d])+'b'+'_Wstd'+'_'+wstd+'_'+'pool_'+str(mul[p])+'xbatch' 
                     else:
-                        name = 'AConnect_'+'11x11_'+str(Q[j])+'b'+'_Wstd'+'_'+wstd+'_'+'pool_'+str(mul[p])+'xbatch' 
+                        name = 'AConnect_'+'11x11_'+str(Q[d])+'b'+'_Wstd'+'_'+wstd+'_'+'pool_'+str(mul[p])+'xbatch' 
                     if(isBin[k]=="yes"):
                         name = name+'_BW'
-                    (x_train,y_train),(x_test,y_test) = load_ds.load_ds(imgSize=imgSize[i],Quant=Q[j])
+                    (x_train,y_train),(x_test,y_test) = load_ds.load_ds(imgSize=imgSize[i],Quant=Q[d])
                     net = './Models/'+name+'.h5'
                     custom_objects = {'AConnect':AConnect.AConnect} #Custom objects for model loading purposes                    
                     for j in range(len(Sim_err)): #Iterate over the sim error vector
