@@ -1,8 +1,18 @@
 import numpy as np
 import tensorflow as tf
-
+"""
+Convolutional layer with A-Connect
+INPUT ARGUMENTS:
+-filters: Number of filter that you want to use during the convolution.(Also known as output channels)
+-kernel_size: List with the dimension of the filter. e.g. [3,3]. It must be less than the input data size
+-Wstd and Bstd: Weights and bias standard deviation for training
+-isBin: string yes or no, whenever you want binary weights
+-strides: Number of strides (or steps) that the filter moves during the convolution
+-padding: "SAME" or "VALID". If you want to keep the same size or reduce it.
+-pool: NUmber of error matrices for training. The recomended size is the same as the batch. 
+"""
 class ConvAConnect(tf.keras.layers.Layer):
-	def __init__(self,filters,kernel_size,Wstd=0,Bstd=0,isBin='no',strides=1,padding="SAME",**kwargs):
+	def __init__(self,filters,kernel_size,Wstd=0,Bstd=0,isBin='no',strides=1,padding="VALID",pool=1000,**kwargs):
 		super(ConvAConnect, self).__init__()
 		self.filters = filters
 		self.kernel_size = kernel_size
@@ -11,6 +21,7 @@ class ConvAConnect(tf.keras.layers.Layer):
 		self.isBin = isBin
 		self.strides = strides
 		self.padding = padding
+		self.pool = pool
 		
 	def build(self,input_shape):
 		shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters)) ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Ch] RGB
@@ -28,14 +39,14 @@ class ConvAConnect(tf.keras.layers.Layer):
 				self.infBerr = abs(1+tf.random.normal(shape=[self.filters,],stddev=self.Bstd)) #Bias error vector for inference
 				self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
 													 #This was necessary to change the error matrix/array when Monte Carlo was running.
-				self.Berr = abs(1+tf.random.normal(shape=[1000,self.filters],stddev=self.Bstd)) #"Pool" of bias error vectors
+				self.Berr = abs(1+tf.random.normal(shape=[self.pool,self.filters],stddev=self.Bstd)) #"Pool" of bias error vectors
 																	
 			else:
 				self.Berr = tf.constant(1,dtype=tf.float32)
 			if(self.Wstd): 
 				self.infWerr = abs(1+tf.random.normal(shape=shape,stddev=self.Wstd)) #Weight matrix for inference
 				self.infWerr = self.infWerr.numpy()										 
-				self.Werr = abs(1+tf.random.normal(shape=list((1000,))+shape,stddev=self.Wstd)) #"Pool" of weights error matrices. Here I need to add an extra dimension. So I concatenate it. But to concatenate, the two elements must be the same type, in this cases, the two elements must be a list
+				self.Werr = abs(1+tf.random.normal(shape=list((self.pool,))+shape,stddev=self.Wstd)) #"Pool" of weights error matrices. Here I need to add an extra dimension. So I concatenate it. But to concatenate, the two elements must be the same type, in this cases, the two elements must be a list
 				#self.Werr = tf.squeeze(self.Werr, axis=0) # Remove the extra dimension
 				 
 			else:
@@ -132,7 +143,8 @@ class ConvAConnect(tf.keras.layers.Layer):
 			'Bstd': self.Bstd,
 			'isBin': self.isBin,
 			'strides': self.strides,
-			'padding': self.padding})
+			'padding': self.padding,
+			'pool': self.pool})
 		return config
 	@tf.custom_gradient
 	def sign(self,x):

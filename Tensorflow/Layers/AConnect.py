@@ -4,14 +4,15 @@
 
 import tensorflow as tf
 import numpy as np
-import sys
-config = open('config.txt','r')
-folder = config.read()
-sys.path.append(folder)
-sys.path.append(folder+'/Scripts')
-import Scripts 
-from Scripts import addMismatch
 ############ This layer was made using the template provided by Keras. For more info, go to the official site.
+"""
+Fully Connected layer with A-Connect
+INPUT ARGUMENTS:
+-output_size: Number of neurons that you want in the layer
+-Wstd and Bstd: Weights and bias standard deviation
+-isBin: WHenever you want binary weights
+-pool: NUmber of error matrices for training. The recomended size is the same as the batch. 
+"""
 
 class AConnect(tf.keras.layers.Layer): 
 	def __init__(self,output_size,Wstd=0,Bstd=0,isBin = "no",pool=1000,**kwargs): #__init__ method is the first method used for an object in python to initialize the ...
@@ -149,6 +150,7 @@ class AConnect(tf.keras.layers.Layer):
 			dydx = tf.divide(dy,abs(x))
 			return dydx
 		return y, grad
+###HOW TO IMPLEMENT MANUALLY THE BACKPROPAGATION###		
 	"""
 	@tf.custom_gradient
 	def forward(self,W,bias,X):
