@@ -207,3 +207,4 @@ f = figure;
         subplot(2,2,4), histogram(acc4,'LineWidth',3,'FaceColor',red_fill), title('MC for MNIST 28x28 8 bits @Simerr=70%'),
         xlabel('Validation Accuracy'), ylabel('Samples')
         annotation(f,'textbox',[0.59 0.03 0.4 0.4],'String',str4,'FitBoxToText','on');
+        
