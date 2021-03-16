@@ -98,7 +98,7 @@ class ConvAConnect(tf.keras.layers.Layer):
                         filter=F,
                         strides=strides,
                         padding=self.padding)
-				Z = Z_reshape(Z,memW,self.X,self.padding) #Output shape from convolution is [1,newH,newW,batch*Ch*out_ch] so it is reshaped to [newH,newW,batch,Ch,out_ch]
+				Z = Z_reshape(Z,memW,self.X,self.padding,self.strides) #Output shape from convolution is [1,newH,newW,batch*Ch*out_ch] so it is reshaped to [newH,newW,batch,Ch,out_ch]
 														  #Where newH and newW are the new image dimensions. This depends on the value of padding
 														  #Padding same: newH = H  and newW = W
 														  #Padding valid: newH = H-fh+1 and newW = W-fw+1
@@ -171,7 +171,7 @@ def reshape(X,F,batch_size): #Used to reshape the input data and the noisy filte
     inp_r = tf.transpose(inp, [1, 2, 0, 3])
     inp_r = tf.reshape(inp_r, [1, H, W, batch_size*channels_img])
     return inp_r, F          
-def Z_reshape(Z,F,X,padding): #Used to reshape the output of the layer
+def Z_reshape(Z,F,X,padding,strides): #Used to reshape the output of the layer
     batch_size=tf.shape(X)[0]
     H = tf.shape(X)[1]
     W = tf.shape(X)[2]
