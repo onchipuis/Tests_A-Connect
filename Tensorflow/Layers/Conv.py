@@ -5,7 +5,7 @@ from tensorflow.keras import backend as K
 
 class Conv(tf.keras.layers.Layer):
 
-	def __init__(self,filters,kernel_size,strides=(1,1),padding="VALID",isBin="no",**kwargs):
+	def __init__(self,filters,kernel_size,strides=1,padding="VALID",isBin="no",**kwargs):
 		super(Conv, self).__init__()
 		self.filters = filters
 		self.kernel_size = kernel_size
@@ -26,9 +26,12 @@ class Conv(tf.keras.layers.Layer):
 
 		super(Conv, self).build(input_shape)
 	def call(self,X,training):
-		self.X = float(X)
-		if(isBin=="yes"):
-		    weights = self.sign(self.W)
+		self.X = X
+		if(self.isBin=="yes"):
+			weights = self.sign(self.W)
+		else:
+			weights = self.W
+
 		Z = tf.nn.convolution(self.X,weights,self.strides,self.padding)
 		Z = self.bias+Z
 		return Z

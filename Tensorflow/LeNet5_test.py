@@ -9,9 +9,9 @@ from Layers import AConnect
 from Layers import ConvAConnect
 identifier = [True]				#Which network you want to train/test True for A-Connect false for normal LeNet
 Sim_err = [0, 0.3, 0.5, 0.7]	#Define all the simulation errors
-Wstd = [0.3, 0.5,0.7] 			#Define the stddev for training
+Wstd = [0.3] 			#Define the stddev for training
 Bstd = Wstd
-isBin = "no"					#Do you want binary weights?
+isBin = "yes"					#Do you want binary weights?
 (x_train, y_train), (x_test, y_test) = load_ds.load_ds() #Load dataset
 _,x_train,x_test=LeNet5.LeNet5(x_train,x_test)	#Load x_train, x_test with augmented dimensions. i.e. 32x32
 x_test = np.float32(x_test) #Convert it to float32
@@ -30,7 +30,7 @@ for i in range(len(identifier)): #Iterate over the networks
                 name = name+'_BW'                     
             print("*****************************TRAINING NETWORK*********************")
             print("\n\t\t\t", name)
-            model,_,_=LeNet5.LeNet5(x_train,x_test,isAConnect=isAConnect,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin)#Get the model
+            model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin)#Get the model
             optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)#Define optimizer
             model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])#Compile the model
             print(model.summary())#See the summary
@@ -43,18 +43,22 @@ for i in range(len(identifier)): #Iterate over the networks
             np.savetxt('./Models/Training data/'+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")    
         
     else:
-        model,x_train,x_test=LeNet5.LeNet5(x_train,x_test,isAConnect=isAConnect,isBin="no")	#Same logic is applied here. But is for normal lenet5
+        model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,isBin=isBin)	#Same logic is applied here. But is for normal lenet5
         optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
+        name = 'LeNet5'        
+        if isBin == "yes": 
+            name = name+'_BW'          
         model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])
+        print("*****************************TRAINING NETWORK*********************")
+        print("\n\t\t\t", name)        
         print(model.summary())
         history = model.fit(x_train,y_train,validation_split=0.2,epochs = 20,batch_size=256)
         acc = history.history['accuracy']
         val_acc = history.history['val_accuracy']        
         string = './Models/'+'LeNet5'+'.h5'
-        name = 'LeNet5'
         model.save(string,include_optimizer=True)
         np.savetxt('./Models/Training data/'+'LeNet5'+'_acc'+'.txt',acc,fmt="%.2f")
-        np.savetxt('./Models/Training data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")    @M
+        np.savetxt('./Models/Training data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")   
 """
 This part is for inference. During the following lines the MCSim will be executed.
 """        
