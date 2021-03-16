@@ -22,7 +22,7 @@ class AConnect(tf.keras.layers.Layer):
 		self.Bstd = Bstd										 		#Bstd standard deviation of the bias(number between 0-1. By default is 0)
 		self.isBin = isBin                                       		#if the layer will binarize the weights(String yes or no. By default is no)
 		self.pool = pool                                                  #Multiplier for the pool of error matrices, by default is 1
-		self.dtype = dtype
+		self.d_type = dtype
 	def build(self,input_shape):								 #This method is used for initialize the layer variables that depend on input_shape
 								                                    #input_shape is automatically computed by tensorflow
 		self.W = self.add_weight("W",							
@@ -39,14 +39,14 @@ class AConnect(tf.keras.layers.Layer):
 				self.infBerr = abs(1+tf.random.normal(shape=[self.output_size],stddev=self.Bstd)) #Bias error vector for inference
 				self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
 													 #This was necessary to change the error matrix/array when Monte Carlo was running.
-				self.Berr = abs(1+tf.random.normal(shape=[self.pool,self.output_size],stddev=self.Bstd,dtype=self.dtype)) #"Pool" of bias error vectors
+				self.Berr = abs(1+tf.random.normal(shape=[self.pool,self.output_size],stddev=self.Bstd,dtype=self.d_type)) #"Pool" of bias error vectors
 																	
 			else:
 				self.Berr = tf.constant(1,dtype=tf.float32)
 			if(self.Wstd): 
 				self.infWerr = abs(1+tf.random.normal(shape=[int(input_shape[-1]),self.output_size],stddev=self.Wstd)) #Weight matrix for inference
 				self.infWerr = self.infWerr.numpy()										 
-				self.Werr = abs(1+tf.random.normal(shape=[self.pool,int(input_shape[-1]),self.output_size],stddev=self.Wstd,dtype=self.dtype)) #"Pool" of weights error matrices.
+				self.Werr = abs(1+tf.random.normal(shape=[self.pool,int(input_shape[-1]),self.output_size],stddev=self.Wstd,dtype=self.d_type)) #"Pool" of weights error matrices.
 				 
 			else:
 				self.Werr = tf.constant(1,dtype=tf.float32)
@@ -142,7 +142,7 @@ class AConnect(tf.keras.layers.Layer):
 			'Bstd': self.Bstd,
 			'isBin': self.isBin,
             'pool': self.pool,
-            'dtype': self.dtype})
+            'dtype': self.d_type})
 		return config
 		
 	@tf.custom_gradient
