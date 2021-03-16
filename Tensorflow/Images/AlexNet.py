@@ -55,18 +55,18 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 		    ConvAConnect.ConvAConnect(filters=384, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=8),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
-		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=8),
+		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=128),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
 		    tf.keras.layers.Flatten(),
-		    AConnect.AConnect(4096, Wstd=Wstd,Bstd=Bstd,pool=8),
+		    AConnect.AConnect(4096, Wstd=Wstd,Bstd=Bstd,pool=128),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.Dropout(0.5),
-		    AConnect.AConnect(4096 , Wstd=Wstd,Bstd=Bstd,pool=8),
+		    AConnect.AConnect(4096 , Wstd=Wstd,Bstd=Bstd,pool=128),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.Dropout(0.5),
-		    AConnect.AConnect(10, Wstd=Wstd,Bstd=Bstd,pool=8),
+		    AConnect.AConnect(10, Wstd=Wstd,Bstd=Bstd,pool=128),
             tf.keras.layers.Softmax()
 	    ])
 
