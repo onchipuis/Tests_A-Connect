@@ -183,5 +183,5 @@ def Z_reshape(Z,F,X,padding): #Used to reshape the output of the layer
     if padding == "SAME":
         out = tf.reshape(Z, [H, W, batch_size, channels, out_channels])
     if padding == "VALID":
-        out = tf.reshape(Z, [H-fh+1, W-fw+1, batch_size, channels, out_channels])
+        out = tf.reshape(Z, [tf.floor(float((H-fh)/strides))+1, tf.floor(float((W-fw)/strides))+1, batch_size, channels, out_channels])
     return out         
