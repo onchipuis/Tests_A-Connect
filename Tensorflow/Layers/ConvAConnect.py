@@ -75,14 +75,14 @@ class ConvAConnect(tf.keras.layers.Layer):
 				else:
 					weights=self.W
 				weights = tf.expand_dims(weights,axis=0)
-				memW = tf.multiply(weights,Werr)
+				memW = tf.multiply(weights,float(Werr))
 				if(self.Bstd != 0):
 					Berr = tf.gather(self.Berr, [loc_id])
 					Berr = tf.squeeze(Berr, axis=0)
 				else:
 					Berr = self.Berr
 				bias = tf.expand_dims(self.bias,axis=0)
-				membias = tf.multiply(bias,Berr)                
+				membias = tf.multiply(bias,float(Berr))
 				membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])
 				#################################WORST OPTION TO DO THE CONVOLUTION###############################################################
 				#Xaux = self.X#tf.reshape(self.X, [self.batch_size,tf.shape(self.X)[1],tf.shape(self.X)[2],tf.shape(self.X)[3]])

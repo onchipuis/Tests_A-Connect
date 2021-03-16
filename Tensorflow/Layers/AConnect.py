@@ -82,7 +82,7 @@ class AConnect(tf.keras.layers.Layer):
 					weights = self.sign(self.W)			#Binarize the weights and multiply them element wise with Werr mask
 				else:
 					weights = self.W	
-				self.memW = tf.multiply(weights,self.mWerr)			         	#Finally we multiply element-wise the error matrix with the weights.
+				self.memW = tf.multiply(weights,float(self.mWerr))			         	#Finally we multiply element-wise the error matrix with the weights.
 						
 				
 				if(self.Bstd !=0):								#For the bias is exactly the same situation
@@ -90,7 +90,7 @@ class AConnect(tf.keras.layers.Layer):
 					self.mBerr = tf.squeeze(Berr,axis=0)
 				else:
 					self.mBerr = self.Berr
-				self.membias = tf.multiply(self.mBerr,self.bias)	
+				self.membias = tf.multiply(float(self.mBerr),self.bias)	
 				
 				self.Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[-1]]) #We need this reshape, beacuse the input data is a column vector with
 																					# 2 dimension, e.g. in the first layer using MNIST we will have a vector with
