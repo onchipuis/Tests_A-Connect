@@ -12,7 +12,7 @@ INPUT ARGUMENTS:
 -pool: NUmber of error matrices for training. The recomended size is the same as the batch. 
 """
 class ConvAConnect(tf.keras.layers.Layer):
-	def __init__(self,filters,kernel_size,Wstd=0,Bstd=0,isBin='no',strides=1,padding="VALID",pool=1000,dtype=tf.dtypes.float32,**kwargs):
+	def __init__(self,filters,kernel_size,Wstd=0,Bstd=0,isBin='no',strides=1,padding="VALID",pool=1000,d_type=tf.dtypes.float32,**kwargs):
 		super(ConvAConnect, self).__init__()
 		self.filters = filters
 		self.kernel_size = kernel_size
@@ -22,7 +22,7 @@ class ConvAConnect(tf.keras.layers.Layer):
 		self.strides = strides
 		self.padding = padding
 		self.pool = pool
-		self.d_type = dtype
+		self.d_type = d_type
 	def build(self,input_shape):
 		shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters)) ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Ch] RGB
 
@@ -145,7 +145,7 @@ class ConvAConnect(tf.keras.layers.Layer):
 			'strides': self.strides,
 			'padding': self.padding,
 			'pool': self.pool,
-			'dtype': self.d_type})
+			'd_type': self.d_type})
 		return config
 	@tf.custom_gradient
 	def sign(self,x):

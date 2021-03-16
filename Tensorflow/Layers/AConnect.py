@@ -15,14 +15,14 @@ INPUT ARGUMENTS:
 """
 
 class AConnect(tf.keras.layers.Layer): 
-	def __init__(self,output_size,Wstd=0,Bstd=0,isBin = "no",pool=1000,dtype=tf.dtypes.float32,**kwargs): #__init__ method is the first method used for an object in python to initialize the ...
+	def __init__(self,output_size,Wstd=0,Bstd=0,isBin = "no",pool=1000,d_type=tf.dtypes.float32,**kwargs): #__init__ method is the first method used for an object in python to initialize the ...
 		super(AConnect, self).__init__()						 		#...object attributes
 		self.output_size = output_size							 		#output_size is the number of neurons of the layer
 		self.Wstd = Wstd										 		#Wstd standard deviation of the weights(number between 0-1. By default is 0)
 		self.Bstd = Bstd										 		#Bstd standard deviation of the bias(number between 0-1. By default is 0)
 		self.isBin = isBin                                       		#if the layer will binarize the weights(String yes or no. By default is no)
 		self.pool = pool                                                  #Multiplier for the pool of error matrices, by default is 1
-		self.d_type = dtype
+		self.d_type = d_type
 	def build(self,input_shape):								 #This method is used for initialize the layer variables that depend on input_shape
 								                                    #input_shape is automatically computed by tensorflow
 		self.W = self.add_weight("W",							
@@ -142,7 +142,7 @@ class AConnect(tf.keras.layers.Layer):
 			'Bstd': self.Bstd,
 			'isBin': self.isBin,
             'pool': self.pool,
-            'dtype': self.d_type})
+            'd_type': self.d_type})
 		return config
 		
 	@tf.custom_gradient
