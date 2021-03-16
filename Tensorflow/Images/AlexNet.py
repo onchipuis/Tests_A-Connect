@@ -41,7 +41,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 		model = tf.keras.models.Sequential([
 			tf.keras.layers.InputLayer(input_shape=[32,32,3]),
 			tf.keras.layers.experimental.preprocessing.Resizing(227,227),    
-		    ConvAConnect.ConvAConnect(filters=96, kernel_size=(11,11),Wstd=Wstd,Bstd=Bstd, strides=4,padding="VALID",pool=32),
+		    ConvAConnect.ConvAConnect(filters=96, kernel_size=(11,11),Wstd=Wstd,Bstd=Bstd, strides=4,padding="VALID",pool=128),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
