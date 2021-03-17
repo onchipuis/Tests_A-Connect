@@ -31,20 +31,20 @@ for i in range(len(identifier)): #Iterate over the networks
             print("*****************************TRAINING NETWORK*********************")
             print("\n\t\t\t", name)
             model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin)#Get the model
-            optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)#Define optimizer
+            optimizer = tf.keras.optimizers.SGD(learning_rate=0.01,momentum=0.9)#Define optimizer
             model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])#Compile the model
             print(model.summary())#See the summary
             history = model.fit(x_train,y_train,validation_split=0.2,epochs = 20,batch_size=256)#Train the model
             acc = history.history['accuracy']#Save the accuracy and the validation accuracy
             val_acc = history.history['val_accuracy']
-            string = './Models/'+'AConnect_LeNet5'+'_Wstd_'+wstd+'_Bstd_'+bstd+'.h5'#Define the folder and the name of the model to be saved
+            string = './Models/'+name+'.h5'#Define the folder and the name of the model to be saved
             model.save(string,include_optimizer=True)#Save the model
             np.savetxt('./Models/Training data/'+name+'_acc'+'.txt',acc,fmt="%.2f")#Save in a txt the accuracy and the validation accuracy for further analysis
             np.savetxt('./Models/Training data/'+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")    
         
     else:
         model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,isBin=isBin)	#Same logic is applied here. But is for normal lenet5
-        optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
+        optimizer = tf.keras.optimizers.SGD(learning_rate=0.01,momentum=0.9)
         name = 'LeNet5'        
         if isBin == "yes": 
             name = name+'_BW'          

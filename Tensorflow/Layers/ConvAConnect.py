@@ -151,7 +151,7 @@ class ConvAConnect(tf.keras.layers.Layer):
 	def sign(self,x):
 		y = tf.math.sign(x)
 		def grad(dy):
-			dydx = tf.divide(dy,abs(x))
+			dydx = tf.divide(dy,abs(x)+1e-5)
 			return dydx
 		return y, grad		
 ############################AUXILIAR FUNCTIONS##################################################

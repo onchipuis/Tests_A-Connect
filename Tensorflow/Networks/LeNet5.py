@@ -55,7 +55,7 @@ def LeNet5(Xtrain=None,Xtest=None,isAConnect=False,Wstd=0,Bstd=0,isBin="no"):
 			tf.keras.layers.Activation('tanh'),                        
 			AConnect.AConnect(84,Wstd,Bstd,isBin=isBin),
 			tf.keras.layers.Activation('tanh'),                        
-			AConnect.AConnect(10,Wstd,Bstd,isBin=isBin),
+			AConnect.AConnect(10,Wstd,Bstd,isBin="yes"),
 			tf.keras.layers.Softmax()							
 		])		
 		
