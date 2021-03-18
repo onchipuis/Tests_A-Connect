@@ -51,7 +51,7 @@ Simerr = input("Please select which Simerr do you want to do inference: ")
 Simerr = float(Simerr)	
 batch_size = 256
 
-for Opt in range(4):
+for Opt in range(1):
 
 	if(Opt == 0): #For standard MNIST 28x28 8 bits
 		imgsize = [28,28]

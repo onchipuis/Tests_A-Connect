@@ -55,6 +55,6 @@ def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,Derr=0,net_name="Network",custom_obj
 #	print('Min. Accuracy: %.1f%%\n' % 100.0*np.amin(acc_noisy))
 #	print('Max. Accuracy: %.1f%%\n'% 100.0*np.amax(acc_noisy))
 
-	np.savetxt('./Results/'+net_name+'_simerr_'+str(100*Wstd)+'_'+str(100*Bstd)+'.txt',acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt
+	np.savetxt('./Results/'+net_name+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt
 	return acc_noisy, media
 	

@@ -16,7 +16,7 @@ import datetime
 print("Please follow the intructions to configure the dataset you want to use\n")
 
 #Opt = input("Please select which dataset do you want to test: \n 1. MNIST 28x28 8 bits \n 2. MNIST 28x28 4 bits \n 3. MNIST 11x11 8 bits \n 4. MNIST 11x11 4 bits \n Option: ")
-Opt = 4#int(Opt)
+Opt = 1#int(Opt)
 batch_size = 256
 if(Opt == 1): #For standard MNIST 28x28 8 bits
 	imgsize = [28,28]
@@ -49,11 +49,11 @@ if(normalize == 'yes'):
 		print ("Not supported matrix quantization")
 
 ##### Define your Weights and biases standard deviation for training
-Wstd=0.5#input("Please define the weights standard deviation for training: ")
-Bstd=0.5#input("Please define the bias standard deviation for training: ")
+Wstd= input("Please define the weights standard deviation for training: ")
+Bstd= input("Please define the bias standard deviation for training: ")
 
-#Wstd = float(Wstd)
-#Bstd = float(Bstd)
+Wstd = float(Wstd)
+Bstd = float(Bstd)
 
 #### Do you want binary weights?
 isBin = 'yes'#input("Do you want binary weights? yes or no: ")
@@ -95,7 +95,7 @@ elif(N==3):
 		if(Wstd !=0 or Bstd !=0):
 			string = string+'_bw'
 		else:
-			string='FCquant_network'
+			string= string+'_bw'
 	else:
 		string = string
 elif(N==4):
@@ -123,6 +123,9 @@ if(Wstd !=0 or Bstd !=0):
 		string = string+'_'+str(int(100*Wstd))
 	if(Bstd != 0):
 		string = string+'_'+str(int(100*Bstd))
+
+else:
+	string = string+'_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))
 	
 optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
 model = MNIST_mismatch.Test_MNIST(N,imgsize,Wstd,Bstd,isBin2)

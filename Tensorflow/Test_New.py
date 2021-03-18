@@ -49,7 +49,7 @@ else:
 	isBin2 = 'no'
 
 batch_size = 256
-for Opt in range(4):
+for Opt in range(1):
 	
 	if(Opt == 0): #For standard MNIST 28x28 8 bits
 		imgsize = [28,28]
