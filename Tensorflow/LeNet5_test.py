@@ -9,18 +9,18 @@ from Layers import AConnect
 from Layers import ConvAConnect
 from Layers import Conv
 from Layers import FC_quant
-identifier = [False,True]				#Which network you want to train/test True for A-Connect false for normal LeNet
+identifier = [True]				#Which network you want to train/test True for A-Connect false for normal LeNet
 Sim_err = [0, 0.3, 0.5, 0.7]	#Define all the simulation errors
-Wstd = [0.3,0.5,0.7] 			#Define the stddev for training
+Wstd = [0] 			#Define the stddev for training
 Bstd = Wstd
 isBin = "yes"					#Do you want binary weights?
 (x_train, y_train), (x_test, y_test) = load_ds.load_ds() #Load dataset
 _,x_train,x_test=LeNet5.LeNet5(x_train,x_test)	#Load x_train, x_test with augmented dimensions. i.e. 32x32
 x_test = np.float32(x_test) #Convert it to float32
-"""
-Training part
-"""
-"""
+
+####Training part
+
+
 for i in range(len(identifier)): #Iterate over the networks
     #print(type(x_test))
     isAConnect = identifier[i] #Which network should be selected
@@ -62,10 +62,10 @@ for i in range(len(identifier)): #Iterate over the networks
         model.save(string,include_optimizer=True)
         np.savetxt('./Models/Training data/'+'LeNet5'+'_acc'+'.txt',acc,fmt="%.2f")
         np.savetxt('./Models/Training data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")  
-"""         
-"""
-This part is for inference. During the following lines the MCSim will be executed.
-"""        
+        
+
+#This part is for inference. During the following lines the MCSim will be executed.
+        
 for k in range(len(identifier)): #Iterate over the networks
     isAConnect = identifier[k] #Select the network
     if isAConnect:
