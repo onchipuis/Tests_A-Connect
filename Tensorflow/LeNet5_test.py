@@ -7,9 +7,11 @@ from datetime import datetime
 from Scripts import MCsim
 from Layers import AConnect
 from Layers import ConvAConnect
-identifier = [True]				#Which network you want to train/test True for A-Connect false for normal LeNet
+from Layers import Conv
+from Layers import FC_quant
+identifier = [False,True]				#Which network you want to train/test True for A-Connect false for normal LeNet
 Sim_err = [0, 0.3, 0.5, 0.7]	#Define all the simulation errors
-Wstd = [0.3] 			#Define the stddev for training
+Wstd = [0.3,0.5,0.7] 			#Define the stddev for training
 Bstd = Wstd
 isBin = "yes"					#Do you want binary weights?
 (x_train, y_train), (x_test, y_test) = load_ds.load_ds() #Load dataset
@@ -17,6 +19,7 @@ _,x_train,x_test=LeNet5.LeNet5(x_train,x_test)	#Load x_train, x_test with augmen
 x_test = np.float32(x_test) #Convert it to float32
 """
 Training part
+"""
 """
 for i in range(len(identifier)): #Iterate over the networks
     #print(type(x_test))
@@ -55,10 +58,11 @@ for i in range(len(identifier)): #Iterate over the networks
         history = model.fit(x_train,y_train,validation_split=0.2,epochs = 20,batch_size=256)
         acc = history.history['accuracy']
         val_acc = history.history['val_accuracy']        
-        string = './Models/'+'LeNet5'+'.h5'
+        string = './Models/'+name+'.h5'
         model.save(string,include_optimizer=True)
         np.savetxt('./Models/Training data/'+'LeNet5'+'_acc'+'.txt',acc,fmt="%.2f")
-        np.savetxt('./Models/Training data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")   
+        np.savetxt('./Models/Training data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")  
+"""         
 """
 This part is for inference. During the following lines the MCSim will be executed.
 """        
@@ -100,16 +104,15 @@ for k in range(len(identifier)): #Iterate over the networks
                 print('\n Simulation started at: ',starttime)
                 print('Simulation finished at: ', endtime)
 
-    else:      
-        string = './Models/'+'LeNet5'+'.h5'
-        name = 'LeNet5'
-        custom_objects = None
+    else: 
+        name = 'LeNet5'        
+        if isBin == "yes": 
+            name = name+'_BW'                 
+        string = './Models/'+name+'.h5'
+        custom_objects = {'Conv':Conv.Conv,'FC_quant':FC_quant.FC_quant} #Custom objects for model loading purposes
         for j in range(len(Sim_err)):
             Err = Sim_err[j]
-            if Err != 0.5:
-                force = "yes"
-            else:
-                force = "no"
+            force = "yes"
             if Err == 0:
                 N = 1
             else:
