@@ -77,6 +77,7 @@ def add_Wnoise(net,Wstd,Bstd,force,Derr,SRAMsz=[1024,1024],SRAMBsz=[1024]):
 						if(layers[i].Wstd != 0):
 							layers[i].infWerr = Werr #Change the inference error matrix
 						else:			
+							#print(layers[i].Werr)                            
 							layers[i].Werr = Werr
 					else:
 							layers[i].Werr = Werr					

@@ -117,13 +117,18 @@ class AConnect(tf.keras.layers.Layer):
 
 		else:
 		    #This part of the code will be executed during the inference
-			if(self.Wstd != 0):
-				Werr = self.infWerr
-				Berr = self.infBerr
+			if(self.Wstd != 0 or self.Bstd !=0):
+				if(self.Wstd !=0):
+					Werr = self.infWerr
+				else:
+					Werr = self.Werr
+				if(self.Bstd != 0):
+					Berr = self.infBerr
+				else:
+					Berr = self.Berr
 			else:
 				Werr = self.Werr
 				Berr = self.Berr
-			
 			if(self.isBin=='yes'):
 				weights =tf.math.sign(self.W)*Werr
 			else:
