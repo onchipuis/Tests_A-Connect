@@ -24,10 +24,10 @@ class ConvAConnect(tf.keras.layers.Layer):
 		self.pool = pool
 		self.d_type = d_type
 	def build(self,input_shape):
-		shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters)) ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Ch] RGB
+		self.shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters)) ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Ch] RGB
 
 		self.W = self.add_weight('kernel',
-								  shape = shape,
+								  shape = self.shape,
 								  initializer = "glorot_uniform",
 								  trainable=True)				  
 		self.bias = self.add_weight('bias',
@@ -39,14 +39,14 @@ class ConvAConnect(tf.keras.layers.Layer):
 				self.infBerr = abs(1+tf.random.normal(shape=[self.filters,],stddev=self.Bstd)) #Bias error vector for inference
 				self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
 													 #This was necessary to change the error matrix/array when Monte Carlo was running.
-				self.Berr = abs(1+tf.random.normal(shape=[self.pool,self.filters],stddev=self.Bstd,dtype=self.d_type)) #"Pool" of bias error vectors
+				#self.Berr = abs(1+tf.random.normal(shape=[self.pool,self.filters],stddev=self.Bstd,dtype=self.d_type)) #"Pool" of bias error vectors
 																	
 			else:
 				self.Berr = tf.constant(1,dtype=tf.float32)
 			if(self.Wstd): 
-				self.infWerr = abs(1+tf.random.normal(shape=shape,stddev=self.Wstd)) #Weight matrix for inference
+				self.infWerr = abs(1+tf.random.normal(shape=self.shape,stddev=self.Wstd)) #Weight matrix for inference
 				self.infWerr = self.infWerr.numpy()										 
-				self.Werr = abs(1+tf.random.normal(shape=list((self.pool,))+shape,stddev=self.Wstd,dtype=self.d_type)) #"Pool" of weights error matrices. Here I need to add an extra dimension. So I concatenate it. But to concatenate, the two elements must be the same type, in this cases, the two elements must be a list
+				#self.Werr = abs(1+tf.random.normal(shape=list((self.pool,))+shape,stddev=self.Wstd,dtype=self.d_type)) #"Pool" of weights error matrices. Here I need to add an extra dimension. So I concatenate it. But to concatenate, the two elements must be the same type, in this cases, the two elements must be a list
 				#self.Werr = tf.squeeze(self.Werr, axis=0) # Remove the extra dimension
 				 
 			else:
@@ -60,14 +60,14 @@ class ConvAConnect(tf.keras.layers.Layer):
 		self.batch_size = tf.shape(self.X)[0]
 		if(training):
 			if(self.Wstd != 0 or self.Bstd != 0):
-				ID = range(np.size(self.Werr,0))
-				ID = tf.random.shuffle(ID)
+				#ID = range(np.size(self.Werr,0))
+				#ID = tf.random.shuffle(ID)
 				
-				loc_id = tf.slice(ID,[0],[self.batch_size])
+				#loc_id = tf.slice(ID,[0],[self.batch_size])
 																#All this code works exactly as A-Connect fullyconnected layer.
 				if(self.Wstd != 0):
-					Werr = tf.gather(self.Werr,[loc_id])
-					Werr = tf.squeeze(Werr, axis=0)
+					#Werr = tf.gather(self.Werr,[loc_id])
+					Werr = abs(1+tf.random.normal(shape=list((self.batch_size,))+self.shape,stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)
 				else:
 					Werr = self.Werr
 				if(self.isBin=='yes'):
@@ -77,8 +77,8 @@ class ConvAConnect(tf.keras.layers.Layer):
 				weights = tf.expand_dims(weights,axis=0)
 				memW = tf.multiply(weights,float(Werr))
 				if(self.Bstd != 0):
-					Berr = tf.gather(self.Berr, [loc_id])
-					Berr = tf.squeeze(Berr, axis=0)
+					#Berr = tf.gather(self.Berr, [loc_id])
+					Berr =  abs(1+tf.random.normal(shape=[self.batch_size,self.filters],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr, axis=0)
 				else:
 					Berr = self.Berr
 				bias = tf.expand_dims(self.bias,axis=0)
@@ -87,7 +87,7 @@ class ConvAConnect(tf.keras.layers.Layer):
 				#################################WORST OPTION TO DO THE CONVOLUTION###############################################################
 				#Xaux = self.X#tf.reshape(self.X, [self.batch_size,tf.shape(self.X)[1],tf.shape(self.X)[2],tf.shape(self.X)[3]])
 				#Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(Xaux,1),memW),dtype=tf.float32),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
-				#Z = tf.reshape(Z, [self.batch_size, tf.shape(Z)[2],tf.shape(Z)[3],tf.shape(Z)[4]])
+				#Z = tf.reshape(Z, [self.batch_size, tf.shape(Z)[1],tf.shape(Z)[2],tf.shape(Z)[3]])
 				##################################################################################################################################
 				#OPTIMIZED LAYER
 				strides = [1,self.strides,self.strides,1]

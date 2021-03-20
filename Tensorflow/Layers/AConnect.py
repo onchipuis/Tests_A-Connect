@@ -39,14 +39,14 @@ class AConnect(tf.keras.layers.Layer):
 				self.infBerr = abs(1+tf.random.normal(shape=[self.output_size],stddev=self.Bstd)) #Bias error vector for inference
 				self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
 													 #This was necessary to change the error matrix/array when Monte Carlo was running.
-				self.Berr = abs(1+tf.random.normal(shape=[self.pool,self.output_size],stddev=self.Bstd,dtype=self.d_type)) #"Pool" of bias error vectors
+				#self.Berr = abs(1+tf.random.normal(shape=[self.pool,self.output_size],stddev=self.Bstd,dtype=self.d_type)) #"Pool" of bias error vectors
 																	
 			else:
 				self.Berr = tf.constant(1,dtype=tf.float32)
 			if(self.Wstd): 
 				self.infWerr = abs(1+tf.random.normal(shape=[int(input_shape[-1]),self.output_size],stddev=self.Wstd)) #Weight matrix for inference
 				self.infWerr = self.infWerr.numpy()										 
-				self.Werr = abs(1+tf.random.normal(shape=[self.pool,int(input_shape[-1]),self.output_size],stddev=self.Wstd,dtype=self.d_type)) #"Pool" of weights error matrices.
+				#self.Werr = abs(1+tf.random.normal(shape=[self.pool,int(input_shape[-1]),self.output_size],stddev=self.Wstd,dtype=self.d_type)) #"Pool" of weights error matrices.
 				 
 			else:
 				self.Werr = tf.constant(1,dtype=tf.float32)
@@ -57,6 +57,7 @@ class AConnect(tf.keras.layers.Layer):
 		
 	def call(self, X, training=None): #With call we can define all the operations that the layer do in the forward propagation.
 		self.X = X
+		row = tf.shape(self.X)[-1]        
 		self.batch_size = tf.shape(self.X)[0] #Numpy arrays and tensors have the number of array/tensor in the first dimension.
 											  #i.e. a tensor with this shape [1000,784,128] are 1000 matrix of [784,128].
 											  #Then the batch_size of the input data also is the first dimension. 
@@ -64,16 +65,16 @@ class AConnect(tf.keras.layers.Layer):
 		#This code will train the network. For inference, please go to the else part
 		if(training):	
 			if(self.Wstd != 0 or self.Bstd != 0):
-				ID = range(np.size(self.Werr,0)) 	#This line creates a vector with numbers from 0-999 (1000 numbers)
-				ID = tf.random.shuffle(ID) 			#Here is applied a shuffle or permutation of the vector numbers i.e. the output vector
+				#ID = range(np.size(self.Werr,0)) 	#This line creates a vector with numbers from 0-999 (1000 numbers)
+				#ID = tf.random.shuffle(ID) 			#Here is applied a shuffle or permutation of the vector numbers i.e. the output vector
 													#will not have the numbers sorted from 0 to 999. Now the numbers are in random position of the vector.
 													#Before the shuffle ID[0]=0, the, after the shuffle ID[0]=could be any number between 0-999.
-				loc_id = tf.slice(ID, [0], [self.batch_size])	#This takes a portion of the ID vector of size batch_size. Which means if we defined 	
+				#loc_id = tf.slice(ID, [0], [self.batch_size])	#This takes a portion of the ID vector of size batch_size. Which means if we defined 	
 																	#batch_size=256. We will take only the numbers in ID in the indexes 0-255. Remeber, the numbers are sorted randomly.						   		
 										   																  	
 				if(self.Wstd !=0):							
-					Werr = tf.gather(self.Werr,[loc_id])		#Finally, this line will take only N matrices from the "Pool" of error matrices. Where N is the batch size.          
-					self.mWerr = tf.squeeze(Werr, axis=0)				#This is necessary because gather add an extra dimension. Squeeze remove this dimension.			 
+					#Werr = tf.gather(self.Werr,[loc_id])		#Finally, this line will take only N matrices from the "Pool" of error matrices. Where N is the batch size.          
+					self.mWerr = abs(1+tf.random.normal(shape=[self.batch_size,int(row),self.output_size],stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)				#This is necessary because gather add an extra dimension. Squeeze remove this dimension.			 
 																#That means, with a weights shape of [784,128] and a batch size of 256. Werr should be a tensor with shape	
 																#[256,784,128], but gather return us a tensor with shape [1,256,784,128], so we remove that 1 with squeeze.
 				else:
@@ -86,8 +87,8 @@ class AConnect(tf.keras.layers.Layer):
 						
 				
 				if(self.Bstd !=0):								#For the bias is exactly the same situation
-					Berr = tf.gather(self.Berr, [loc_id])  		 
-					self.mBerr = tf.squeeze(Berr,axis=0)
+					#Berr = tf.gather(self.Berr, [loc_id])  		 
+					self.mBerr = abs(1+tf.random.normal(shape=[self.batch_size,self.output_size],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr,axis=0)
 				else:
 					self.mBerr = self.Berr
 				self.membias = tf.multiply(float(self.mBerr),self.bias)	
@@ -202,5 +203,8 @@ class AConnect(tf.keras.layers.Layer):
 			dB = tf.reduce_sum(dB, axis=0)
 			return dW,dB,dX
 		return Z, grad """
+			
+
+
 			
 
