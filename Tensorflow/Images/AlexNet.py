@@ -45,17 +45,17 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
-		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(5,5), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=128),
+		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(5,5), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=128,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
-		    ConvAConnect.ConvAConnect(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=128),
+		    ConvAConnect.ConvAConnect(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=128,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
-		    ConvAConnect.ConvAConnect(filters=384, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=128),
+		    ConvAConnect.ConvAConnect(filters=384, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=128,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
-		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=128),
+		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=128,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
@@ -84,7 +84,7 @@ model=model_creation(isAConnect=True,Wstd=0.5,Bstd=0.5)
 model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.001,momentum=0.9), metrics=['accuracy'])
 print(model.summary())
 model.fit(train_images,train_labels,
-          batch_size=128,epochs=50,
+          batch_size=256,epochs=50,
           validation_split=0.2
           )
 model.evaluate(test_images,test_labels)    
