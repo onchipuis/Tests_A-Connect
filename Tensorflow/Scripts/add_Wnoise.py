@@ -36,7 +36,7 @@ def add_Wnoise(net,Wstd,Bstd,force,Derr,SRAMsz=[1024,1024],SRAMBsz=[1024]):
 				MBerr_aux = MBerr[0:Bsz[0]] #Takes a sample from MBerr of size Bias_size
 				#print(Wsz)
 				if hasattr(layers[i],'strides'): #If the layer have the attribute strides means that it is a convolutional layer
-					Merr_aux = Merr[0:Wsz[0]*Wsz[1], 0:Wsz[2]*Wsz[3]] #Takes the sample from Merr of size [Wsz[0]*Wsz[1],Wsz[2]*Wsz[3]]. This is used to get the property number of elementes
+					Merr_aux = Merr[0:Wsz[0]*Wsz[3], 0:Wsz[1]*Wsz[2]] #Takes the sample from Merr of size [Wsz[0]*Wsz[1],Wsz[2]*Wsz[3]]. This is used to get the property number of elementes
 					Merr_aux = np.reshape(Merr_aux,[Wsz[0],Wsz[1],Wsz[2],Wsz[3]]) #Then this matrix is reshaped to the property dimensions
 				else:
 					Merr_aux = Merr[0:Wsz[0], 0:Wsz[1]] #If the layer does not have strides, it is a FC layer
