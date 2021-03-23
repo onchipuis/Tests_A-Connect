@@ -92,12 +92,12 @@ model=model_creation(isAConnect=False,Wstd=0.5,Bstd=0.5)
 model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9), metrics=['accuracy'])
 print(model.summary())
 model.fit(train_images,train_labels,
-          batch_size=256,epochs=10,
+          batch_size=256,epochs=2,
           validation_data=val_data
           )
 model.evaluate(test_images,test_labels)    
 model.save("../Models/AlexNet.h5",include_optimizer=True)
 
 acc=np.zeros([1000,1])
-acc,media=MCsim.MCsim("../Models/AlexNet.h5",test_images, test_labels,1000,0.3,0.3,"no","AlexNet_30",SRAMsz=[10000,10000],optimizer=tf.optimizers.SGD(lr=0.001,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+acc,media=MCsim.MCsim("../Models/AlexNet.h5",test_images, test_labels,1000,0.3,0.3,"no","AlexNet_30",SRAMsz=[10000,50000],optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
 
