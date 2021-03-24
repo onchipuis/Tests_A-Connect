@@ -20,7 +20,8 @@ def VggNet(isAConnect=False,Wstd=0,Bstd=0):
 	if(not(isAConnect)):
 		model = tf.keras.models.Sequential([
             tf.keras.layers.InputLayer(input_shape=[32,32,3]),
- #stack1
+			tf.keras.layers.experimental.preprocessing.Resizing(224,224), 			
+#stack1
 			tf.keras.layers.Conv2D(64,kernel_size=[3,3],padding='same',activation='relu'),
 			tf.keras.layers.Conv2D(64,kernel_size=[3,3],padding='same',activation='relu'),
 			tf.keras.layers.MaxPool2D(pool_size=[2,2],strides=2,padding='same'),
@@ -53,6 +54,7 @@ def VggNet(isAConnect=False,Wstd=0,Bstd=0):
 
 		model = tf.keras.models.Sequential([
             tf.keras.layers.InputLayer(input_shape=[32,32,3]),
+            tf.keras.layers.experimental.preprocessing.Resizing(227,227), 
  #stack1
 			ConvAConnect.ConvAConnect(64,kernel_size=[3,3],padding="SAME",activation='relu'),
 			ConvAConnect.ConvAConnect(64,kernel_size=[3,3],padding="SAME",activation='relu'),
@@ -102,11 +104,11 @@ val_data = val_datagen.flow(test_images, test_labels, batch_size = 256)
 
 model=VggNet(isAConnect=False,Wstd=0.5,Bstd=0.5)
 #parametros para el entrenamiento
-model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9), metrics=['accuracy'])
+model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.1,momentum=0.9), metrics=['accuracy'])
 print(model.summary())
 model.fit(train_images,train_labels,
-          batch_size=256,epochs=50,
-          validation_split=0.2
+          batch_size=128,epochs=10,
+          validation_split=0.3
           )
 model.evaluate(test_images,test_labels)    
 #model.save("../Models/VggNet.h5",include_optimizer=True)
