@@ -98,6 +98,29 @@ model.fit(train_data,
 model.evaluate(test_images,test_labels)    
 model.save("../Models/AlexNet.h5",include_optimizer=True)
 
+
+Sim_err = [0, 0.3, 0.5, 0.7]
+name = 'AlexNet'                      
+string = '../Models/'+name+'.h5'
 acc=np.zeros([1000,1])
-acc,media=MCsim.MCsim("../Models/AlexNet.h5",test_images, test_labels,1000,0.3,0.3,"no","AlexNet_30",SRAMsz=[10000,50000],optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+for j in range(len(Sim_err)):
+    Err = Sim_err[j]
+    force = "yes"
+    if Err == 0:
+        N = 1
+    else:
+        N = 1000
+            #####
+    print('\n\n*******************************************************************************************\n\n')
+    print('TESTING NETWORK: ', name)
+    print('With simulation error: ', Err)
+    print('\n\n*******************************************************************************************')
+    acc, media = MCsim.MCsim(string,test_images, test_labels,N,Err,Err,force,0,name,SRAMsz=[10000,50000],SRAMBsz=[4096],optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+    np.savetxt('../Results/'+name+'_simerr_'+str(int(100*Err))+'_'+str(int(100*Err))+'.txt',acc,fmt="%.2f")
+
+            #####
+           
+           
+
+#acc,media=MCsim.MCsim("../Models/AlexNet.h5",test_images, test_labels,1000,0.3,0.3,"no","AlexNet_30",SRAMsz=[10000,50000],optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
 
