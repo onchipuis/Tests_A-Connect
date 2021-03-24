@@ -9,7 +9,10 @@ INPUT ARGUMENTS:
 -isBin: string yes or no, whenever you want binary weights
 -strides: Number of strides (or steps) that the filter moves during the convolution
 -padding: "SAME" or "VALID". If you want to keep the same size or reduce it.
--pool: NUmber of error matrices for training. The recomended size is the same as the batch. 
+-Op: 1 or 2. Which way to do the convolution you want to use. The first option is slower but has less memory cosumption and the second one is faster
+but consumes a lot of memory.
+-Slice: Optional parameter. Used to divide the batch into 2 or 4 minibatches of size batch/N. Functions only when you select 2 in Op.
+-d_type: Type of the parameters that the layers will create. Supports fp16, fp32 and fp64 
 """
 class ConvAConnect(tf.keras.layers.Layer):
 	def __init__(self,filters,kernel_size,Wstd=0,Bstd=0,isBin='no',strides=1,padding="VALID",Op=1,Slice=1,d_type=tf.dtypes.float32,**kwargs):
@@ -45,7 +48,7 @@ class ConvAConnect(tf.keras.layers.Layer):
 				#self.Berr = abs(1+tf.random.normal(shape=[self.pool,self.filters],stddev=self.Bstd,dtype=self.d_type)) #"Pool" of bias error vectors
 																	
 			else:
-				self.Berr = tf.constant(1,dtype=tf.float32)
+				self.Berr = tf.constant(1,dtype=self.d_type)
 			if(self.Wstd): 
 				self.infWerr = abs(1+tf.random.normal(shape=self.shape,stddev=self.Wstd)) #Weight matrix for inference
 				self.infWerr = self.infWerr.numpy()										 
@@ -53,10 +56,10 @@ class ConvAConnect(tf.keras.layers.Layer):
 				#self.Werr = tf.squeeze(self.Werr, axis=0) # Remove the extra dimension
 				 
 			else:
-				self.Werr = tf.constant(1,dtype=tf.float32)
+				self.Werr = tf.constant(1,dtype=self.d_type)
 		else:
-			self.Werr = tf.constant(1,dtype=tf.float32) #We need to define the number 1 as a float32.
-			self.Berr = tf.constant(1,dtype=tf.float32)
+			self.Werr = tf.constant(1,dtype=self.d_type) #We need to define the number 1 as a float32.
+			self.Berr = tf.constant(1,dtype=self.d_type)
 		super(ConvAConnect, self).build(input_shape)
 	def call(self,X,training):
 		self.X = tf.cast(X, dtype=self.d_type)       
@@ -141,29 +144,29 @@ class ConvAConnect(tf.keras.layers.Layer):
 					    X1 = self.X[0:nBatches]
 					    F1 = memW[0:nBatches]
 					    b1 = membias[0:nBatches]
-					    inp_r, F = reshape(X1,F1)
+					    inp_r, F1 = reshape(X1,F1)
 					    Z = tf.nn.depthwise_conv2d(
                                                     inp_r,
-                                                    filter=F,
+                                                    filter=F1,
                                                     strides=strides,
                                                     padding=self.padding)
-					    Z = Z_reshape(Z,F1,X1,self.padding,self.strides)
+					    Z = Z_reshape(Z,memW[0:nBatches],X1,self.padding,self.strides)
 					    Z = tf.transpose(Z, [2, 0, 1, 3, 4])
 					    Z = tf.reduce_sum(Z, axis=3)
 					    Z1 = b1+Z
-					    X2 = self.X[nBatches:2*nBatches]
-					    F2 = memW[nBatches:2*nBatches]
-					    b2 = membias[nBatches:2*nBatches]
-					    inp_r, F = reshape(X2,F2)
+					    X1 = self.X[nBatches:2*nBatches]
+					    F1 = memW[nBatches:2*nBatches]
+					    b1 = membias[nBatches:2*nBatches]
+					    inp_r, F1 = reshape(X1,F1)
 					    Z = tf.nn.depthwise_conv2d(
                                                     inp_r,
-                                                    filter=F,
+                                                    filter=F1,
                                                     strides=strides,
                                                     padding=self.padding)
-					    Z = Z_reshape(Z,F2,X2,self.padding,self.strides)
+					    Z = Z_reshape(Z,memW[nBatches:2*nBatches],X1,self.padding,self.strides)
 					    Z = tf.transpose(Z, [2, 0, 1, 3, 4])
 					    Z = tf.reduce_sum(Z, axis=3)
-					    Z2 = b2+Z                                                                
+					    Z2 = b1+Z                                                                
 					    Z = tf.concat([Z1,Z2],axis=0)
 					elif(self.Slice == 4):       
 					    nBatches = tf.cast(self.batch_size/4,dtype=tf.int32)
@@ -292,8 +295,6 @@ class ConvAConnect(tf.keras.layers.Layer):
 		return y, grad		
 ############################AUXILIAR FUNCTIONS##################################################
 def reshape(X,F): #Used to reshape the input data and the noisy filters
-    inp = X
-    F = F
     batch_size=tf.shape(X)[0]    
     H = tf.shape(X)[1]
     W = tf.shape(X)[2]
@@ -304,7 +305,7 @@ def reshape(X,F): #Used to reshape the input data and the noisy filters
     out_channels = tf.shape(F)[-1]
     F = tf.transpose(F, [1, 2, 0, 3, 4])
     F = tf.reshape(F, [fh, fw, channels*batch_size, out_channels]) 
-    inp_r = tf.transpose(inp, [1, 2, 0, 3])
+    inp_r = tf.transpose(X, [1, 2, 0, 3])
     inp_r = tf.reshape(inp_r, [1, H, W, batch_size*channels_img])
     return inp_r, F          
 def Z_reshape(Z,F,X,padding,strides): #Used to reshape the output of the layer
@@ -318,7 +319,7 @@ def Z_reshape(Z,F,X,padding,strides): #Used to reshape the output of the layer
     out_channels = tf.shape(F)[-1]
     #tf.print(fh)    
     if padding == "SAME":
-        out = tf.reshape(Z, [tf.floor(tf.cast((H)/strides,dtype=tf.float16)), tf.floor(tf.cast((W)/strides,dtype=tf.float16)), batch_size, channels, out_channels])
+        return tf.reshape(Z, [tf.floor(tf.cast((H)/strides,dtype=tf.float16)), tf.floor(tf.cast((W)/strides,dtype=tf.float16)), batch_size, channels, out_channels])
     if padding == "VALID":
-        out = tf.reshape(Z, [tf.floor(tf.cast((H-fh)/strides,dtype=tf.float16))+1, tf.floor(tf.cast((W-fw)/strides,dtype=tf.float16))+1, batch_size, channels, out_channels])
-    return out         
+        return tf.reshape(Z, [tf.floor(tf.cast((H-fh)/strides,dtype=tf.float16))+1, tf.floor(tf.cast((W-fw)/strides,dtype=tf.float16))+1, batch_size, channels, out_channels])
+    #return out         

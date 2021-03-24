@@ -44,17 +44,17 @@ class AConnect(tf.keras.layers.Layer):
 				#self.Berr = abs(1+tf.random.normal(shape=[self.pool,self.output_size],stddev=self.Bstd,dtype=self.d_type)) #"Pool" of bias error vectors
 																	
 			else:
-				self.Berr = tf.constant(1,dtype=tf.float32)
+				self.Berr = tf.constant(1,dtype=self.d_type)
 			if(self.Wstd): 
 				self.infWerr = abs(1+tf.random.normal(shape=[int(input_shape[-1]),self.output_size],stddev=self.Wstd)) #Weight matrix for inference
 				self.infWerr = self.infWerr.numpy()										 
 				#self.Werr = abs(1+tf.random.normal(shape=[self.pool,int(input_shape[-1]),self.output_size],stddev=self.Wstd,dtype=self.d_type)) #"Pool" of weights error matrices.
 				 
 			else:
-				self.Werr = tf.constant(1,dtype=tf.float32)
+				self.Werr = tf.constant(1,dtype=self.d_type)
 		else:
-			self.Werr = tf.constant(1,dtype=tf.float32) #We need to define the number 1 as a float32.
-			self.Berr = tf.constant(1,dtype=tf.float32)
+			self.Werr = tf.constant(1,dtype=self.d_type) #We need to define the number 1 as a float32.
+			self.Berr = tf.constant(1,dtype=self.d_type)
 		super(AConnect, self).build(input_shape)
 		
 	def call(self, X, training=None): #With call we can define all the operations that the layer do in the forward propagation.

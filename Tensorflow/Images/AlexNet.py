@@ -8,9 +8,9 @@ from Layers import ConvAConnect
 from Layers import AConnect
 from Scripts import MCsim
 import numpy as np
-
 import tensorflow as tf
 
+@profile
 def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 	if(not(isAConnect)):
 		model = tf.keras.models.Sequential([
@@ -41,21 +41,21 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 		model = tf.keras.models.Sequential([
 			tf.keras.layers.InputLayer(input_shape=[32,32,3]),
 			tf.keras.layers.experimental.preprocessing.Resizing(227,227),    
-		    ConvAConnect.ConvAConnect(filters=96, kernel_size=(11,11),Wstd=Wstd,Bstd=Bstd, strides=4,padding="VALID",Slice=4,d_type=tf.dtypes.float16),
+		    ConvAConnect.ConvAConnect(filters=96, kernel_size=(11,11),Wstd=Wstd,Bstd=Bstd, strides=4,padding="VALID",Op=2,Slice=4,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
-		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(5,5), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",Slice=4,d_type=tf.dtypes.float16),
+		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(5,5), Wstd=Wstd,Bstd=Bstd, strides=1,padding="SAME",Op=2,Slice=4,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
-		    ConvAConnect.ConvAConnect(filters=128, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",Slice=4,d_type=tf.dtypes.float16),
+		    ConvAConnect.ConvAConnect(filters=128, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd, strides=1,padding="SAME",Op=2,Slice=4,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
-		    ConvAConnect.ConvAConnect(filters=128, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",Slice=4,d_type=tf.dtypes.float16),
+		    ConvAConnect.ConvAConnect(filters=128, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,padding="SAME",Op=2,Slice=4,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
-		    ConvAConnect.ConvAConnect(filters=32, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=2,  padding="SAME",Slice=4,d_type=tf.dtypes.float16),
+		    ConvAConnect.ConvAConnect(filters=32, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,padding="SAME",Op=2,Slice=4,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
@@ -89,7 +89,7 @@ val_data = val_datagen.flow(test_images, test_labels, batch_size = 256)
 
 model=model_creation(isAConnect=True,Wstd=0.5,Bstd=0.5)
 #parametros para el entrenamiento
-model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9), metrics=['accuracy'])
+model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.001,momentum=0.9), metrics=['accuracy'])
 print(model.summary())
 model.fit(train_data,
           batch_size=256,epochs=2,

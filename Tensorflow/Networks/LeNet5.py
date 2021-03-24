@@ -48,11 +48,11 @@ def LeNet5(Xtrain=None,Xtest=None,isAConnect=False,Wstd=0,Bstd=0,isBin="no"):
 		model = tf.keras.Sequential([
 			tf.keras.layers.InputLayer(input_shape=[32,32]),
 			tf.keras.layers.Reshape((32,32,1)),
-			ConvAConnect.ConvAConnect(6,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin,strides=1,padding="VALID"),
+			ConvAConnect.ConvAConnect(6,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin,strides=1,padding="VALID",Op=2,Slice=1),
             tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.Activation('tanh'),            
 			tf.keras.layers.AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
-			ConvAConnect.ConvAConnect(16,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin ,strides=1,padding="VALID"),
+			ConvAConnect.ConvAConnect(16,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin ,strides=1,padding="VALID",Op=2,Slice=1),
             tf.keras.layers.BatchNormalization(),            
 			tf.keras.layers.Activation('tanh'),                        
 			tf.keras.layers.AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
