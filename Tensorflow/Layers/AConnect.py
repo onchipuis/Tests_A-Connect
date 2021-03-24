@@ -28,11 +28,13 @@ class AConnect(tf.keras.layers.Layer):
 		self.W = self.add_weight("W",							
 										shape = [int(input_shape[-1]),self.output_size], #Weights matrix 
 										initializer = "glorot_uniform",
+                                        dtype = self.d_type,
 										trainable=True)
 
 		self.bias = self.add_weight("bias",
 										shape = [self.output_size,],					#Bias vector
 										initializer = "zeros",
+                                        dtype = self.d_type,
 										trainable=True)					
 		if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
 			if(self.Bstd != 0):
@@ -56,7 +58,7 @@ class AConnect(tf.keras.layers.Layer):
 		super(AConnect, self).build(input_shape)
 		
 	def call(self, X, training=None): #With call we can define all the operations that the layer do in the forward propagation.
-		self.X = X
+		self.X = tf.cast(X, dtype=self.d_type)
 		row = tf.shape(self.X)[-1]        
 		self.batch_size = tf.shape(self.X)[0] #Numpy arrays and tensors have the number of array/tensor in the first dimension.
 											  #i.e. a tensor with this shape [1000,784,128] are 1000 matrix of [784,128].
@@ -83,7 +85,7 @@ class AConnect(tf.keras.layers.Layer):
 					weights = self.sign(self.W)			#Binarize the weights and multiply them element wise with Werr mask
 				else:
 					weights = self.W	
-				self.memW = tf.multiply(weights,float(self.mWerr))			         	#Finally we multiply element-wise the error matrix with the weights.
+				self.memW = tf.multiply(weights,self.mWerr)			         	#Finally we multiply element-wise the error matrix with the weights.
 						
 				
 				if(self.Bstd !=0):								#For the bias is exactly the same situation
@@ -91,7 +93,7 @@ class AConnect(tf.keras.layers.Layer):
 					self.mBerr = abs(1+tf.random.normal(shape=[self.batch_size,self.output_size],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr,axis=0)
 				else:
 					self.mBerr = self.Berr
-				self.membias = tf.multiply(float(self.mBerr),self.bias)	
+				self.membias = tf.multiply(self.mBerr,self.bias)	
 				
 				self.Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[-1]]) #We need this reshape, beacuse the input data is a column vector with
 																					# 2 dimension, e.g. in the first layer using MNIST we will have a vector with
