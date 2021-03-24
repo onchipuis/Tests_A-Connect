@@ -41,21 +41,21 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 		model = tf.keras.models.Sequential([
 			tf.keras.layers.InputLayer(input_shape=[32,32,3]),
 			tf.keras.layers.experimental.preprocessing.Resizing(227,227),    
-		    ConvAConnect.ConvAConnect(filters=96, kernel_size=(11,11),Wstd=Wstd,Bstd=Bstd, strides=4,padding="VALID",pool=128),
+		    ConvAConnect.ConvAConnect(filters=96, kernel_size=(11,11),Wstd=Wstd,Bstd=Bstd, strides=4,padding="VALID",Slice=4,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
-		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(5,5), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=128,d_type=tf.dtypes.float16),
+		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(5,5), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",Slice=4,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
-		    ConvAConnect.ConvAConnect(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=128,d_type=tf.dtypes.float16),
+		    ConvAConnect.ConvAConnect(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",Slice=4,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
-		    ConvAConnect.ConvAConnect(filters=384, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=128,d_type=tf.dtypes.float16),
+		    ConvAConnect.ConvAConnect(filters=384, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",Slice=4,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
-		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",pool=128,d_type=tf.dtypes.float16),
+		    ConvAConnect.ConvAConnect(filters=256, kernel_size=(1,1), Wstd=Wstd,Bstd=Bstd, strides=1,  padding="SAME",Slice=4,d_type=tf.dtypes.float16),
             tf.keras.layers.ReLU(),
 		    tf.keras.layers.BatchNormalization(),
 		    tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
@@ -87,11 +87,11 @@ val_datagen.fit(test_images)
 val_data = val_datagen.flow(test_images, test_labels, batch_size = 256)
 
 
-model=model_creation(isAConnect=False,Wstd=0.5,Bstd=0.5)
+model=model_creation(isAConnect=True,Wstd=0.5,Bstd=0.5)
 #parametros para el entrenamiento
 model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9), metrics=['accuracy'])
 print(model.summary())
-model.fit(train_images,train_labels,
+model.fit(train_data,
           batch_size=256,epochs=2,
           validation_data=val_data
           )
