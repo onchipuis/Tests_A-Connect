@@ -34,7 +34,7 @@ for i in range(len(identifier)): #Iterate over the networks
             print("*****************************TRAINING NETWORK*********************")
             print("\n\t\t\t", name)
             model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin)#Get the model
-            optimizer = tf.keras.optimizers.SGD(learning_rate=0.01,momentum=0.9)#Define optimizer
+            optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)#Define optimizer
             model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])#Compile the model
             print(model.summary())#See the summary
             history = model.fit(x_train,y_train,validation_split=0.2,epochs = 20,batch_size=256)#Train the model
