@@ -73,22 +73,22 @@ class ConvAConnect(tf.keras.layers.Layer):
 																#All this code works exactly as A-Connect fullyconnected layer.
 				if(self.Wstd != 0):
 					#Werr = tf.gather(self.Werr,[loc_id])
-					Werr = abs(1+tf.random.normal(shape=list((self.batch_size,))+self.shape,stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)
+					self.Werr = abs(1+tf.random.normal(shape=list((self.batch_size,))+self.shape,stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)
 				else:
-					Werr = self.Werr
+					self.Werr = self.Werr
 				if(self.isBin=='yes'):
 					weights=self.sign(self.W)
 				else:
 					weights=self.W
 				weights = tf.expand_dims(weights,axis=0)
-				memW = tf.multiply(weights,Werr)
+				memW = tf.multiply(weights,self.Werr)
 				if(self.Bstd != 0):
 					#Berr = tf.gather(self.Berr, [loc_id])
-					Berr =  abs(1+tf.random.normal(shape=[self.batch_size,self.filters],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr, axis=0)
+					self.Berr =  abs(1+tf.random.normal(shape=[self.batch_size,self.filters],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr, axis=0)
 				else:
-					Berr = self.Berr
+					self.Berr = self.Berr
 				bias = tf.expand_dims(self.bias,axis=0)
-				membias = tf.multiply(bias,Berr)
+				membias = tf.multiply(bias,self.Berr)
 				membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])
 				#################################WORST OPTION TO DO THE CONVOLUTION###############################################################
 				if(self.Op == 1):

@@ -76,24 +76,24 @@ class AConnect(tf.keras.layers.Layer):
 										   																  	
 				if(self.Wstd !=0):							
 					#Werr = tf.gather(self.Werr,[loc_id])		#Finally, this line will take only N matrices from the "Pool" of error matrices. Where N is the batch size.          
-					self.mWerr = abs(1+tf.random.normal(shape=[self.batch_size,int(row),self.output_size],stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)				#This is necessary because gather add an extra dimension. Squeeze remove this dimension.			 
+					self.Werr = abs(1+tf.random.normal(shape=[self.batch_size,int(row),self.output_size],stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)				#This is necessary because gather add an extra dimension. Squeeze remove this dimension.			 
 																#That means, with a weights shape of [784,128] and a batch size of 256. Werr should be a tensor with shape	
 																#[256,784,128], but gather return us a tensor with shape [1,256,784,128], so we remove that 1 with squeeze.
 				else:
-					self.mWerr = self.Werr
+					self.Werr = self.Werr
 				if(self.isBin=='yes'):
 					weights = self.sign(self.W)			#Binarize the weights and multiply them element wise with Werr mask
 				else:
 					weights = self.W	
-				self.memW = tf.multiply(weights,self.mWerr)			         	#Finally we multiply element-wise the error matrix with the weights.
+				self.memW = tf.multiply(weights,self.Werr)			         	#Finally we multiply element-wise the error matrix with the weights.
 						
 				
 				if(self.Bstd !=0):								#For the bias is exactly the same situation
 					#Berr = tf.gather(self.Berr, [loc_id])  		 
-					self.mBerr = abs(1+tf.random.normal(shape=[self.batch_size,self.output_size],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr,axis=0)
+					self.Berr = abs(1+tf.random.normal(shape=[self.batch_size,self.output_size],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr,axis=0)
 				else:
-					self.mBerr = self.Berr
-				self.membias = tf.multiply(self.mBerr,self.bias)	
+					self.Berr = self.Berr
+				self.membias = tf.multiply(self.Berr,self.bias)	
 				
 				self.Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[-1]]) #We need this reshape, beacuse the input data is a column vector with
 																					# 2 dimension, e.g. in the first layer using MNIST we will have a vector with

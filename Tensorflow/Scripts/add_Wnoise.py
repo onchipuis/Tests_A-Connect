@@ -61,8 +61,8 @@ def add_Wnoise(net,Wstd,Bstd,force,Derr,SRAMsz=[1024,1024],SRAMBsz=[1024]):
 						Bstd = Bstd
 				else:
 					Bstd = Bstd
-				if hasattr(layers[i],'Werr') or hasattr(layers[i],'Berr'): #Now if the layer have Werr or Berr is an A-Conenct or DropConnect layer
-#					
+				if hasattr(layers[i],'Werr') or hasattr(layers[i],'Berr') or hasattr(layers[i],'infWerr') or hasattr(layers[i],'infBerr'): #Now if the layer have Werr or Berr is an A-Conenct or DropConnect layer
+					#print(i)#					
 					Werr = abs(1+Wstd*Merr_aux) #Create the error matrix taking into account the Wstd and Bstd
 					Berr = abs(1+Bstd*MBerr_aux)
 					if(layers[i].isBin == 'yes'): 
