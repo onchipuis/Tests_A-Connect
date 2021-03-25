@@ -11,7 +11,7 @@ from Layers import Conv
 from Layers import FC_quant
 identifier = [True]				#Which network you want to train/test True for A-Connect false for normal LeNet
 Sim_err = [0, 0.3, 0.5, 0.7]	#Define all the simulation errors
-Wstd = [0.5] 			#Define the stddev for training
+Wstd = [0.3,0.5,0.7] 			#Define the stddev for training
 Bstd = Wstd
 isBin = "yes"					#Do you want binary weights?
 (x_train, y_train), (x_test, y_test) = load_ds.load_ds() #Load dataset
