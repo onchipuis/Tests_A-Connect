@@ -16,5 +16,5 @@ def classify(net,Xtest,Ytest):
 	#	pred[i] = label_predicted[i] == Ytest[i]
 		
 	#accuracy = np.sum(pred)/len(Ytest)
-	_,accuracy = net.evaluate(Xtest,Ytest,verbose=0)
+	_,accuracy = net.evaluate(Xtest,Ytest,verbose=1,use_multiprocessing=True)
 	return accuracy

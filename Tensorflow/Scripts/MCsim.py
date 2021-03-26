@@ -27,7 +27,8 @@ import matplotlib.pyplot as plt
 from Layers import fullyconnected
 import tensorflow as tf
 
-def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,Derr=0,net_name="Network",custom_objects=None,SRAMsz=[1024,1024],SRAMBsz=[1024],optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy']):
+def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,Derr=0,net_name="Network",custom_objects=None,dtype='float32',
+optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy']):
 	acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy
 	local_net = tf.keras.models.load_model(net,custom_objects = custom_objects) #Load the trained model
 	local_net.save_weights(filepath=('./Models/'+net_name+'_weights.h5')) #Save the weights. It is used to optimize the script RAM consumption
@@ -37,7 +38,7 @@ def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,Derr=0,net_name="Network",custom_obj
 #	global parallel
 
 	for i in range(M): #Iterate over M samples
-		[NetNoisy,Wstdn,Bstdn] = add_Wnoise.add_Wnoise(local_net,Wstd,Bstd,force,Derr,SRAMsz=SRAMsz,SRAMBsz=SRAMBsz) #Function that adds the new noisy matrices to the layers
+		[NetNoisy,Wstdn,Bstdn] = add_Wnoise.add_Wnoise(local_net,Wstd,Bstd,force,Derr,dtype=dtype) #Function that adds the new noisy matrices to the layers
 		NetNoisy.compile(optimizer,loss,metrics) #Compile the model. It is necessary to use the model.evaluate
 		acc_noisy[i] = classify.classify(NetNoisy, Xtest, Ytest) #Get the accuracy of the network
 		acc_noisy[i] = 100*acc_noisy[i]

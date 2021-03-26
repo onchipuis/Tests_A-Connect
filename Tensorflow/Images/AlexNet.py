@@ -10,7 +10,7 @@ from Scripts import MCsim
 import numpy as np
 import tensorflow as tf
 
-@profile
+
 def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 	if(not(isAConnect)):
 		model = tf.keras.models.Sequential([
@@ -74,7 +74,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 	return model
 	
 (train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.cifar10.load_data()	
-CLASS_NAMES= ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+#CLASS_NAMES= ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 train_datagen = ImageDataGenerator(rescale=1./255, shear_range=0.1, zoom_range=0.1, 
@@ -87,7 +87,7 @@ val_datagen.fit(test_images)
 val_data = val_datagen.flow(test_images, test_labels, batch_size = 256)
 
 
-model=model_creation(isAConnect=True,Wstd=0.5,Bstd=0.5)
+model=model_creation(isAConnect=False,Wstd=0.5,Bstd=0.5)
 #parametros para el entrenamiento
 model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.001,momentum=0.9), metrics=['accuracy'])
 print(model.summary())
@@ -96,12 +96,12 @@ model.fit(train_data,
           validation_data=val_data
           )
 model.evaluate(test_images,test_labels)    
-model.save("../Models/AlexNet.h5",include_optimizer=True)
+model.save("./Models/AlexNet.h5",include_optimizer=True)
 
 
 Sim_err = [0, 0.3, 0.5, 0.7]
 name = 'AlexNet'                      
-string = '../Models/'+name+'.h5'
+string = './Models/'+name+'.h5'
 acc=np.zeros([1000,1])
 for j in range(len(Sim_err)):
     Err = Sim_err[j]
@@ -115,7 +115,7 @@ for j in range(len(Sim_err)):
     print('TESTING NETWORK: ', name)
     print('With simulation error: ', Err)
     print('\n\n*******************************************************************************************')
-    acc, media = MCsim.MCsim(string,test_images, test_labels,N,Err,Err,force,0,name,SRAMsz=[10000,50000],SRAMBsz=[4096],optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+    acc, media = MCsim.MCsim(string,test_images, test_labels,N,Err,Err,force,0,name,optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
     np.savetxt('../Results/'+name+'_simerr_'+str(int(100*Err))+'_'+str(int(100*Err))+'.txt',acc,fmt="%.2f")
 
             #####

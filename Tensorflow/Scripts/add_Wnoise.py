@@ -14,17 +14,14 @@ This function returns a NoisyNet and the values of Wstd and Bstd used
 import numpy as np
 import tensorflow as tf
 
-def add_Wnoise(net,Wstd,Bstd,force,Derr,SRAMsz=[1024,1024],SRAMBsz=[1024]):
+def add_Wnoise(net,Wstd,Bstd,force,Derr,dtype='float32'):
 	layers = net.layers #Get the list of layers used in the model
 	Nlayers = np.size(layers) #Get the number of layers
 	
-	SRAMsz = SRAMsz #Takes the size values for the error matrices
-	SRAMBsz = SRAMBsz
-	
-	Merr = np.random.randn(SRAMsz[0],SRAMsz[1]) #Takes from a normal distribution a matrix with the defined dimensions
-	Merr = Merr.astype('float32')	
-	MBerr = np.random.randn(SRAMBsz[0]) #Takes from a normal distribution a vector with the defined dimensions
-	MBerr = MBerr.astype('float32')	
+	#Merr = np.random.randn(SRAMsz[0],SRAMsz[1]) #Takes from a normal distribution a matrix with the defined dimensions
+	#Merr = Merr.astype(dtype)	
+	#MBerr = np.random.randn(SRAMBsz[0]) #Takes from a normal distribution a vector with the defined dimensions
+	#MBerr = MBerr.astype(dtype)	
 #	
 	for i in range(Nlayers): #Iterate over the number of layers
 		if layers[i].count_params() != 0: #If the layer does not have training parameters it is omitted
@@ -33,13 +30,11 @@ def add_Wnoise(net,Wstd,Bstd,force,Derr,SRAMsz=[1024,1024],SRAMBsz=[1024]):
 
 				Wsz = np.shape(layers[i].weights[0]) #Takes the weights/kernel size
 				Bsz = np.shape(layers[i].weights[1]) #Takes the bias size
-				MBerr_aux = MBerr[0:Bsz[0]] #Takes a sample from MBerr of size Bias_size
-				#print(Wsz)
+				MBerr_aux = np.random.randn(Bsz[0])
 				if hasattr(layers[i],'strides'): #If the layer have the attribute strides means that it is a convolutional layer
-					Merr_aux = Merr[0:Wsz[0]*Wsz[3], 0:Wsz[1]*Wsz[2]] #Takes the sample from Merr of size [Wsz[0]*Wsz[1],Wsz[2]*Wsz[3]]. This is used to get the property number of elementes
-					Merr_aux = np.reshape(Merr_aux,[Wsz[0],Wsz[1],Wsz[2],Wsz[3]]) #Then this matrix is reshaped to the property dimensions
+					Merr_aux = np.random.randn(Wsz[0],Wsz[1],Wsz[2],Wsz[3])
 				else:
-					Merr_aux = Merr[0:Wsz[0], 0:Wsz[1]] #If the layer does not have strides, it is a FC layer
+					Merr_aux = np.random.randn(Wsz[0], Wsz[1]) #If the layer does not have strides, it is a FC layer
 				
 				if hasattr(layers[i], 'Wstd'): #Does the layer have Wstd? if it is true is an A-Connect or DropConnect network
 					if(layers[i].Wstd != 0): #IF the value it is different from zero, the layer is working with the algorithm
