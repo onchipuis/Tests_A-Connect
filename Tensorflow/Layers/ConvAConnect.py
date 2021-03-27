@@ -11,11 +11,11 @@ INPUT ARGUMENTS:
 -padding: "SAME" or "VALID". If you want to keep the same size or reduce it.
 -Op: 1 or 2. Which way to do the convolution you want to use. The first option is slower but has less memory cosumption and the second one is faster
 but consumes a lot of memory.
--Slice: Optional parameter. Used to divide the batch into 2 or 4 minibatches of size batch/N. Functions only when you select 2 in Op.
+-Slice: Optional parameter. Used to divide the batch into 2,4 or 8 minibatches of size batch/N. This works only when you select 2 in Op.
 -d_type: Type of the parameters that the layers will create. Supports fp16, fp32 and fp64 
 """
 class ConvAConnect(tf.keras.layers.Layer):
-	def __init__(self,filters,kernel_size,Wstd=0,Bstd=0,isBin='no',strides=1,padding="VALID",Op=1,Slice=1,d_type=tf.dtypes.float32,**kwargs):
+	def __init__(self,filters,kernel_size,strides=1,padding="VALID",Wstd=0,Bstd=0,isBin='no',Op=1,Slice=1,d_type=tf.dtypes.float32,**kwargs):
 		super(ConvAConnect, self).__init__()
 		self.filters = filters
 		self.kernel_size = kernel_size
@@ -49,7 +49,7 @@ class ConvAConnect(tf.keras.layers.Layer):
 																	
 			else:
 				self.Berr = tf.constant(1,dtype=self.d_type)
-			if(self.Wstd): 
+			if(self.Wstd !=0): 
 				self.infWerr = abs(1+tf.random.normal(shape=self.shape,stddev=self.Wstd)) #Weight matrix for inference
 				self.infWerr = self.infWerr.numpy()										 
 				#self.Werr = abs(1+tf.random.normal(shape=list((self.pool,))+shape,stddev=self.Wstd,dtype=self.d_type)) #"Pool" of weights error matrices. Here I need to add an extra dimension. So I concatenate it. But to concatenate, the two elements must be the same type, in this cases, the two elements must be a list
@@ -68,175 +68,92 @@ class ConvAConnect(tf.keras.layers.Layer):
 			if(self.Wstd != 0 or self.Bstd != 0):
 				#ID = range(np.size(self.Werr,0))
 				#ID = tf.random.shuffle(ID)
-				
+				if(self.isBin=='yes'):
+				    weights=self.sign(self.W)
+				else:
+				    weights=self.W				
 				#loc_id = tf.slice(ID,[0],[self.batch_size])
 																#All this code works exactly as A-Connect fullyconnected layer.
-				if(self.Wstd != 0):
-					#Werr = tf.gather(self.Werr,[loc_id])
-					self.Werr = abs(1+tf.random.normal(shape=list((self.batch_size,))+self.shape,stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)
-				else:
-					self.Werr = self.Werr
-				if(self.isBin=='yes'):
-					weights=self.sign(self.W)
-				else:
-					weights=self.W
-				weights = tf.expand_dims(weights,axis=0)
-				memW = tf.multiply(weights,self.Werr)
-				if(self.Bstd != 0):
-					#Berr = tf.gather(self.Berr, [loc_id])
-					self.Berr =  abs(1+tf.random.normal(shape=[self.batch_size,self.filters],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr, axis=0)
-				else:
-					self.Berr = self.Berr
-				bias = tf.expand_dims(self.bias,axis=0)
-				membias = tf.multiply(bias,self.Berr)
-				membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])
 				#################################WORST OPTION TO DO THE CONVOLUTION###############################################################
 				if(self.Op == 1):
-					Xaux = self.X#tf.reshape(self.X, [self.batch_size,tf.shape(self.X)[1],tf.shape(self.X)[2],tf.shape(self.X)[3]])
-					Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(Xaux,1),memW), fn_output_signature=self.d_type),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
+					if(self.Wstd != 0):
+					    #Werr = tf.gather(self.Werr,[loc_id])
+					    Werr = abs(1+tf.random.normal(shape=list((self.batch_size,))+self.shape,stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)
+					else:
+					    Werr = self.Werr
+					weights = tf.expand_dims(weights,axis=0)
+					memW = tf.multiply(weights,Werr)
+					if(self.Bstd != 0):
+					    #Berr = tf.gather(self.Berr, [loc_id])
+					    Berr =  abs(1+tf.random.normal(shape=[self.batch_size,self.filters],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr, axis=0)
+					else:
+					    Berr = self.Berr
+					bias = tf.expand_dims(self.bias,axis=0)
+					membias = tf.multiply(bias,Berr)
+					membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])                    
+					#Xaux = self.X#tf.reshape(self.X, [self.batch_size,tf.shape(self.X)[1],tf.shape(self.X)[2],tf.shape(self.X)[3]])
+					Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(self.X,1),memW), parallel_iterations=self.batch_size,fn_output_signature=self.d_type),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
 					Z = tf.reshape(Z, [self.batch_size, tf.shape(Z)[1],tf.shape(Z)[2],tf.shape(Z)[3]])
 					Z = Z+membias
 				##################################################################################################################################
 				#OPTIMIZED LAYER
 				else:
 					strides = [1,self.strides,self.strides,1]
-                    
-					if(self.Slice == 2):
-    #This was the approach to slice the batch in N minibatches of size batch/N. Currently is not working because tensorflow does not allow iterate over symbolic tensors.
-    #This happens because input tensor X have a symbolic batch dimension until the graph is executed. That means, X has dimensions [None,H,W,Ch], where None corresponds to the batch
-					    """i = tf.constant(0)                    
-                        nBatches = tf.cast(self.batch_size/self.N,dtype=tf.int32)
-                        Xaux = self.X[0:nBatches]
-                        F_aux = memW[0:nBatches]
-                        b_aux = membias[0:nBatches]
-                        inp_r, F = reshape(Xaux,F_aux)
-                        Z = tf.nn.depthwise_conv2d(
-                                                    inp_r,
-                                                    filter=F,
-                                                    strides=strides,
-                                                    padding=self.padding)
-                        Z = Z_reshape(Z,F_aux,Xaux,self.padding,self.strides)
-                        Z = tf.transpose(Z, [2, 0, 1, 3, 4])
-                        Z = tf.reduce_sum(Z, axis=3)
-                        Z = b_aux+Z 
-                        self.Y = tf.zeros(tf.shape(Z),dtype=self.d_type)
-                        self.Y = tf.experimental.numpy.append(self.Y,Z)                                     
-                        cond = lambda i: tf.less(i,self.N-1)                                                
-                        def body(i):                                              
-                            Xaux = self.X[(i+1)*nBatches:(i+2)*nBatches]
-                            F_aux = memW[(i+1)*nBatches:(i+2)*nBatches]
-                            b_aux = membias[(i+1)*nBatches:(i+2)*nBatches]
-                            inp_r, F = reshape(Xaux,F_aux)
-                            temp = tf.nn.depthwise_conv2d(
-                                                    inp_r,
-                                                    filter=F,
-                                                    strides=strides,
-                                                    padding=self.padding)
-                            temp = Z_reshape(temp,F_aux,Xaux,self.padding,self.strides)
-                            temp = tf.transpose(temp, [2, 0, 1, 3, 4])
-                            temp = tf.reduce_sum(temp, axis=3)
-                            temp = b_aux+temp
-                            Y = tf.experimental.numpy.append(self.Y,temp)
-                            return Y
-                        Z = tf.while_loop(cond,body,[i])"""
-    #Lets try to slice into 2 minibatches of size batch/2 the data and filters 
-					    nBatches = tf.cast(self.batch_size/2,dtype=tf.int32)
-					    X1 = self.X[0:nBatches]
-					    F1 = memW[0:nBatches]
-					    b1 = membias[0:nBatches]
-					    inp_r, F1 = reshape(X1,F1)
-					    Z = tf.nn.depthwise_conv2d(
-                                                    inp_r,
-                                                    filter=F1,
-                                                    strides=strides,
-                                                    padding=self.padding)
-					    Z = Z_reshape(Z,memW[0:nBatches],X1,self.padding,self.strides)
-					    Z = tf.transpose(Z, [2, 0, 1, 3, 4])
-					    Z = tf.reduce_sum(Z, axis=3)
-					    Z1 = b1+Z
-					    X1 = self.X[nBatches:2*nBatches]
-					    F1 = memW[nBatches:2*nBatches]
-					    b1 = membias[nBatches:2*nBatches]
-					    inp_r, F1 = reshape(X1,F1)
-					    Z = tf.nn.depthwise_conv2d(
-                                                    inp_r,
-                                                    filter=F1,
-                                                    strides=strides,
-                                                    padding=self.padding)
-					    Z = Z_reshape(Z,memW[nBatches:2*nBatches],X1,self.padding,self.strides)
-					    Z = tf.transpose(Z, [2, 0, 1, 3, 4])
-					    Z = tf.reduce_sum(Z, axis=3)
-					    Z2 = b1+Z                                                                
+					if(self.Slice == 2): #Slice the batch into 2 minibatches of size batch/2
+					    miniBatch = tf.cast(self.batch_size/2,dtype=tf.int32)                                                                  
+					    Z1 = self.slice_batch(weights,miniBatch,0,strides) #Takes a portion from 0:minibatch
+					    Z2 = self.slice_batch(weights,miniBatch,1,strides) #Takes a portion from minibatch:2*minibatch
 					    Z = tf.concat([Z1,Z2],axis=0)
-					elif(self.Slice == 4):       
-					    nBatches = tf.cast(self.batch_size/4,dtype=tf.int32)
-					    Xaux = self.X[0:nBatches]
-					    F = memW[0:nBatches]
-					    b = membias[0:nBatches]
-					    inp_r, F = reshape(Xaux,F)
-					    Z = tf.nn.depthwise_conv2d(
-                                                    inp_r,
-                                                    filter=F,
-                                                    strides=strides,
-                                                    padding=self.padding)
-					    Z = Z_reshape(Z,memW[0:nBatches],Xaux,self.padding,self.strides)
-					    Z = tf.transpose(Z, [2, 0, 1, 3, 4])
-					    Z = tf.reduce_sum(Z, axis=3)
-					    Z = b+Z
-                        ###
-					    Xaux = self.X[nBatches:2*nBatches]
-					    F = memW[nBatches:2*nBatches]
-					    b = membias[nBatches:2*nBatches]
-					    inp_r, F = reshape(Xaux,F)
-					    Z2 = tf.nn.depthwise_conv2d(
-                                                    inp_r,
-                                                    filter=F,
-                                                    strides=strides,
-                                                    padding=self.padding)
-					    Z2 = Z_reshape(Z2,memW[nBatches:2*nBatches],Xaux,self.padding,self.strides)
-					    Z2 = tf.transpose(Z2, [2, 0, 1, 3, 4])
-					    Z2 = tf.reduce_sum(Z2, axis=3)
-					    Z2 = b+Z2
-					    Z = tf.concat([Z,Z2],axis=0)                    
-                        ###
-					    Xaux = self.X[2*nBatches:3*nBatches]
-					    F = memW[2*nBatches:3*nBatches]
-					    b = membias[2*nBatches:3*nBatches]
-					    inp_r, F = reshape(Xaux,F)
-					    Z2 = tf.nn.depthwise_conv2d(
-                                                    inp_r,
-                                                    filter=F,
-                                                    strides=strides,
-                                                    padding=self.padding)
-					    Z2 = Z_reshape(Z2,memW[2*nBatches:3*nBatches],Xaux,self.padding,self.strides)
-					    Z2 = tf.transpose(Z2, [2, 0, 1, 3, 4])
-					    Z2 = tf.reduce_sum(Z2, axis=3)
-					    Z2 = b+Z2
-					    Z = tf.concat([Z,Z2],axis=0)
-                        ###
-					    Xaux = self.X[3*nBatches:4*nBatches]
-					    F = memW[3*nBatches:4*nBatches]
-					    b = membias[3*nBatches:4*nBatches]
-					    inp_r, F = reshape(Xaux,F)
-					    Z2 = tf.nn.depthwise_conv2d(
-                                                    inp_r,
-                                                    filter=F,
-                                                    strides=strides,
-                                                    padding=self.padding)
-					    Z2 = Z_reshape(Z2,memW[3*nBatches:4*nBatches],Xaux,self.padding,self.strides)
-					    Z2 = tf.transpose(Z2, [2, 0, 1, 3, 4])
-					    Z2 = tf.reduce_sum(Z2, axis=3)
-					    Z2 = b+Z2
-					    Z = tf.concat([Z,Z2],axis=0)				
-					else:                        
-					    inp_r, F = reshape(self.X,memW) #Makes the reshape from [batch,H,W,ch] to [1,H,W,Ch*batch] for input. For filters from [batch,fh,fw,Ch,out_ch]  to
+					elif(self.Slice == 4):
+					    miniBatch = tf.cast(self.batch_size/4,dtype=tf.int32) #Slice the batch into 4 minibatches of size batch/4
+					    Z = self.slice_batch(weights,miniBatch,0,strides) #Takes a portion from 0:minibatch
+					    Z1 = self.slice_batch(weights,miniBatch,1,strides) #Takes a portion from minibatch:2*minibatch
+					    Z = tf.concat([Z,Z1],axis=0)                      
+					    Z1 = self.slice_batch(weights,miniBatch,2,strides) #Takes a portion from 2*minibatch:3*minibatch
+					    Z = tf.concat([Z,Z1],axis=0)                                              
+					    Z1 = self.slice_batch(weights,miniBatch,3,strides) #Takes a portion from 3*minibatch:4*minibatch
+					    Z = tf.concat([Z,Z1],axis=0)                                                                                                                                                                        
+					elif(self.Slice == 8):
+					    miniBatch = tf.cast(self.batch_size/8,dtype=tf.int32) #Slice the batch into 8 minibatches of size batch/8
+					    Z = self.slice_batch(weights,miniBatch,0,strides) #Takes a portion from 0:minibatch
+					    Z1 = self.slice_batch(weights,miniBatch,1,strides) #Takes a portion from minibatch:2*minibatch
+					    Z = tf.concat([Z,Z1],axis=0)                      
+					    Z1 = self.slice_batch(weights,miniBatch,2,strides) #Takes a portion from 2*minibatch:3*minibatch
+					    Z = tf.concat([Z,Z1],axis=0)                                              
+					    Z1 = self.slice_batch(weights,miniBatch,3,strides) #Takes a portion from 3*minibatch:4*minibatch
+					    Z = tf.concat([Z,Z1],axis=0)
+					    Z1 = self.slice_batch(weights,miniBatch,4,strides) #Takes a portion from 4*minibatch:5*minibatch
+					    Z = tf.concat([Z,Z1],axis=0)
+					    Z1 = self.slice_batch(weights,miniBatch,5,strides) #Takes a portion from 5*minibatch:4*minibatch
+					    Z = tf.concat([Z,Z1],axis=0)
+					    Z1 = self.slice_batch(weights,miniBatch,6,strides) #Takes a portion from 6*minibatch:7*minibatch
+					    Z = tf.concat([Z,Z1],axis=0)
+					    Z1 = self.slice_batch(weights,miniBatch,7,strides) #Takes a portion from 7*minibatch:8*minibatch
+					    Z = tf.concat([Z,Z1],axis=0)                                                                                                                                                              
+					else:     
+					    if(self.Wstd != 0):
+					        #Werr = tf.gather(self.Werr,[loc_id])
+					        Werr = abs(1+tf.random.normal(shape=list((self.batch_size,))+self.shape,stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)
+					    else:
+					        Werr = self.Werr
+					    weights = tf.expand_dims(weights,axis=0)
+					    memW = tf.multiply(weights,Werr)
+					    if(self.Bstd != 0):
+					        #Berr = tf.gather(self.Berr, [loc_id])
+					        Berr =  abs(1+tf.random.normal(shape=[self.batch_size,self.filters],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr, axis=0)
+					    else:
+					        Berr = self.Berr
+					    bias = tf.expand_dims(self.bias,axis=0)
+					    membias = tf.multiply(bias,Berr)
+					    membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])                                                                        
+					    inp_r, memW = reshape(self.X,memW) #Makes the reshape from [batch,H,W,ch] to [1,H,W,Ch*batch] for input. For filters from [batch,fh,fw,Ch,out_ch]  to
                                                                         #[fh,fw,ch*batch,out_ch]
 					    Z = tf.nn.depthwise_conv2d(
                                 inp_r,
-                                filter=F,
+                                filter=memW,
                                 strides=strides,
                                 padding=self.padding)
-					    Z = Z_reshape(Z,memW,self.X,self.padding,self.strides) #Output shape from convolution is [1,newH,newW,batch*Ch*out_ch] so it is reshaped to [newH,newW,batch,Ch,out_ch]
+					    Z = Z_reshape(Z,Werr,self.X,self.padding,self.strides) #Output shape from convolution is [1,newH,newW,batch*Ch*out_ch] so it is reshaped to [newH,newW,batch,Ch,out_ch]
                                                                 #Where newH and newW are the new image dimensions. This depends on the value of padding
                                                                 #Padding same: newH = H  and newW = W
                                                                 #Padding valid: newH = H-fh+1 and newW = W-fw+1
@@ -269,6 +186,35 @@ class ConvAConnect(tf.keras.layers.Layer):
 			bias = self.bias*Berr                
 			Z = bias+tf.nn.convolution(self.X,weights,self.strides,self.padding)	           								
 		return Z
+	def slice_batch(self,weights,miniBatch,N,strides):
+		if(self.Wstd != 0):
+			#Werr = tf.gather(self.Werr,[loc_id])
+			Werr = abs(1+tf.random.normal(shape=list((miniBatch,))+self.shape,stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)
+		else:
+			Werr = self.Werr
+
+		weights = tf.expand_dims(weights,axis=0)
+		memW = tf.multiply(weights,Werr)
+		if(self.Bstd != 0):
+			#Berr = tf.gather(self.Berr, [loc_id])
+			Berr =  abs(1+tf.random.normal(shape=[miniBatch,self.filters],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr, axis=0)
+		else:
+			Berr = self.Berr
+		bias = tf.expand_dims(self.bias,axis=0)
+		membias = tf.multiply(bias,Berr)
+		membias = tf.reshape(membias,[miniBatch,1,1,tf.shape(membias)[-1]])     
+		inp_r, memW = reshape(self.X[N*miniBatch:(N+1)*miniBatch],memW)
+		Z = tf.nn.depthwise_conv2d(
+                                    inp_r,
+                                    filter=memW,
+                                    strides=strides,
+                                    padding=self.padding)
+		Z = Z_reshape(Z,Werr,self.X[N*miniBatch:(N+1)*miniBatch],self.padding,self.strides)
+		Z = tf.transpose(Z, [2, 0, 1, 3, 4])
+		Z = tf.reduce_sum(Z, axis=3)
+		Z = Z+membias        
+		return Z   
+
 	def conv(self,tupla):
 		x,kernel = tupla
 		return tf.nn.convolution(x,kernel,strides=self.strides,padding=self.padding)    
@@ -306,7 +252,7 @@ def reshape(X,F): #Used to reshape the input data and the noisy filters
     F = tf.transpose(F, [1, 2, 0, 3, 4])
     F = tf.reshape(F, [fh, fw, channels*batch_size, out_channels]) 
     inp_r = tf.transpose(X, [1, 2, 0, 3])
-    inp_r = tf.reshape(inp_r, [1, H, W, batch_size*channels_img])
+    inp_r = tf.reshape(X, [1, H, W, batch_size*channels_img])
     return inp_r, F          
 def Z_reshape(Z,F,X,padding,strides): #Used to reshape the output of the layer
     batch_size=tf.shape(X)[0]
@@ -319,7 +265,9 @@ def Z_reshape(Z,F,X,padding,strides): #Used to reshape the output of the layer
     out_channels = tf.shape(F)[-1]
     #tf.print(fh)    
     if padding == "SAME":
-        return tf.reshape(Z, [tf.floor(tf.cast((H)/strides,dtype=tf.float16)), tf.floor(tf.cast((W)/strides,dtype=tf.float16)), batch_size, channels, out_channels])
+        Z = tf.reshape(Z, [tf.floor(tf.cast((H)/strides,dtype=tf.float16)), tf.floor(tf.cast((W)/strides,dtype=tf.float16)), batch_size, channels, out_channels])
+        #Z = tf.reduce_sum(Z, axis=3)        
     if padding == "VALID":
-        return tf.reshape(Z, [tf.floor(tf.cast((H-fh)/strides,dtype=tf.float16))+1, tf.floor(tf.cast((W-fw)/strides,dtype=tf.float16))+1, batch_size, channels, out_channels])
-    #return out         
+        Z = tf.reshape(Z, [tf.floor(tf.cast((H-fh)/strides,dtype=tf.float16))+1, tf.floor(tf.cast((W-fw)/strides,dtype=tf.float16))+1, batch_size, channels, out_channels])
+        #Z = tf.reduce_sum(Z, axis=3)                        
+    return Z         
