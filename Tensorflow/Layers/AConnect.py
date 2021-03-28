@@ -93,21 +93,22 @@ class AConnect(tf.keras.layers.Layer):
 					Z = tf.concat([Z,Z1],axis=0)                                                                                                                                                                        
 				elif(self.Slice == 8):
 					miniBatch = tf.cast(self.batch_size/8,dtype=tf.int32) #Slice the batch into 8 minibatches of size batch/8
-					Z = self.slice_batch(weights,miniBatch,0,row) #Takes a portion from 0:minibatch
-					Z1 = self.slice_batch(weights,miniBatch,1,row) #Takes a portion from minibatch:2*minibatch
-					Z = tf.concat([Z,Z1],axis=0)                      
-					Z1 = self.slice_batch(weights,miniBatch,2,row) #Takes a portion from 2*minibatch:3*minibatch
-					Z = tf.concat([Z,Z1],axis=0)                                              
-					Z1 = self.slice_batch(weights,miniBatch,3,row) #Takes a portion from 3*minibatch:4*minibatch
-					Z = tf.concat([Z,Z1],axis=0)
-					Z1 = self.slice_batch(weights,miniBatch,4,row) #Takes a portion from 4*minibatch:5*minibatch
-					Z = tf.concat([Z,Z1],axis=0)
-					Z1 = self.slice_batch(weights,miniBatch,5,row) #Takes a portion from 5*minibatch:4*minibatch
-					Z = tf.concat([Z,Z1],axis=0)
-					Z1 = self.slice_batch(weights,miniBatch,6,row) #Takes a portion from 6*minibatch:7*minibatch
-					Z = tf.concat([Z,Z1],axis=0)
-					Z1 = self.slice_batch(weights,miniBatch,7,row) #Takes a portion from 7*minibatch:8*minibatch
-					Z = tf.concat([Z,Z1],axis=0)
+					Z = self.slice_batch(weights,miniBatch,0,row) #Takes a portion from 0:minibatch                    
+					for i in range(7):
+					    Z1 = self.slice_batch(weights,miniBatch,i+1,row) #Takes a portion from minibatch:2*minibatch
+					    Z = tf.concat([Z,Z1],axis=0)                      
+					#Z1 = self.slice_batch(weights,miniBatch,2,row) #Takes a portion from 2*minibatch:3*minibatch
+					#Z = tf.concat([Z,Z1],axis=0)                                              
+					#Z1 = self.slice_batch(weights,miniBatch,3,row) #Takes a portion from 3*minibatch:4*minibatch
+					#Z = tf.concat([Z,Z1],axis=0)
+					#Z1 = self.slice_batch(weights,miniBatch,4,row) #Takes a portion from 4*minibatch:5*minibatch
+					#Z = tf.concat([Z,Z1],axis=0)
+					#Z1 = self.slice_batch(weights,miniBatch,5,row) #Takes a portion from 5*minibatch:4*minibatch
+					#Z = tf.concat([Z,Z1],axis=0)
+					#Z1 = self.slice_batch(weights,miniBatch,6,row) #Takes a portion from 6*minibatch:7*minibatch
+					#Z = tf.concat([Z,Z1],axis=0)
+					#Z1 = self.slice_batch(weights,miniBatch,7,row) #Takes a portion from 7*minibatch:8*minibatch
+					#Z = tf.concat([Z,Z1],axis=0)
 				else:                    
 					if(self.Wstd !=0):							
                         #Werr = tf.gather(self.Werr,[loc_id])		#Finally, this line will take only N matrices from the "Pool" of error matrices. Where N is the batch size.          
@@ -180,16 +181,15 @@ class AConnect(tf.keras.layers.Layer):
 			Werr = self.Werr
 
 		weights = tf.expand_dims(weights,axis=0)
-		memW = tf.multiply(weights,Werr)
+		memW = tf.multiply(weights,Werr)    
 		if(self.Bstd != 0):
 			#Berr = tf.gather(self.Berr, [loc_id])
 			Berr =  abs(1+tf.random.normal(shape=[miniBatch,self.output_size],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr, axis=0)
 		else:
 			Berr = self.Berr
 		bias = tf.expand_dims(self.bias,axis=0)
-		membias = tf.multiply(bias,Berr)
-		membias = tf.reshape(membias,[miniBatch,1,1,tf.shape(membias)[-1]])     
-		Xaux = tf.reshape(self.X, [miniBatch,1,tf.shape(self.X)[-1]]) #We need this reshape, beacuse the input data is a column vector with
+		membias = tf.multiply(bias,Berr) 
+		Xaux = tf.reshape(self.X[N*miniBatch:(N+1)*miniBatch], [miniBatch,1,row]) #We need this reshape, beacuse the input data is a column vector with
 																					# 2 dimension, e.g. in the first layer using MNIST we will have a vector with
 																					#shape [batchsize,784], and we need to do a matrix multiplication.
 																					#Which means the last dimension of the first matrix and the first dimension of the
@@ -199,9 +199,12 @@ class AConnect(tf.keras.layers.Layer):
 																					#Thats why we add an extra dimension, and transpose the vector. At the end we will have a vector with shape [batchsize,1,784].
 																					#And the multiplication result will be correct.
 																					
-		Z = tf.matmul(Xaux, memW) 	#Matrix multiplication between input and mask. With output shape [batchsize,1,128]
-		Z = tf.reshape(Z,[miniBatch,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
-		Z = tf.add(Z,membias) #FInally, we add the bias error mask      
+		Z = tf.matmul(Xaux, memW) 	#Matrix multiplication between input and mask. With output shape [batchsize,1,128]         
+		Z = tf.reshape(Z,[miniBatch,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]           
+		Z = tf.add(Z,membias) #FInally, we add the bias error mask   
+		tf.print('X dims: ',tf.shape(Xaux))                     
+		#tf.print('Werr dims: ',tf.shape(memW))                             
+		#tf.print('Z dims: ',tf.shape(Z))                             
 		return Z  
 
 	#THis is only for saving purposes. Does not affect the layer performance.	

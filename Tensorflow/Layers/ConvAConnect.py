@@ -91,8 +91,8 @@ class ConvAConnect(tf.keras.layers.Layer):
 					bias = tf.expand_dims(self.bias,axis=0)
 					membias = tf.multiply(bias,Berr)
 					membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])                    
-					#Xaux = self.X#tf.reshape(self.X, [self.batch_size,tf.shape(self.X)[1],tf.shape(self.X)[2],tf.shape(self.X)[3]])
-					Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(self.X,1),memW), parallel_iterations=self.batch_size,fn_output_signature=self.d_type),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
+					#Xaux = tf.transpose(self.X,[0,1,2,3])#tf.reshape(self.X, [self.batch_size,tf.shape(self.X)[1],tf.shape(self.X)[2],tf.shape(self.X)[3]])
+					Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(self.X,1),memW), parallel_iterations=256,fn_output_signature=self.d_type),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
 					Z = tf.reshape(Z, [self.batch_size, tf.shape(Z)[1],tf.shape(Z)[2],tf.shape(Z)[3]])
 					Z = Z+membias
 				##################################################################################################################################
