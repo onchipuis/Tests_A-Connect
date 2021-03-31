@@ -107,29 +107,15 @@ class ConvAConnect(tf.keras.layers.Layer):
 					elif(self.Slice == 4):
 					    miniBatch = tf.cast(self.batch_size/4,dtype=tf.int32) #Slice the batch into 4 minibatches of size batch/4
 					    Z = self.slice_batch(weights,miniBatch,0,strides) #Takes a portion from 0:minibatch
-					    Z1 = self.slice_batch(weights,miniBatch,1,strides) #Takes a portion from minibatch:2*minibatch
-					    Z = tf.concat([Z,Z1],axis=0)                      
-					    Z1 = self.slice_batch(weights,miniBatch,2,strides) #Takes a portion from 2*minibatch:3*minibatch
-					    Z = tf.concat([Z,Z1],axis=0)                                              
-					    Z1 = self.slice_batch(weights,miniBatch,3,strides) #Takes a portion from 3*minibatch:4*minibatch
-					    Z = tf.concat([Z,Z1],axis=0)                                                                                                                                                                        
+					    for i in range(3):
+					        Z1 = self.slice_batch(weights,miniBatch,i+1,strides) #Takes a portion from i*minibatch:(i+1)*minibatch
+					        Z = tf.concat([Z,Z1],axis=0)                                                                                                                                                                        
 					elif(self.Slice == 8):
 					    miniBatch = tf.cast(self.batch_size/8,dtype=tf.int32) #Slice the batch into 8 minibatches of size batch/8
-					    Z = self.slice_batch(weights,miniBatch,0,strides) #Takes a portion from 0:minibatch
-					    Z1 = self.slice_batch(weights,miniBatch,1,strides) #Takes a portion from minibatch:2*minibatch
-					    Z = tf.concat([Z,Z1],axis=0)                      
-					    Z1 = self.slice_batch(weights,miniBatch,2,strides) #Takes a portion from 2*minibatch:3*minibatch
-					    Z = tf.concat([Z,Z1],axis=0)                                              
-					    Z1 = self.slice_batch(weights,miniBatch,3,strides) #Takes a portion from 3*minibatch:4*minibatch
-					    Z = tf.concat([Z,Z1],axis=0)
-					    Z1 = self.slice_batch(weights,miniBatch,4,strides) #Takes a portion from 4*minibatch:5*minibatch
-					    Z = tf.concat([Z,Z1],axis=0)
-					    Z1 = self.slice_batch(weights,miniBatch,5,strides) #Takes a portion from 5*minibatch:4*minibatch
-					    Z = tf.concat([Z,Z1],axis=0)
-					    Z1 = self.slice_batch(weights,miniBatch,6,strides) #Takes a portion from 6*minibatch:7*minibatch
-					    Z = tf.concat([Z,Z1],axis=0)
-					    Z1 = self.slice_batch(weights,miniBatch,7,strides) #Takes a portion from 7*minibatch:8*minibatch
-					    Z = tf.concat([Z,Z1],axis=0)                                                                                                                                                              
+					    Z = self.slice_batch(weights,miniBatch,0,strides) #Takes a portion from 0:minibatch                  
+					    for i in range(7):
+					        Z1 = self.slice_batch(weights,miniBatch,i+1,strides) #Takes a portion from i*minibatch:(i+1)*minibatch
+					        Z = tf.concat([Z,Z1],axis=0)                                                                                                                                                              
 					else:     
 					    if(self.Wstd != 0):
 					        #Werr = tf.gather(self.Werr,[loc_id])

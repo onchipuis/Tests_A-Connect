@@ -85,12 +85,9 @@ class AConnect(tf.keras.layers.Layer):
 				elif(self.Slice == 4):
 					miniBatch = tf.cast(self.batch_size/4,dtype=tf.int32) #Slice the batch into 4 minibatches of size batch/4
 					Z = self.slice_batch(weights,miniBatch,0,row) #Takes a portion from 0:minibatch
-					Z1 = self.slice_batch(weights,miniBatch,1,row) #Takes a portion from minibatch:2*minibatch
-					Z = tf.concat([Z,Z1],axis=0)                      
-					Z1 = self.slice_batch(weights,miniBatch,2,row) #Takes a portion from 2*minibatch:3*minibatch
-					Z = tf.concat([Z,Z1],axis=0)                                              
-					Z1 = self.slice_batch(weights,miniBatch,3,row) #Takes a portion from 3*minibatch:4*minibatch
-					Z = tf.concat([Z,Z1],axis=0)                                                                                                                                                                        
+					for i in range(3):
+					    Z1 = self.slice_batch(weights,miniBatch,i+1,row) #Takes a portion from minibatch:2*minibatch
+					    Z = tf.concat([Z,Z1],axis=0)                                                                                                                                                                              
 				elif(self.Slice == 8):
 					miniBatch = tf.cast(self.batch_size/8,dtype=tf.int32) #Slice the batch into 8 minibatches of size batch/8
 					Z = self.slice_batch(weights,miniBatch,0,row) #Takes a portion from 0:minibatch                    
