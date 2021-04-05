@@ -132,14 +132,14 @@ class ConvAConnect(tf.keras.layers.Layer):
 					    bias = tf.expand_dims(self.bias,axis=0)
 					    membias = tf.multiply(bias,Berr)
 					    membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])                                                                        
-					    inp_r, memW = reshape(self.X,memW) #Makes the reshape from [batch,H,W,ch] to [1,H,W,Ch*batch] for input. For filters from [batch,fh,fw,Ch,out_ch]  to
+					    inp_r, F = reshape(self.X,memW) #Makes the reshape from [batch,H,W,ch] to [1,H,W,Ch*batch] for input. For filters from [batch,fh,fw,Ch,out_ch]  to
                                                                         #[fh,fw,ch*batch,out_ch]
 					    Z = tf.nn.depthwise_conv2d(
                                 inp_r,
-                                filter=memW,
+                                filter=F,
                                 strides=strides,
                                 padding=self.padding)
-					    Z = Z_reshape(Z,Werr,self.X,self.padding,self.strides) #Output shape from convolution is [1,newH,newW,batch*Ch*out_ch] so it is reshaped to [newH,newW,batch,Ch,out_ch]
+					    Z = Z_reshape(Z,memW,self.X,self.padding,self.strides) #Output shape from convolution is [1,newH,newW,batch*Ch*out_ch] so it is reshaped to [newH,newW,batch,Ch,out_ch]
                                                                 #Where newH and newW are the new image dimensions. This depends on the value of padding
                                                                 #Padding same: newH = H  and newW = W
                                                                 #Padding valid: newH = H-fh+1 and newW = W-fw+1
@@ -238,7 +238,7 @@ def reshape(X,F): #Used to reshape the input data and the noisy filters
     F = tf.transpose(F, [1, 2, 0, 3, 4])
     F = tf.reshape(F, [fh, fw, channels*batch_size, out_channels]) 
     inp_r = tf.transpose(X, [1, 2, 0, 3])
-    inp_r = tf.reshape(X, [1, H, W, batch_size*channels_img])
+    inp_r = tf.reshape(inp_r, [1, H, W, batch_size*channels_img])
     return inp_r, F          
 def Z_reshape(Z,F,X,padding,strides): #Used to reshape the output of the layer
     batch_size=tf.shape(X)[0]
@@ -251,9 +251,7 @@ def Z_reshape(Z,F,X,padding,strides): #Used to reshape the output of the layer
     out_channels = tf.shape(F)[-1]
     #tf.print(fh)    
     if padding == "SAME":
-        Z = tf.reshape(Z, [tf.floor(tf.cast((H)/strides,dtype=tf.float16)), tf.floor(tf.cast((W)/strides,dtype=tf.float16)), batch_size, channels, out_channels])
-        #Z = tf.reduce_sum(Z, axis=3)        
+        return tf.reshape(Z, [tf.floor(tf.cast((H)/strides,dtype=tf.float16)), tf.floor(tf.cast((W)/strides,dtype=tf.float16)), batch_size, channels, out_channels])
     if padding == "VALID":
-        Z = tf.reshape(Z, [tf.floor(tf.cast((H-fh)/strides,dtype=tf.float16))+1, tf.floor(tf.cast((W-fw)/strides,dtype=tf.float16))+1, batch_size, channels, out_channels])
-        #Z = tf.reduce_sum(Z, axis=3)                        
-    return Z         
+        return tf.reshape(Z, [tf.floor(tf.cast((H-fh)/strides,dtype=tf.float16))+1, tf.floor(tf.cast((W-fw)/strides,dtype=tf.float16))+1, batch_size, channels, out_channels])
+    #return out              
