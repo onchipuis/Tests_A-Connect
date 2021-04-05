@@ -50,12 +50,15 @@ optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_
 	#acc_noisy = pool.map(parallel, range(M))
 	#pool.close()
 	media = np.median(acc_noisy)
+	IQR = np.percentile(acc_noisy,75) - np.percentile(acc_noisy,25)
+	stats = [media,IQR]
 	print('----------------------------------------------------------------')
-	print('Median: %.1f%%\n' % media)
-	#print('IQR Accuracy: %.1f%%\n',100*iqr(acc_noisy))
-#	print('Min. Accuracy: %.1f%%\n' % 100.0*np.amin(acc_noisy))
-#	print('Max. Accuracy: %.1f%%\n'% 100.0*np.amax(acc_noisy))
+	print('Median: %.2f%%\n' % media)
+	print('IQR Accuracy: %.2f%%\n' % IQR)
+	print('Min. Accuracy: %.2f%%\n' % np.amin(acc_noisy))
+	print('Max. Accuracy: %.2f%%\n'% np.amax(acc_noisy))
 
 	np.savetxt('./Results/'+net_name+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt
+	np.savetxt('./Results/Stats/'+net_name+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',stats,fmt="%.2f") #Save the median and iqr of M samples in a txt
 	return acc_noisy, media
 	

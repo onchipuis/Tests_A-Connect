@@ -74,10 +74,10 @@ def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no",pool=1000):
 		
 		model = tf.keras.Sequential([
 			tf.keras.layers.Flatten(input_shape=imgsize),	
-			AConnect.AConnect(128,Wstd,Bstd,isBin,pool),
+			AConnect.AConnect(128,Wstd,Bstd,isBin),
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.ReLU(),
-			AConnect.AConnect(10,Wstd,Bstd,isBin,pool),
+			AConnect.AConnect(10,Wstd,Bstd,isBin),
 			tf.keras.layers.Softmax()
 		])
 
@@ -150,7 +150,6 @@ def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no",pool=1000):
 			tf.keras.layers.Softmax()
 		])
 		
-		return model
 		
 		return model		
 	

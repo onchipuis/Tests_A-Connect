@@ -119,33 +119,39 @@ class ConvAConnect(tf.keras.layers.Layer):
 					else:     
 					    if(self.Wstd != 0):
 					        #Werr = tf.gather(self.Werr,[loc_id])
-					        Werr = abs(1+tf.random.normal(shape=list((self.batch_size,))+self.shape,stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)
+					        Werr = abs(1+tf.random.normal(shape=list((8,))+self.shape,stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)
 					    else:
 					        Werr = self.Werr
 					    weights = tf.expand_dims(weights,axis=0)
 					    memW = tf.multiply(weights,Werr)
 					    if(self.Bstd != 0):
 					        #Berr = tf.gather(self.Berr, [loc_id])
-					        Berr =  abs(1+tf.random.normal(shape=[self.batch_size,self.filters],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr, axis=0)
+					        Berr =  abs(1+tf.random.normal(shape=[8,self.filters],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr, axis=0)
 					    else:
 					        Berr = self.Berr
 					    bias = tf.expand_dims(self.bias,axis=0)
 					    membias = tf.multiply(bias,Berr)
-					    membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])                                                                        
-					    inp_r, F = reshape(self.X,memW) #Makes the reshape from [batch,H,W,ch] to [1,H,W,Ch*batch] for input. For filters from [batch,fh,fw,Ch,out_ch]  to
+					    membias = tf.reshape(membias,[8,1,1,tf.shape(membias)[-1]])
+					    Z = tf.nn.conv2d(self.X[0:32],memW[0],strides=strides,padding=self.padding)
+					    Z = Z+membias[0]
+					    for i in range(7):				
+					        Z1 = tf.nn.conv2d(self.X[(i+1)*32:(i+2)*32],memW[i+1],strides=strides,padding=self.padding)                                                                                              
+					        Z1 = tf.add(Z1,membias[i+1])                   
+					        Z = tf.concat([Z,Z1],axis=0)                                                                                                                                                
+					    #inp_r, F = reshape(self.X,memW) #Makes the reshape from [batch,H,W,ch] to [1,H,W,Ch*batch] for input. For filters from [batch,fh,fw,Ch,out_ch]  to
                                                                         #[fh,fw,ch*batch,out_ch]
-					    Z = tf.nn.depthwise_conv2d(
-                                inp_r,
-                                filter=F,
-                                strides=strides,
-                                padding=self.padding)
-					    Z = Z_reshape(Z,memW,self.X,self.padding,self.strides) #Output shape from convolution is [1,newH,newW,batch*Ch*out_ch] so it is reshaped to [newH,newW,batch,Ch,out_ch]
+					    #Z = tf.nn.depthwise_conv2d(
+                        #        inp_r,
+                        #        filter=F,
+                        #        strides=strides,
+                        #        padding=self.padding)
+					    #Z = Z_reshape(Z,memW,self.X,self.padding,self.strides) #Output shape from convolution is [1,newH,newW,batch*Ch*out_ch] so it is reshaped to [newH,newW,batch,Ch,out_ch]
                                                                 #Where newH and newW are the new image dimensions. This depends on the value of padding
                                                                 #Padding same: newH = H  and newW = W
                                                                 #Padding valid: newH = H-fh+1 and newW = W-fw+1
-					    Z = tf.transpose(Z, [2, 0, 1, 3, 4]) #Get the property output shape [batch,nH,nW,Ch,out_ch]
-					    Z = tf.reduce_sum(Z, axis=3)		#Removes the input channel dimension by adding all this elements                                                        
-					    Z = membias+Z					#Add the bias
+					    #Z = tf.transpose(Z, [2, 0, 1, 3, 4]) #Get the property output shape [batch,nH,nW,Ch,out_ch]
+					    #Z = tf.reduce_sum(Z, axis=3)		#Removes the input channel dimension by adding all this elements                                                        
+					    #Z = membias+Z					#Add the bias
 			else:
 				if(self.isBin=='yes'):
 					weights=self.sign(self.W)*self.Werr

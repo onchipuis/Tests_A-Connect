@@ -4,13 +4,7 @@
 
 import tensorflow as tf
 import numpy as np
-import sys
-config = open('config.txt','r')
-folder = config.read()
-sys.path.append(folder)
-sys.path.append(folder+'/Scripts')
-import Scripts 
-from Scripts import addMismatch
+
 ############ This layer was made using the template provided by Keras. For more info, go to the official site.
 
 class AConnect(tf.keras.layers.Layer): 
