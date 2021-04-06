@@ -94,7 +94,7 @@ for k in range(len(identifier)): #Iterate over the networks
                 print('TESTING NETWORK: ', name)
                 print('With simulation error: ', Err)
                 print('\n\n*******************************************************************************************')
-                acc_noisy, media = MCsim.MCsim(string,x_test,y_test,N,Err,Err,force,0,name,custom_objects,SRAMsz=[1024,1024],SRAMBsz=[1024]) #Perform the simulation
+                acc_noisy, media = MCsim.MCsim(string,x_test,y_test,N,Err,Err,force,0,name,custom_objects) #Perform the simulation
                 #For more information about MCSim please go to Scripts/MCsim.py
                 #####
                 now = datetime.now()
