@@ -66,7 +66,7 @@ class AConnect(tf.keras.layers.Layer):
 										   																  	
 				if(self.Wstd !=0):							
 					#Werr = tf.gather(self.Werr,[loc_id])		#Finally, this line will take only N matrices from the "Pool" of error matrices. Where N is the batch size.          
-					self.mWerr = abs(1+tf.random.normal(shape=[8,tf.cast(row,tf.int32),self.output_size],stddev=self.Wstd))#tf.squeeze(Werr, axis=0)				#This is necessary because gather add an extra dimension. Squeeze remove this dimension.			 
+					self.mWerr = abs(1+tf.random.normal(shape=[16,tf.cast(row,tf.int32),self.output_size],stddev=self.Wstd))#tf.squeeze(Werr, axis=0)				#This is necessary because gather add an extra dimension. Squeeze remove this dimension.			 
 																#That means, with a weights shape of [784,128] and a batch size of 256. Werr should be a tensor with shape	
 																#[256,784,128], but gather return us a tensor with shape [1,256,784,128], so we remove that 1 with squeeze.
 				else:
@@ -80,15 +80,15 @@ class AConnect(tf.keras.layers.Layer):
 				
 				if(self.Bstd !=0):								#For the bias is exactly the same situation
 					#Berr = tf.gather(self.Berr, [loc_id])  		 
-					self.mBerr = abs(1+tf.random.normal(shape=[8,self.output_size],stddev=self.Bstd))#tf.squeeze(Berr,axis=0)
+					self.mBerr = abs(1+tf.random.normal(shape=[16,self.output_size],stddev=self.Bstd))#tf.squeeze(Berr,axis=0)
 				else:
 					self.mBerr = self.Berr
 				#self.membias = tf.multiply(self.mBerr,self.bias)	
-				Z = tf.matmul(self.X[0:32],weights*self.mWerr[0])
+				Z = tf.matmul(self.X[0:16],weights*self.mWerr[0])
 				Z = tf.add(Z,self.bias*self.mBerr[0])
 				#tf.print(tf.shape(Z))                                                
-				for i in range(7):				
-				    Z1 = tf.matmul(self.X[(i+1)*(32):(i+2)*(32)],weights*self.mWerr[i+1])                                                                                              
+				for i in range(15):				
+				    Z1 = tf.matmul(self.X[(i+1)*(16):(i+2)*(16)],weights*self.mWerr[i+1])                                                                                              
 				    Z1 = tf.add(Z1,self.bias*self.mBerr[i+1])                   
 				    Z = tf.concat([Z,Z1],axis=0)
 				    #tf.print(tf.shape(Z))                    

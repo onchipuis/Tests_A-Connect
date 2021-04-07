@@ -119,23 +119,23 @@ class ConvAConnect(tf.keras.layers.Layer):
 					else:     
 					    if(self.Wstd != 0):
 					        #Werr = tf.gather(self.Werr,[loc_id])
-					        Werr = abs(1+tf.random.normal(shape=list((8,))+self.shape,stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)
+					        Werr = abs(1+tf.random.normal(shape=list((16,))+self.shape,stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)
 					    else:
 					        Werr = self.Werr
 					    weights = tf.expand_dims(weights,axis=0)
 					    memW = tf.multiply(weights,Werr)
 					    if(self.Bstd != 0):
 					        #Berr = tf.gather(self.Berr, [loc_id])
-					        Berr =  abs(1+tf.random.normal(shape=[8,self.filters],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr, axis=0)
+					        Berr =  abs(1+tf.random.normal(shape=[16,self.filters],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr, axis=0)
 					    else:
 					        Berr = self.Berr
 					    bias = tf.expand_dims(self.bias,axis=0)
 					    membias = tf.multiply(bias,Berr)
-					    membias = tf.reshape(membias,[8,1,1,tf.shape(membias)[-1]])
-					    Z = tf.nn.conv2d(self.X[0:32],memW[0],strides=strides,padding=self.padding)
+					    membias = tf.reshape(membias,[16,1,1,tf.shape(membias)[-1]])
+					    Z = tf.nn.conv2d(self.X[0:16],memW[0],strides=strides,padding=self.padding)
 					    Z = Z+membias[0]
-					    for i in range(7):				
-					        Z1 = tf.nn.conv2d(self.X[(i+1)*32:(i+2)*32],memW[i+1],strides=strides,padding=self.padding)                                                                                              
+					    for i in range(15):				
+					        Z1 = tf.nn.conv2d(self.X[(i+1)*16:(i+2)*16],memW[i+1],strides=strides,padding=self.padding)                                                                                              
 					        Z1 = tf.add(Z1,membias[i+1])                   
 					        Z = tf.concat([Z,Z1],axis=0)                                                                                                                                                
 					    #inp_r, F = reshape(self.X,memW) #Makes the reshape from [batch,H,W,ch] to [1,H,W,Ch*batch] for input. For filters from [batch,fh,fw,Ch,out_ch]  to
