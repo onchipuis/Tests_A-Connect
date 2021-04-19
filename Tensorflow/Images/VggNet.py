@@ -107,8 +107,8 @@ model=VggNet(isAConnect=False,Wstd=0.5,Bstd=0.5)
 model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.1,momentum=0.9), metrics=['accuracy'])
 print(model.summary())
 model.fit(train_images,train_labels,
-          batch_size=128,epochs=10,
-          validation_split=0.3
+          batch_size=256,epochs=10,
+          validation_split=0.2
           )
 model.evaluate(test_images,test_labels)    
 #model.save("../Models/VggNet.h5",include_optimizer=True)
