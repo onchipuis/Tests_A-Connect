@@ -13,11 +13,6 @@ from memory_profiler import profile
 
 @profile
 def memory_test(Wstd,Bstd):
-    from tensorflow.compat.v1.keras.backend import set_session
-    from tensorflow.compat.v1 import Session, ConfigProto, GPUOptions
-    tf_config = ConfigProto(gpu_options=GPUOptions(allow_growth=False))
-    session = Session(config=tf_config)
-    set_session(session)
     model = tf.keras.models.Sequential([
 		tf.keras.layers.InputLayer(input_shape=[32,32,3]),
 		tf.keras.layers.experimental.preprocessing.Resizing(227,227),    
@@ -40,7 +35,7 @@ def memory_test(Wstd,Bstd):
         tf.keras.layers.ReLU(),
 		tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
 		tf.keras.layers.Flatten(),
-		AConnect.AConnect(4096, Wstd=Wstd,Bstd=Bstd,d_type=tf.dtypes.float16),
+		AConnect.AConnect(4096, Wstd=Wstd,Bstd=Bstd,pool=2,d_type=tf.dtypes.float16),
 		tf.keras.layers.BatchNormalization(),        
         tf.keras.layers.ReLU(),
 		tf.keras.layers.Dropout(0.5),
