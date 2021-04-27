@@ -22,32 +22,57 @@ def VggNet(isAConnect=False,Wstd=0,Bstd=0):
             tf.keras.layers.InputLayer(input_shape=[32,32,3]),
 			tf.keras.layers.experimental.preprocessing.Resizing(224,224), 			
 #stack1
-			tf.keras.layers.Conv2D(64,kernel_size=[3,3],padding='same',activation='relu'),
-			tf.keras.layers.Conv2D(64,kernel_size=[3,3],padding='same',activation='relu'),
-			tf.keras.layers.MaxPool2D(pool_size=[2,2],strides=2,padding='same'),
+			tf.keras.layers.Conv2D(64,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Conv2D(64,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.MaxPool2D(pool_size=(2,2),strides=(3,3),padding='same'),
 #stack2
-			tf.keras.layers.Conv2D(128,kernel_size=[3,3],padding='same',activation='relu'),
-			tf.keras.layers.Conv2D(128,kernel_size=[3,3],padding='same',activation='relu'),
-			tf.keras.layers.MaxPool2D(pool_size=[2,2],strides=2,padding='same'),
+			tf.keras.layers.Conv2D(128,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Conv2D(128,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.MaxPool2D(pool_size=(2,2),strides=(2,2),padding='same'),
 #stack3
-			tf.keras.layers.Conv2D(256,kernel_size=[3,3],padding='same',activation='relu'),
-			tf.keras.layers.Conv2D(256,kernel_size=[3,3],padding='same',activation='relu'),
-			tf.keras.layers.Conv2D(256,kernel_size=[1,1],padding='same',activation='relu'),
-			tf.keras.layers.MaxPool2D(pool_size=[2,2],strides=2,padding='same'),
+			tf.keras.layers.Conv2D(256,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Conv2D(256,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Conv2D(256,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Conv2D(256,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.MaxPool2D(pool_size=(2,2),strides=(2,2),padding='same'),
 #stack4
-			tf.keras.layers.Conv2D(512,kernel_size=[3,3],padding='same',activation='relu'),
-			tf.keras.layers.Conv2D(512,kernel_size=[3,3],padding='same',activation='relu'),
-			tf.keras.layers.Conv2D(512,kernel_size=[1,1],padding='same',activation='relu'),
-			tf.keras.layers.MaxPool2D(pool_size=[2,2],strides=2,padding='same'),    
+			tf.keras.layers.Conv2D(512,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Conv2D(512,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Conv2D(512,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Conv2D(512,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.MaxPool2D(pool_size=(2,2),strides=(2,2),padding='same'),    
 #stack5
-			tf.keras.layers.Conv2D(512,kernel_size=[3,3],padding='same',activation='relu'),
-			tf.keras.layers.Conv2D(512,kernel_size=[3,3],padding='same',activation='relu'),
-			tf.keras.layers.Conv2D(512,kernel_size=[1,1],padding='same',activation='relu'),
-			tf.keras.layers.MaxPool2D(pool_size=[2,2],strides=2,padding='same'),
+			tf.keras.layers.Conv2D(512,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Conv2D(512,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Conv2D(512,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Conv2D(512,kernel_size=(3,3),padding='same',activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.MaxPool2D(pool_size=(2,2),strides=(2,2),padding='same'),
 #dense   
-			tf.keras.layers.Dense(256,activation='relu'),
-			tf.keras.layers.Dense(256,activation='relu'),
+			tf.keras.layers.Flatten(),
+			tf.keras.layers.Dense(32,activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Dropout(0.5),
+			tf.keras.layers.Dense(32,activation='relu'),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.Dropout(0.5),
 			tf.keras.layers.Dense(10,activation=None),
+			tf.keras.layers.BatchNormalization(),          
             tf.keras.layers.Softmax()
 	    ])
 	else:
@@ -90,28 +115,23 @@ def VggNet(isAConnect=False,Wstd=0,Bstd=0):
 	
 (train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.cifar10.load_data()	
 CLASS_NAMES= ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+
 """
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-train_datagen = ImageDataGenerator(rescale=1./255, shear_range=0.1, zoom_range=0.1, 
-                                   horizontal_flip=True, vertical_flip=True)
-train_datagen.fit(train_images)
-train_data = train_datagen.flow(train_images,train_labels, batch_size = 256)
+datagen = ImageDataGenerator(horizontal_flip=True,width_shift_range=0.125,height_shift_range=0.125,fill_mode='constant',cval=0.)
 
-val_datagen = ImageDataGenerator(rescale=1./255)
-val_datagen.fit(test_images)
-val_data = val_datagen.flow(test_images, test_labels, batch_size = 256)
+datagen.fit(train_images)
 """
 
 model=VggNet(isAConnect=False,Wstd=0.5,Bstd=0.5)
 #parametros para el entrenamiento
 model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.1,momentum=0.9), metrics=['accuracy'])
 print(model.summary())
-model.fit(train_images,train_labels,
-          batch_size=256,epochs=10,
-          validation_split=0.2
-          )
+model.fit(train_images, train_labels,
+          batch_size=256,epochs=100,
+          validation_split=0.2)
 model.evaluate(test_images,test_labels)    
-#model.save("../Models/VggNet.h5",include_optimizer=True)
+model.save("../Models/VggNet.h5",include_optimizer=True)
 
 #acc=np.zeros([1000,1])
 #acc,media=MCsim.MCsim("../Models/VggNet.h5",test_images, test_labels,1000,0.3,0.3,"no","VggNet_30",SRAMsz=[10000,20000],SRAMBsz=[4096],optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
