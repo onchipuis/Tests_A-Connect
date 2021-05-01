@@ -53,14 +53,14 @@ class AConnect(tf.keras.layers.Layer):
 				self.infBerr = abs(1+tf.random.normal(shape=[self.output_size],stddev=self.Bstd)) #Bias error vector for inference
 				self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
 													 #This was necessary to change the error matrix/array when Monte Carlo was running.
-				#self.Berr = abs(1+tf.random.normal(shape=[self.pool,self.output_size],stddev=self.Bstd,dtype=self.d_type)) #"Pool" of bias error vectors
+				
 																	
 			else:
 				self.Berr = tf.constant(1,dtype=self.d_type)
 			if(self.Wstd != 0): 
 				self.infWerr = abs(1+tf.random.normal(shape=[int(input_shape[-1]),self.output_size],stddev=self.Wstd)) #Weight matrix for inference
 				self.infWerr = self.infWerr.numpy()										 
-				#self.Werr = abs(1+tf.random.normal(shape=[self.pool,int(input_shape[-1]),self.output_size],stddev=self.Wstd,dtype=self.d_type)) #"Pool" of weights error matrices.
+				
 				 
 			else:
 				self.Werr = tf.constant(1,dtype=self.d_type)
@@ -79,12 +79,6 @@ class AConnect(tf.keras.layers.Layer):
 		#This code will train the network. For inference, please go to the else part
 		if(training):	
 			if(self.Wstd != 0 or self.Bstd != 0):
-				#ID = range(np.size(self.Werr,0)) 	#This line creates a vector with numbers from 0-999 (1000 numbers)
-				#ID = tf.random.shuffle(ID) 			#Here is applied a shuffle or permutation of the vector numbers i.e. the output vector
-													#will not have the numbers sorted from 0 to 999. Now the numbers are in random position of the vector.
-													#Before the shuffle ID[0]=0, the, after the shuffle ID[0]=could be any number between 0-999.
-				#loc_id = tf.slice(ID, [0], [self.batch_size])	#This takes a portion of the ID vector of size batch_size. Which means if we defined 	
-																	#batch_size=256. We will take only the numbers in ID in the indexes 0-255. Remeber, the numbers are sorted randomly.						   		
 				if(self.isBin=="yes"):
 					weights = self.sign(self.W)			#Binarize the weights and multiply them element wise with Werr mask
 				else:
