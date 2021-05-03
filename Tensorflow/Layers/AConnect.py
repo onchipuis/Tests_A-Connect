@@ -83,7 +83,7 @@ class AConnect(tf.keras.layers.Layer):
 					weights = self.sign(self.W)			#Binarize the weights and multiply them element wise with Werr mask
 				else:
 				    weights = self.W
-				if(self.pool is None):                                                                                        
+				if(self.pool is None):                                                                                                     
 				    if(self.Slice == 2): #Slice the batch into 2 minibatches of size batch/2
 				        miniBatch = tf.cast(self.batch_size/2,dtype=tf.int32)                                                                  
 				        Z1 = self.slice_batch(weights,miniBatch,0,row) #Takes a portion from 0:minibatch
@@ -101,15 +101,14 @@ class AConnect(tf.keras.layers.Layer):
 				        for i in range(7):                       
 				            Z1 = self.slice_batch(miniBatch,i+1,row) #Takes a portion from minibatch:2*minibatch
 				            Z = tf.concat([Z,Z1],axis=0)                      
-				    else: #if we dont have pool attribute, the layer will train with a batch of error matrices.                   
+				    else:                 
 				        if(self.Wstd !=0):							
 				            #Werr = tf.gather(self.Werr,[loc_id])		#Finally, this line will take only N matrices from the "Pool" of error matrices. Where N is the batch size.          
 				            Werr = abs(1+tf.random.normal(shape=[self.batch_size,tf.cast(row,tf.int32),self.output_size],stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)				#This is necessary because gather add an extra dimension. Squeeze remove this dimension.			 
                                                                         #That means, with a weights shape of [784,128] and a batch size of 256. Werr should be a tensor with shape	
                                                                         #[256,784,128], but gather return us a tensor with shape [1,256,784,128], so we remove that 1 with squeeze.
 				        else:
-				            Werr = self.Werr
-        
+				            Werr = self.Werr      
 				        memW = tf.multiply(weights,Werr)			         	#Finally we multiply element-wise the error matrix with the weights.
                         
 				        if(self.Bstd !=0):								#For the bias is exactly the same situation
@@ -141,27 +140,20 @@ class AConnect(tf.keras.layers.Layer):
 				    else:
 				        Werr = self.Werr
         
-				    memW = tf.multiply(weights,Werr)			         	#Finally we multiply element-wise the error matrix with the weights.
-
 				    if(self.Bstd !=0):								#For the bias is exactly the same situation
 				        Berr = abs(1+tf.random.normal(shape=[self.pool,self.output_size],stddev=self.Bstd,dtype=self.d_type))#tf.squeeze(Berr,axis=0)
 				    else:
-				        Berr = self.Berr
-				    membias = tf.multiply(Berr,self.bias)	
+				        Berr = self.Berr	
                         
-				    Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[-1]]) 
 				    newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
-				    Z = tf.matmul(Xaux[0:newBatch], memW[0]) 	#Matrix multiplication between input and mask. With output shape [batchsize,1,128]
+				    Z = tf.matmul(self.X[0:newBatch], weights*Werr[0]) 	#Matrix multiplication between input and mask. With output shape [batchsize,1,128]
 				    Z = tf.reshape(Z,[newBatch,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
-				    Z = tf.add(Z,membias[0]) #FInally, we add the bias error mask 
+				    Z = tf.add(Z,self.bias*Berr[0]) #FInally, we add the bias error mask 
 				    for i in range(self.pool-1):
-				        Z1 = tf.matmul(Xaux[(i+1)*newBatch:(i+2)*newBatch], memW[i+1])
-				        Z1 = tf.reshape(Z1,[newBatch,tf.shape(Z1)[-1]])                       
-				        Z1 = tf.add(Z1,membias[i+1])                                           
+				        Z1 = tf.matmul(self.X[(i+1)*newBatch:(i+2)*newBatch], weights*Werr[i+1])
+				        Z1 = tf.add(Z1,self.bias*Berr[i+1])                                           
 				        Z = tf.concat([Z,Z1],axis=0)                                                 
-				    #Z = self.forward(self.W,self.bias,self.Xaux)                    
 
-					
 			else:
 				if(self.isBin=='yes'):
 					self.memW = self.sign(self.W)*self.Werr 

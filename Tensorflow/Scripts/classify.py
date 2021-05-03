@@ -4,7 +4,7 @@
 
 import numpy as np
 
-def classify(net,Xtest,Ytest):
+def classify(net,Xtest,Ytest,top5):
 	#pred = np.zeros(len(Ytest))
 	#label_predicted = np.zeros(len(Ytest))
 	#Ypred = net.predict(Xtest)
@@ -16,5 +16,9 @@ def classify(net,Xtest,Ytest):
 	#	pred[i] = label_predicted[i] == Ytest[i]
 		
 	#accuracy = np.sum(pred)/len(Ytest)
-	_,accuracy = net.evaluate(Xtest,Ytest,verbose=0,use_multiprocessing=True)
-	return accuracy
+    if top5:
+	    _, accuracy, top5acc = net.evaluate(Xtest,Ytest,verbose=0,use_multiprocessing=True)
+	    return accuracy, top5acc
+    else:        
+	    _,accuracy = net.evaluate(Xtest,Ytest,verbose=0,use_multiprocessing=True)
+	    return accuracy

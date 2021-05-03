@@ -164,9 +164,7 @@ class ConvAConnect(tf.keras.layers.Layer):
 				    if(self.Wstd != 0):
 				        Werr = abs(1+tf.random.normal(shape=list((self.pool,))+self.shape,stddev=self.Wstd,dtype=self.d_type))#tf.squeeze(Werr, axis=0)
 				    else:
-				        Werr = self.Werr
-        
-				    memW = tf.multiply(weights,Werr)			    #Finally we multiply element-wise the error matrix with the weights.
+				        Werr = self.Werr      
 
 				    if(self.Bstd != 0):
 
@@ -174,20 +172,19 @@ class ConvAConnect(tf.keras.layers.Layer):
 				    else:
 				        Berr = self.Berr
 
-				    membias = tf.multiply(Berr,self.bias)	
 				    newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
-				    Z = tf.nn.conv2d(self.X[0:newBatch], memW[0],strides=[1,self.strides,self.strides,1],padding=self.padding) 
-				    Z = tf.add(Z,membias[0]) #FInally, we add the bias error mask 
+				    Z = tf.nn.conv2d(self.X[0:newBatch], weights*Werr[0],strides=[1,self.strides,self.strides,1],padding=self.padding) 
+				    Z = tf.add(Z,self.bias*Berr[0]) #FInally, we add the bias error mask 
 				    for i in range(self.pool-1):
-				        Z1 = tf.nn.conv2d(self.X[(i+1)*newBatch:(i+2)*newBatch], memW[i+1],strides=[1,self.strides,self.strides,1],padding=self.padding)                    
-				        Z1 = tf.add(Z1,membias[i+1])                                           
+				        Z1 = tf.nn.conv2d(self.X[(i+1)*newBatch:(i+2)*newBatch], weights*Werr[i+1],strides=[1,self.strides,self.strides,1],padding=self.padding)                    
+				        Z1 = tf.add(Z1,self.bias*Berr[i+1])                                           
 				        Z = tf.concat([Z,Z1],axis=0)                                                   
 			else:
 				if(self.isBin=='yes'):
 					weights=self.sign(self.W)*self.Werr
 				else:
 					weights=self.W*self.Werr
-				Z = self.bias*self.Berr+tf.nn.convolution(self.X,weights,self.strides,self.padding)				
+				Z = self.bias*self.Berr+tf.nn.conv2d(self.X,weights,self.strides,self.padding)				
 		else:
 			if(self.Wstd != 0 or self.Bstd !=0):
 				if(self.Wstd !=0):
@@ -206,7 +203,7 @@ class ConvAConnect(tf.keras.layers.Layer):
 			else:
 				weights=self.W*Werr	
 			bias = self.bias*Berr                
-			Z = bias+tf.nn.convolution(self.X,weights,self.strides,self.padding)	           								
+			Z = bias+tf.nn.conv2d(self.X,weights,self.strides,self.padding)	           								
 		return Z
 	def slice_batch(self,weights,miniBatch,N,strides):
 		if(self.Wstd != 0):

@@ -10,8 +10,8 @@ from Layers import ConvAConnect
 from Layers import Conv
 from Layers import FC_quant
 identifier = [True]				#Which network you want to train/test True for A-Connect false for normal LeNet
-Sim_err = [0,0.3,0.5,0.7]	#Define all the simulation errors
-Wstd = [0.3,0.5,0.7] 			#Define the stddev for training
+Sim_err = [0,0.3]	#Define all the simulation errors
+Wstd = [0.3] 			#Define the stddev for training
 Bstd = Wstd
 isBin = "no"					#Do you want binary weights?
 (x_train, y_train), (x_test, y_test) = load_ds.load_ds() #Load dataset
@@ -35,9 +35,10 @@ for i in range(len(identifier)): #Iterate over the networks
             print("\n\t\t\t", name)
             model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin)#Get the model
             optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)#Define optimizer
-            model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])#Compile the model
+            top5 = tf.keras.metrics.TopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None) #COnfigure the model to get the top-5 accuracy
+            model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5])#Compile the model
             print(model.summary())#See the summary
-            history = model.fit(x_train,y_train,validation_split=0.2,epochs = 20,batch_size=256)#Train the model
+            history = model.fit(x_train,y_train,validation_split=0.2,epochs = 1,batch_size=256)#Train the model
             acc = history.history['accuracy']#Save the accuracy and the validation accuracy
             val_acc = history.history['val_accuracy']
             string = './Models/'+name+'.h5'#Define the folder and the name of the model to be saved
@@ -94,7 +95,8 @@ for k in range(len(identifier)): #Iterate over the networks
                 print('TESTING NETWORK: ', name)
                 print('With simulation error: ', Err)
                 print('\n\n*******************************************************************************************')
-                acc_noisy, media = MCsim.MCsim(string,x_test,y_test,N,Err,Err,force,0,name,custom_objects) #Perform the simulation
+                acc_noisy, media = MCsim.MCsim(string,x_test,y_test,N,Err,Err,force,0,name,custom_objects,
+                optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5],top5=True) #Perform the simulation
                 #For more information about MCSim please go to Scripts/MCsim.py
                 #####
                 now = datetime.now()
@@ -124,7 +126,8 @@ for k in range(len(identifier)): #Iterate over the networks
             print('TESTING NETWORK: ', name)
             print('With simulation error: ', Err)
             print('\n\n*******************************************************************************************')
-            acc_noisy, media = MCsim.MCsim(string,x_test,y_test,N,Err,Err,force,0,name,custom_objects,SRAMsz=[1024,1024],SRAMBsz=[1024])
+            acc_noisy, media = MCsim.MCsim(string,x_test,y_test,N,Err,Err,force,0,name,custom_objects,
+            optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])
             #####
             now = datetime.now()
             endtime = now.time()
