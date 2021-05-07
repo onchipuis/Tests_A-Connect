@@ -45,7 +45,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
 			tf.keras.layers.Flatten(),
-      tf.keras.layers.Dense(1024, activation='relu'),
+      			tf.keras.layers.Dense(1024, activation='relu'),
 			tf.keras.layers.Dropout(0.5),
 			tf.keras.layers.Dense(1024, activation='relu'),
 			tf.keras.layers.Dropout(0.5),
@@ -58,36 +58,37 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 		model = tf.keras.models.Sequential([
 			tf.keras.layers.InputLayer(input_shape=[32,32,3]),
 			tf.keras.layers.experimental.preprocessing.Resizing(227,227),    
-		  ConvAConnect.ConvAConnect(filters=96, kernel_size=(11,11),Wstd=Wstd,Bstd=Bstd,pool=16, strides=4,padding="VALID",Op=1,Slice=1,d_type=tf.dtypes.float16),
-      tf.keras.layers.ReLU(),
-		  tf.keras.layers.BatchNormalization(),
+		  ConvAConnect.ConvAConnect(filters=96, kernel_size=(11,11),Wstd=Wstd,Bstd=Bstd,pool=16, strides=4,padding="VALID",Op=1,Slice=1,d_type=tf.dtypes.float16),       
+            tf.keras.layers.ReLU(),
+		  tf.keras.layers.BatchNormalization(),               
 		  tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
-		  ConvAConnect.ConvAConnect(filters=256, kernel_size=(5,5), Wstd=Wstd,Bstd=Bstd,pool=16, strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),
-      tf.keras.layers.ReLU(),
-		  tf.keras.layers.BatchNormalization(),
+		  ConvAConnect.ConvAConnect(filters=256, kernel_size=(5,5), Wstd=Wstd,Bstd=Bstd,pool=16, strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),       
+      		  tf.keras.layers.ReLU(),
+		  tf.keras.layers.BatchNormalization(),                   
 		  tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
-			ConvAConnect.ConvAConnect(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd,pool=16, strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),
-      tf.keras.layers.ReLU(),
-		  tf.keras.layers.BatchNormalization(),
-		  ConvAConnect.ConvAConnect(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd,pool=16, strides=1,padding="SAME",Op=2,Slice=1,d_type=tf.dtypes.float16),
-      tf.keras.layers.ReLU(),
-		  tf.keras.layers.BatchNormalization(),
-		  ConvAConnect.ConvAConnect(filters=256, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd,pool=16, strides=1,padding="SAME",Op=2,Slice=1,d_type=tf.dtypes.float16),
-      tf.keras.layers.ReLU(),
-		  tf.keras.layers.BatchNormalization(),
+		  ConvAConnect.ConvAConnect(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd,pool=16, strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),        
+      		  tf.keras.layers.ReLU(),
+		  tf.keras.layers.BatchNormalization(),                   
+		  ConvAConnect.ConvAConnect(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd,pool=16, strides=1,padding="SAME",Op=2,Slice=1,d_type=tf.dtypes.float16),      
+                  tf.keras.layers.ReLU(),
+		  tf.keras.layers.BatchNormalization(),                      
+		  ConvAConnect.ConvAConnect(filters=256, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd,pool=16, strides=1,padding="SAME",Op=2,Slice=1,d_type=tf.dtypes.float16),        
+                  tf.keras.layers.ReLU(),
+		  tf.keras.layers.BatchNormalization(),                      
 		  tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
 		  tf.keras.layers.Flatten(),
-		  AConnect.AConnect(1024, Wstd=Wstd,Bstd=Bstd,pool=16,d_type=tf.dtypes.float16),
-      tf.keras.layers.ReLU(),
+		  AConnect.AConnect(1024, Wstd=Wstd,Bstd=Bstd,pool=16,d_type=tf.dtypes.float16),   
+                  tf.keras.layers.ReLU(),
+		  tf.keras.layers.BatchNormalization(),                      
 		  tf.keras.layers.Dropout(0.5),
-		  AConnect.AConnect(1024, Wstd=Wstd,Bstd=Bstd,pool=16,d_type=tf.dtypes.float16),
-      tf.keras.layers.ReLU(),
-		  tf.keras.layers.Dropout(0.5),
-		  AConnect.AConnect(512, Wstd=Wstd,Bstd=Bstd,pool=16,d_type=tf.dtypes.float16),
-      tf.keras.layers.ReLU(),
-		  tf.keras.layers.Dropout(0.5),
+		  AConnect.AConnect(1024, Wstd=Wstd,Bstd=Bstd,pool=16,d_type=tf.dtypes.float16),      
+                  tf.keras.layers.ReLU(),
+		  tf.keras.layers.BatchNormalization(),    
+		  AConnect.AConnect(512, Wstd=Wstd,Bstd=Bstd,pool=16,d_type=tf.dtypes.float16),        
+                  tf.keras.layers.ReLU(),
+		  tf.keras.layers.BatchNormalization(),    
 		  AConnect.AConnect(10, Wstd=Wstd,Bstd=Bstd,pool=16,d_type=tf.dtypes.float16),
-      tf.keras.layers.Softmax()
+                  tf.keras.layers.Softmax()
 	    ])
 
 
@@ -100,7 +101,7 @@ CLASS_NAMES= ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'h
 def step_decay (epoch): 
    initial_lrate = 0.01 
    drop = 0.5 
-   epochs_drop = 20.0 
+   epochs_drop = 30.0 
    lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
    return lrate
 
@@ -123,7 +124,7 @@ def get_top_n_score(target, prediction, n):
 
 
 
-model=model_creation(isAConnect=False,Wstd=0.5,Bstd=0.5)
+model=model_creation(isAConnect=True,Wstd=0.5,Bstd=0.5)
 #parametros para el entrenamiento
 
 lrate = LearningRateScheduler(step_decay)
@@ -132,7 +133,7 @@ callbacks_list = [lrate]
 
 top5 = tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None)
 
-model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.0, momentum=0.9), metrics=['accuracy',top5])
+model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.0,momentum=0.9), metrics=['accuracy',top5])
 print(model.summary())
 
 
