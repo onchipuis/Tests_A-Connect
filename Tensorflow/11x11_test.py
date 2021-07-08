@@ -6,7 +6,7 @@ from Networks import MNIST_mismatch
 from Scripts import load_ds
 from datetime import datetime
 from Scripts import MCsim
-Sim_err = [0]	#Define all the simulation errors
+Sim_err = [0,0.3,0.5,0.7]	#Define all the simulation errors
 Wstd = [0.3,0.5,0.7] 			#Define the stddev for training
 Bstd = Wstd
 isBin = ["yes"]					#Do you want binary weights?
