@@ -6,16 +6,18 @@ from Networks import MNIST_mismatch
 from Scripts import load_ds
 from datetime import datetime
 from Scripts import MCsim
-Sim_err = [0,0.3,0.5,0.7]	#Define all the simulation errors
-Wstd = [0.3] 			#Define the stddev for training
+Sim_err = [0]	#Define all the simulation errors
+Wstd = [0.7] 			#Define the stddev for training
 Bstd = Wstd
 isBin = ["yes"]					#Do you want binary weights?
-(x_train, y_train), (x_test, y_test) = load_ds.load_ds(imgSize=[11,11], Quant=8) #Load dataset
+bits = 4
+(x_train, y_train), (x_test, y_test) = load_ds.load_ds(imgSize=[11,11], Quant=bits) #Load dataset
+bits = str(bits)+'bits'
 for p in range(len(isBin)):
     for c in range(len(Wstd)): #Iterate over the Wstd and Bstd for training
         wstd = str(int(100*Wstd[c]))
         bstd = str(int(100*Bstd[c]))
-        name = 'AConnect_11x11_4bits'+'_Wstd_'+wstd+'_Bstd_'+bstd 
+        name = 'AConnect_11x11_'+bits+'_Wstd_'+wstd+'_Bstd_'+bstd 
         if isBin[p] == "yes": 
             name = name+'_BW'                     
         print("*****************************TRAINING NETWORK*********************")
@@ -36,7 +38,7 @@ for k in range(len(isBin)): #Iterate over the networks
     for m in range(len(Wstd)): #Iterate over the training Wstd and Bstd
         wstd = str(int(100*Wstd[m]))
         bstd = str(int(100*Bstd[m]))
-        name = 'AConnect_11x11_4bits'+'_Wstd_'+wstd+'_Bstd_'+bstd
+        name = 'AConnect_11x11_'+bits+'_Wstd_'+wstd+'_Bstd_'+bstd
         if isBin[k] == "yes":
             name = name+'_BW'                          
         string = './Models/'+name+'.h5'

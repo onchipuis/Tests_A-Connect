@@ -235,7 +235,7 @@ class AConnect(tf.keras.layers.Layer):
 	def sign(self,x):
 		y = tf.math.sign(x)
 		def grad(dy):
-			dydx = tf.divide(dy,abs(x)+1e-5)
+			dydx = tf.divide(dy,abs(x))
 			return dydx
 		return y, grad
 ###HOW TO IMPLEMENT MANUALLY THE BACKPROPAGATION###		
