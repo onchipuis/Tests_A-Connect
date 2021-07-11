@@ -10,7 +10,7 @@ Sim_err = [0,0.3,0.5,0.7]	#Define all the simulation errors
 Wstd = [0.3,0.5,0.7] 			#Define the stddev for training
 Bstd = Wstd
 isBin = ["no"]					#Do you want binary weights?
-bits = 8
+bits = 4
 (x_train, y_train), (x_test, y_test) = load_ds.load_ds(imgSize=[11,11], Quant=bits) #Load dataset
 bits = str(bits)+'bits'
 for p in range(len(isBin)):
