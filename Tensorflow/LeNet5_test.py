@@ -10,8 +10,8 @@ from Layers import ConvAConnect
 from Layers import Conv
 from Layers import FC_quant
 identifier = [True]				#Which network you want to train/test True for A-Connect false for normal LeNet
-Sim_err = [0,0.3]	#Define all the simulation errors
-Wstd = [0.3] 			#Define the stddev for training
+Sim_err = [0,0.3,0.5,0.7]	#Define all the simulation errors
+Wstd = [0.3,0.5,0.7] 			#Define the stddev for training
 Bstd = Wstd
 isBin = "no"					#Do you want binary weights?
 (x_train, y_train), (x_test, y_test) = load_ds.load_ds() #Load dataset
@@ -38,7 +38,7 @@ for i in range(len(identifier)): #Iterate over the networks
             top5 = tf.keras.metrics.TopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None) #COnfigure the model to get the top-5 accuracy
             model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5])#Compile the model
             print(model.summary())#See the summary
-            history = model.fit(x_train,y_train,validation_split=0.2,epochs = 1,batch_size=256)#Train the model
+            history = model.fit(x_train,y_train,validation_split=0.2,epochs = 20,batch_size=256)#Train the model
             acc = history.history['accuracy']#Save the accuracy and the validation accuracy
             val_acc = history.history['val_accuracy']
             string = './Models/'+name+'.h5'#Define the folder and the name of the model to be saved
