@@ -51,7 +51,7 @@ class dva_fc(tf.keras.layers.Layer):
 		row = tf.shape(self.X)[-1]         
 		if training:   
 		    if self.isBin == "yes":
-		        W = self.sign(W)
+		        W = self.sign(self.W)
 		    else:
 		        W = self.W 
 		    Werr = abs(1+tf.random.normal(shape=[tf.cast(row,tf.int32),self.output_size],stddev=self.Wstd))

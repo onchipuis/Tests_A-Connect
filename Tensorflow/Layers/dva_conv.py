@@ -51,7 +51,7 @@ class dva_conv(tf.keras.layers.Layer):
 		self.batch_size = tf.shape(self.X)[0]     
 		if training:
 		    if self.isBin == "yes":
-		        W = self.sign(W)
+		        W = self.sign(self.W)
 		    else:
 		        W = self.W            
 		    Werr = abs(1+tf.random.normal(shape=self.shape,stddev=self.Wstd))
