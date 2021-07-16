@@ -50,24 +50,24 @@ class dva_conv(tf.keras.layers.Layer):
 		self.X = tf.cast(X, dtype=tf.dtypes.float32)     
 		self.batch_size = tf.shape(self.X)[0]     
 		if training:
-		    if isBin == "yes":
+		    if self.isBin == "yes":
 		        W = self.sign(W)
 		    else:
 		        W = self.W            
-			Werr = abs(1+tf.random.normal(shape=self.shape,stddev=self.Wstd))
-			Berr = abs(1+tf.random.normal(shape=[self.filters,],stddev=self.Bstd))
-			weights = self.W*Werr
-			bias = self.bias*Berr
-			Z = tf.nn.conv2d(self.X, weights,strides=[1,self.strides,self.strides,1],padding=self.padding) + bias
+		    Werr = abs(1+tf.random.normal(shape=self.shape,stddev=self.Wstd))
+		    Berr = abs(1+tf.random.normal(shape=[self.filters,],stddev=self.Bstd))
+		    weights = W*Werr
+		    bias = self.bias*Berr
+		    Z = tf.nn.conv2d(self.X, weights,strides=[1,self.strides,self.strides,1],padding=self.padding) + bias
 		else:
-			Werr = self.infWerr
-			Berr = self.infBerr
-			if(self.isBin=='yes'):
-				weights =tf.math.sign(self.W)*Werr
-			else:
-				weights = self.W*Werr   
-			bias = self.bias*Berr
-			Z = tf.nn.conv2d(self.X, weights,strides=[1,self.strides,self.strides,1],padding=self.padding) + bias
+		    Werr = self.infWerr
+		    Berr = self.infBerr
+		    if(self.isBin=='yes'):
+		        weights =tf.math.sign(self.W)*Werr
+		    else:
+		        weights = self.W*Werr   
+		    bias = self.bias*Berr
+		    Z = tf.nn.conv2d(self.X, weights,strides=[1,self.strides,self.strides,1],padding=self.padding) + bias
 		return Z
 
 	@tf.custom_gradient

@@ -50,25 +50,24 @@ class dva_fc(tf.keras.layers.Layer):
 		self.X = tf.cast(X, dtype=tf.dtypes.float32)
 		row = tf.shape(self.X)[-1]         
 		if training:   
-		    if isBin == "yes":
+		    if self.isBin == "yes":
 		        W = self.sign(W)
 		    else:
-		        W = self.W
-			self.batch_size = tf.shape(self.X)[0] 
-			Werr = abs(1+tf.random.normal(shape=[tf.cast(row,tf.int32),self.output_size],stddev=self.Wstd))
-			Berr = abs(1+tf.random.normal(shape=[self.output_size,],stddev=self.Bstd))
-			weights = W*Werr
-			bias = self.bias*Berr
-			Z = tf.matmul(self.X,weights)+bias
+		        W = self.W 
+		    Werr = abs(1+tf.random.normal(shape=[tf.cast(row,tf.int32),self.output_size],stddev=self.Wstd))
+		    Berr = abs(1+tf.random.normal(shape=[self.output_size,],stddev=self.Bstd))
+		    weights = W*Werr
+		    bias = self.bias*Berr
+		    Z = tf.matmul(self.X,weights)+bias
 		else:
-			Werr = self.infWerr
-			Berr = self.infBerr
-			if(self.isBin=='yes'):
-				weights =tf.math.sign(self.W)*Werr
-			else:
-				weights = self.W*Werr            
-			bias = self.bias*Berr
-			Z = tf.matmul(self.X,weights)+bias		
+		    Werr = self.infWerr
+		    Berr = self.infBerr
+		    if(self.isBin=='yes'):
+		        weights =tf.math.sign(self.W)*Werr
+		    else:
+		        weights = self.W*Werr            
+		    bias = self.bias*Berr
+		    Z = tf.matmul(self.X,weights)+bias		
 		return Z
 
 	@tf.custom_gradient
