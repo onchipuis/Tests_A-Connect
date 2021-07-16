@@ -50,19 +50,34 @@ class dva_fc(tf.keras.layers.Layer):
 		self.X = tf.cast(X, dtype=tf.dtypes.float32)
 		row = tf.shape(self.X)[-1]         
 		if training:   
+		    if isBin == "yes":
+		        W = self.sign(W)
+		    else:
+		        W = self.W
 			self.batch_size = tf.shape(self.X)[0] 
 			Werr = abs(1+tf.random.normal(shape=[tf.cast(row,tf.int32),self.output_size],stddev=self.Wstd))
 			Berr = abs(1+tf.random.normal(shape=[self.output_size,],stddev=self.Bstd))
-			weights = self.W*Werr
+			weights = W*Werr
 			bias = self.bias*Berr
 			Z = tf.matmul(self.X,weights)+bias
 		else:
 			Werr = self.infWerr
 			Berr = self.infBerr
-			weights = self.W*Werr
+			if(self.isBin=='yes'):
+				weights =tf.math.sign(self.W)*Werr
+			else:
+				weights = self.W*Werr            
 			bias = self.bias*Berr
 			Z = tf.matmul(self.X,weights)+bias		
 		return Z
+
+	@tf.custom_gradient
+	def sign(self,x):
+		y = tf.math.sign(x)
+		def grad(dy):
+			dydx = tf.divide(dy,abs(x))
+			return dydx
+		return y, grad        
 
 	def get_config(self):
 			config = super(dva_fc, self).get_config()

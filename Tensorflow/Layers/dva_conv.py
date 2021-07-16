@@ -50,6 +50,10 @@ class dva_conv(tf.keras.layers.Layer):
 		self.X = tf.cast(X, dtype=tf.dtypes.float32)     
 		self.batch_size = tf.shape(self.X)[0]     
 		if training:
+		    if isBin == "yes":
+		        W = self.sign(W)
+		    else:
+		        W = self.W            
 			Werr = abs(1+tf.random.normal(shape=self.shape,stddev=self.Wstd))
 			Berr = abs(1+tf.random.normal(shape=[self.filters,],stddev=self.Bstd))
 			weights = self.W*Werr
@@ -58,10 +62,21 @@ class dva_conv(tf.keras.layers.Layer):
 		else:
 			Werr = self.infWerr
 			Berr = self.infBerr
-			weights = self.W*Werr
+			if(self.isBin=='yes'):
+				weights =tf.math.sign(self.W)*Werr
+			else:
+				weights = self.W*Werr   
 			bias = self.bias*Berr
 			Z = tf.nn.conv2d(self.X, weights,strides=[1,self.strides,self.strides,1],padding=self.padding) + bias
 		return Z
+
+	@tf.custom_gradient
+	def sign(self,x):
+		y = tf.math.sign(x)
+		def grad(dy):
+			dydx = tf.divide(dy,abs(x))
+			return dydx
+		return y, grad     
 
 	def get_config(self):
 		config = super(dva_conv, self).get_config()

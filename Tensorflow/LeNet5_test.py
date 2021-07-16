@@ -9,6 +9,8 @@ from Layers import AConnect
 from Layers import ConvAConnect
 from Layers import Conv
 from Layers import FC_quant
+from Layers import dva_fc
+from Layers import dva_conv
 identifier = [True]				#Which network you want to train/test True for A-Connect false for normal LeNet
 Sim_err = [0,0.3,0.5,0.7]	#Define all the simulation errors
 Wstd = [0.3,0.5,0.7] 			#Define the stddev for training
@@ -28,7 +30,7 @@ for i in range(len(identifier)): #Iterate over the networks
         for c in range(len(Wstd)): #Iterate over the Wstd and Bstd for training
             wstd = str(int(100*Wstd[c]))
             bstd = str(int(100*Bstd[c]))
-            name = 'AConnect_LeNet5'+'_Wstd_'+wstd+'_Bstd_'+bstd 
+            name = 'DVA_LeNet5'+'_Wstd_'+wstd+'_Bstd_'+bstd 
             if isBin == "yes": 
                 name = name+'_BW'                     
             print("*****************************TRAINING NETWORK*********************")
@@ -73,11 +75,11 @@ for k in range(len(identifier)): #Iterate over the networks
         for m in range(len(Wstd)): #Iterate over the training Wstd and Bstd
             wstd = str(int(100*Wstd[m]))
             bstd = str(int(100*Bstd[m]))
-            name = 'AConnect_LeNet5'+'_Wstd_'+wstd+'_Bstd_'+bstd
+            name = 'DVA_LeNet5'+'_Wstd_'+wstd+'_Bstd_'+bstd
             if isBin == "yes":
                 name = name+'_BW'                          
             string = './Models/'+name+'.h5'
-            custom_objects = {'ConvAConnect':ConvAConnect.ConvAConnect,'AConnect':AConnect.AConnect} #Custom objects for model loading purposes
+            custom_objects = {'dva_conv':dva_conv.dva_conv,'dva_fc':dva_fc.dva_fc} #Custom objects for model loading purposes
             for j in range(len(Sim_err)): #Iterate over the sim error vector
                 Err = Sim_err[j]
                 if Err != Wstd[m]: #If the sim error is different from the training error, do not force the error

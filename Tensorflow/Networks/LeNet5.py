@@ -8,6 +8,8 @@ from Layers import ConvAConnect
 from Layers import AConnect
 from Layers import Conv
 from Layers import FC_quant
+from Layers import dva_fc
+from Layers import dva_conv
 config = open('config.txt','r')
 folder = config.read()
 sys.path.append(folder)
@@ -48,22 +50,22 @@ def LeNet5(Xtrain=None,Xtest=None,isAConnect=False,Wstd=0,Bstd=0,isBin="no"):
 		model = tf.keras.Sequential([
 			tf.keras.layers.InputLayer(input_shape=[32,32]),
 			tf.keras.layers.Reshape((32,32,1)),
-			ConvAConnect.ConvAConnect(6,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin,strides=1,padding="VALID",Op=2,Slice=1),
+			dva_conv.dva_conv(6,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin,strides=1,padding="VALID"),
             tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.Activation('tanh'),            
 			tf.keras.layers.AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
-			ConvAConnect.ConvAConnect(16,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin ,strides=1,padding="VALID",Op=2,Slice=1),
+			dva_conv.dva_conv(16,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin ,strides=1,padding="VALID"),
             tf.keras.layers.BatchNormalization(),            
 			tf.keras.layers.Activation('tanh'),                        
 			tf.keras.layers.AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
 			tf.keras.layers.Flatten(),
-			AConnect.AConnect(120,Wstd,Bstd,isBin=isBin),
+			dva_fc.dva_fc(120,Wstd,Bstd,isBin=isBin),
             tf.keras.layers.BatchNormalization(),            
 			tf.keras.layers.Activation('tanh'),                        
-			AConnect.AConnect(84,Wstd,Bstd,isBin=isBin),
+			dva_fc.dva_fc(84,Wstd,Bstd,isBin=isBin),
             tf.keras.layers.BatchNormalization(),            
 			tf.keras.layers.Activation('tanh'),                        
-			AConnect.AConnect(10,Wstd,Bstd,isBin=isBin),
+			dva_fc.dva_fc(10,Wstd,Bstd,isBin=isBin),
 			tf.keras.layers.Softmax()							
 		])		
 		
