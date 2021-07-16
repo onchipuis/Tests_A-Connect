@@ -9,7 +9,7 @@ class dva_fc(tf.keras.layers.Layer):
 		self.Wstd = Wstd										 		#Wstd standard deviation of the weights(number between 0-1. By default is 0)
 		self.Bstd = Bstd										 		#Bstd standard deviation of the bias(number between 0-1. By default is 0)       
 		self.isBin = isBin                                       		#if the layer will binarize the weights(String yes or no. By default is no)
-		self.d_type = d_type                                            #Data type of the weights and other variables. Default is fp32. Please see tf.dtypes.Dtype
+                                         #Data type of the weights and other variables. Default is fp32. Please see tf.dtypes.Dtype
 		self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)                  #Weights regularizer. Default is None
 		self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
 	def build(self,input_shape):								 #This method is used for initialize the layer variables that depend on input_shape
@@ -47,9 +47,9 @@ class dva_fc(tf.keras.layers.Layer):
 		super(dva_fc, self).build(input_shape)
 		
 	def call(self, X, training=None): #With call we can define all the operations that the layer do in the forward propagation.
-		if training:
-			self.X = tf.cast(X, dtype=tf.dtypes.float32)
-			row = tf.shape(self.X)[-1]        
+		self.X = tf.cast(X, dtype=tf.dtypes.float32)
+		row = tf.shape(self.X)[-1]         
+		if training:   
 			self.batch_size = tf.shape(self.X)[0] 
 			Werr = abs(1+tf.random.normal(shape=[tf.cast(row,tf.int32),self.output_size],stddev=self.Wstd))
 			Berr = abs(1+tf.random.normal(shape=[self.output_size,],stddev=self.Bstd))

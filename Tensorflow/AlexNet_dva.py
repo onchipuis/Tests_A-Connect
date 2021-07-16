@@ -50,36 +50,36 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 		model = tf.keras.models.Sequential([
 			tf.keras.layers.InputLayer(input_shape=[32,32,3]),
 			tf.keras.layers.experimental.preprocessing.Resizing(227,227),    
-			dva_conv.dva_conv(filters=96, kernel_size=(11,11),Wstd=Wstd,Bstd=Bstd,pool=8, strides=4,padding="VALID",Op=1,Slice=1,d_type=tf.dtypes.float16),       
+			dva_conv.dva_conv(filters=96, kernel_size=(11,11),Wstd=Wstd,Bstd=Bstd, strides=4,padding="VALID"),       
 			tf.keras.layers.ReLU(),
 			tf.keras.layers.BatchNormalization(),               
 		  	tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
-		  	dva_conv.dva_conv(filters=256, kernel_size=(5,5), Wstd=Wstd,Bstd=Bstd,pool=8, strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),       
+		  	dva_conv.dva_conv(filters=256, kernel_size=(5,5), Wstd=Wstd,Bstd=Bstd, strides=1,padding="SAME"),       
 			tf.keras.layers.ReLU(),
 			tf.keras.layers.BatchNormalization(),                   
 			tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
-			dva_conv.dva_conv(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd,pool=8, strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),        
+			dva_conv.dva_conv(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd, strides=1,padding="SAME"),        
 			tf.keras.layers.ReLU(),
 			tf.keras.layers.BatchNormalization(),                   
-			dva_conv.dva_conv(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd,pool=8, strides=1,padding="SAME",Op=2,Slice=1,d_type=tf.dtypes.float16),      
+			dva_conv.dva_conv(filters=384, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd, strides=1,padding="SAME"),      
 			tf.keras.layers.ReLU(),
 			tf.keras.layers.BatchNormalization(),                      
-			dva_conv.dva_conv(filters=256, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd,pool=8, strides=1,padding="SAME",Op=2,Slice=1,d_type=tf.dtypes.float16),        
+			dva_conv.dva_conv(filters=256, kernel_size=(3,3), Wstd=Wstd,Bstd=Bstd, strides=1,padding="SAME"),        
 			tf.keras.layers.ReLU(),
 			tf.keras.layers.BatchNormalization(),                      
 			tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2)),
 			tf.keras.layers.Flatten(),
-			dva_fc.dva_fc(1024, Wstd=Wstd,Bstd=Bstd,pool=8,d_type=tf.dtypes.float16),   
+			dva_fc.dva_fc(1024, Wstd=Wstd,Bstd=Bstd),   
 			tf.keras.layers.ReLU(),
 			tf.keras.layers.BatchNormalization(),                      
 			tf.keras.layers.Dropout(0.5),
-			dva_fc.dva_fc(1024, Wstd=Wstd,Bstd=Bstd,pool=8,d_type=tf.dtypes.float16),      
+			dva_fc.dva_fc(1024, Wstd=Wstd,Bstd=Bstd),      
 			tf.keras.layers.ReLU(),
 			tf.keras.layers.BatchNormalization(),    
-			dva_fc.dva_fc(512, Wstd=Wstd,Bstd=Bstd,pool=8,d_type=tf.dtypes.float16),        
+			dva_fc.dva_fc(512, Wstd=Wstd,Bstd=Bstd),        
 			tf.keras.layers.ReLU(),
 			tf.keras.layers.BatchNormalization(),    
-			dva_fc.dva_fc(10, Wstd=Wstd,Bstd=Bstd,pool=8,d_type=tf.dtypes.float16),
+			dva_fc.dva_fc(10, Wstd=Wstd,Bstd=Bstd),
 			tf.keras.layers.Softmax()
 	    ])
 
@@ -87,8 +87,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 	return model
 	
 (train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.cifar10.load_data()	
-CLASS_NAMES= ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
-"""
+
 
 def step_decay (epoch): 
    initial_lrate = 0.01 
@@ -116,7 +115,7 @@ def get_top_n_score(target, prediction, n):
 
 
 
-model=model_creation(isAConnect=True,Wstd=0.0,Bstd=0.0)
+model=model_creation(isAConnect=True,Wstd=0.3,Bstd=0.3)
 #parametros para el entrenamiento
 
 lrate = LearningRateScheduler(step_decay)
@@ -146,7 +145,7 @@ print("top-5 score:", get_top_n_score(test_labels, y_predict, 5))
 #model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5])#Compile the model
 
 
-model.save("./Models/AlexNet_05.h5",include_optimizer=True)
+model.save("./Models/AlexNet_dva_30.h5",include_optimizer=True)
 
 elapsed_time = time.time() - start_time
 print("Elapsed time: {}".format(hms_string(elapsed_time)))
@@ -154,7 +153,7 @@ print('Tiempo de procesamiento (secs): ', time.time()-tic)
 
 
 ##Montecarlo
-"""
+
 def step_decay (epoch): 
    initial_lrate = 0.01 
    drop = 0.5 
@@ -165,6 +164,7 @@ def step_decay (epoch):
 seed = 7
 numpy.random.seed(seed) 
 lrate = LearningRateScheduler(step_decay)
+"""
 top5 = tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None)
 Sim_err = [0.7]
 name = 'AlexNet_aconnect_07'                      
@@ -199,5 +199,5 @@ for j in range(len(Sim_err)):
     print('\n\n*******************************************************************************************')
     print('\n Simulation started at: ',starttime)
     print('Simulation finished at: ', endtime)            
-
+"""
 #acc,media=MCsim.MCsim("../Models/AlexNet.h5",test_images, test_labels,1000,0.3,0.3,"no","AlexNet_30",SRAMsz=[10000,50000],optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
