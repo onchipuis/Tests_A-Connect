@@ -88,11 +88,11 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 	
 (train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.cifar10.load_data()	
 
-
+"""
 def step_decay (epoch): 
    initial_lrate = 0.01 
    drop = 0.5 
-   epochs_drop = 30.0 
+   epochs_drop = 20.0 
    lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
    return lrate
 
@@ -115,7 +115,7 @@ def get_top_n_score(target, prediction, n):
 
 
 
-model=model_creation(isAConnect=True,Wstd=0.3,Bstd=0.3)
+model=model_creation(isAConnect=True,Wstd=0.5,Bstd=0.5)
 #parametros para el entrenamiento
 
 lrate = LearningRateScheduler(step_decay)
@@ -145,13 +145,13 @@ print("top-5 score:", get_top_n_score(test_labels, y_predict, 5))
 #model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5])#Compile the model
 
 
-model.save("./Models/AlexNet_dva_30.h5",include_optimizer=True)
+model.save("./Models/AlexNet_dva_50.h5",include_optimizer=True)
 
 elapsed_time = time.time() - start_time
 print("Elapsed time: {}".format(hms_string(elapsed_time)))
 print('Tiempo de procesamiento (secs): ', time.time()-tic)
 
-
+"""
 ##Montecarlo
 
 def step_decay (epoch): 
@@ -164,20 +164,20 @@ def step_decay (epoch):
 seed = 7
 numpy.random.seed(seed) 
 lrate = LearningRateScheduler(step_decay)
-"""
+
 top5 = tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None)
-Sim_err = [0.7]
-name = 'AlexNet_aconnect_07'                      
+Sim_err = [0,0.3]
+name = 'AlexNet_dva_50'                      
 string = './Models/'+name+'.h5'
 custom_objects = {'dva_fc':dva_fc.dva_fc,'dva_conv':dva_conv.dva_conv}
-acc=np.zeros([500,1])
+acc=np.zeros([1000,1])
 for j in range(len(Sim_err)):
     Err = Sim_err[j]
     force = "yes"
     if Err == 0:
         N = 1
     else:
-        N = 500
+        N = 1000
             #####
     elapsed_time = time.time() - start_time
     print("Elapsed time: {}".format(hms_string(elapsed_time)))
@@ -188,8 +188,8 @@ for j in range(len(Sim_err)):
     print('With simulation error: ', Err)
     print('\n\n*******************************************************************************************')
     
-    acc, media = MCsim.MCsim(string,test_images, test_labels,N,Err,Err,force,0,name,custom_objects,optimizer=tf.optimizers.SGD(lr=0.001,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy',top5],top5=True)
-    np.savetxt('../Results/'+name+'_simerr_'+str(int(100*Err))+'_'+str(int(100*Err))+'.txt',acc,fmt="%.2f")
+    acc, media = MCsim.MCsim(string,test_images, test_labels,N,Err,Err,force,0,name,custom_objects,optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy',top5],top5=True)
+    #np.savetxt('./Results/'+name+'_simerr_'+str(int(100*Err))+'_'+str(int(100*Err))+'.txt',acc,fmt="%.2f")
 
     now = datetime.now()
     endtime = now.time()
@@ -199,5 +199,5 @@ for j in range(len(Sim_err)):
     print('\n\n*******************************************************************************************')
     print('\n Simulation started at: ',starttime)
     print('Simulation finished at: ', endtime)            
-"""
+
 #acc,media=MCsim.MCsim("../Models/AlexNet.h5",test_images, test_labels,1000,0.3,0.3,"no","AlexNet_30",SRAMsz=[10000,50000],optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
