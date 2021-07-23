@@ -15,7 +15,7 @@ identifier = [True]				#Which network you want to train/test True for A-Connect 
 Sim_err = [0,0.3,0.5,0.7]	#Define all the simulation errors
 Wstd = [0.3,0.5,0.7] 			#Define the stddev for training
 Bstd = Wstd
-isBin = "yes"					#Do you want binary weights?
+isBin = "no"					#Do you want binary weights?
 (x_train, y_train), (x_test, y_test) = load_ds.load_ds() #Load dataset
 _,x_train,x_test=LeNet5.LeNet5(x_train,x_test)	#Load x_train, x_test with augmented dimensions. i.e. 32x32
 x_test = np.float32(x_test) #Convert it to float32
@@ -36,7 +36,7 @@ for i in range(len(identifier)): #Iterate over the networks
             print("*****************************TRAINING NETWORK*********************")
             print("\n\t\t\t", name)
             model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin)#Get the model
-            optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)#Define optimizer
+            optimizer = tf.keras.optimizers.SGD(learning_rate=0.01,momentum=0.9)#Define optimizer
             top5 = tf.keras.metrics.TopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None) #COnfigure the model to get the top-5 accuracy
             model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5])#Compile the model
             print(model.summary())#See the summary
@@ -98,7 +98,7 @@ for k in range(len(identifier)): #Iterate over the networks
                 print('With simulation error: ', Err)
                 print('\n\n*******************************************************************************************')
                 acc_noisy, media = MCsim.MCsim(string,x_test,y_test,N,Err,Err,force,0,name,custom_objects,
-                optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5],top5=True) #Perform the simulation
+                optimizer=tf.keras.optimizers.SGD(learning_rate=0.01,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5],top5=True) #Perform the simulation
                 #For more information about MCSim please go to Scripts/MCsim.py
                 #####
                 now = datetime.now()
