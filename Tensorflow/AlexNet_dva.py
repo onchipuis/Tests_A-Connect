@@ -166,18 +166,18 @@ numpy.random.seed(seed)
 lrate = LearningRateScheduler(step_decay)
 
 top5 = tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None)
-Sim_err = [0,0.3]
-name = 'AlexNet_dva_50'                      
-string = './Models/'+name+'.h5'
+Sim_err = [0.7]
+name = 'AlexNet_dva_30'                      
+string = '/content/gdrive/MyDrive/DVA/'+name+'.h5'
 custom_objects = {'dva_fc':dva_fc.dva_fc,'dva_conv':dva_conv.dva_conv}
-acc=np.zeros([1000,1])
+acc=np.zeros([500,1])
 for j in range(len(Sim_err)):
     Err = Sim_err[j]
     force = "yes"
     if Err == 0:
         N = 1
     else:
-        N = 1000
+        N = 500
             #####
     elapsed_time = time.time() - start_time
     print("Elapsed time: {}".format(hms_string(elapsed_time)))
