@@ -17,6 +17,8 @@ custom_objects= {'ConvAConnect':ConvAConnect.ConvAConnect,'AConnect':AConnect.AC
 SRAMsz: Matrix dimension for the static error matrix that you want to generate. It is depend on the dimension of the layer weights
 SRAMBsz: Vector dimension for the static error vector that you want to generate. It is depend on the dimension of the layer weights
 optimizer,loss,metrics: The values that you used during the training
+	run_model_eagerly: Set to True to run the noisy model eagerly, can help to increase the performance in certain cases
+	evaluate_batch_size: Batch size used when evaluating the model, higher values increase performance at the expense of a higher memory usage
 This function returns the noisy accuracy values and the mean of this values
 """
 import numpy as np
@@ -28,7 +30,8 @@ from Layers import fullyconnected
 import tensorflow as tf
 
 def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,force,Derr=0,net_name="Network",custom_objects=None,dtype='float32',
-optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy'],top5=False):
+optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy'],top5=False,
+run_model_eagerly=False,evaluate_batch_size=None):
 	acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy
 	top5acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy   top5
 	local_net = tf.keras.models.load_model(net,custom_objects = custom_objects) #Load the trained model
@@ -40,12 +43,12 @@ optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_
 
 	for i in range(M): #Iterate over M samples
 		[NetNoisy,Wstdn,Bstdn] = add_Wnoise.add_Wnoise(local_net,Wstd,Bstd,force,Derr,dtype=dtype) #Function that adds the new noisy matrices to the layers
-		NetNoisy.compile(optimizer,loss,metrics) #Compile the model. It is necessary to use the model.evaluate
+		NetNoisy.compile(optimizer,loss,metrics,run_eagerly=run_model_eagerly) #Compile the model. It is necessary to use the model.evaluate
 		if top5:       
-		    acc_noisy[i],top5acc_noisy[i] = classify.classify(NetNoisy, Xtest, Ytest,top5) #Get the accuracy of the network
+		    acc_noisy[i],top5acc_noisy[i] = classify.classify(NetNoisy, Xtest, Ytest,top5,ev_batch_size=evaluate_batch_size) #Get the accuracy of the network
 		    top5acc_noisy[i] = 100*top5acc_noisy[i]              
 		else:
-		    acc_noisy[i] = classify.classify(NetNoisy, Xtest, Ytest,top5) #Get the accuracy of the network                        
+		    acc_noisy[i] = classify.classify(NetNoisy, Xtest, Ytest,top5,ev_batch_size=evaluate_batch_size) #Get the accuracy of the network                        
 		acc_noisy[i] = 100*acc_noisy[i]      
 		print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i],top5acc_noisy[i]))
 		local_net.load_weights(filepath=('./Models/'+net_name+'_weights.h5')) #Takes the original weights value.

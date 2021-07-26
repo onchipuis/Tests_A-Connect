@@ -166,8 +166,8 @@ numpy.random.seed(seed)
 lrate = LearningRateScheduler(step_decay)
 
 top5 = tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None)
-Sim_err = [0.7]
-name = 'AlexNet_dva_30'                      
+Sim_err = [0.5]
+name = 'AlexNet_dva_70'                      
 string = '/content/gdrive/MyDrive/DVA/'+name+'.h5'
 custom_objects = {'dva_fc':dva_fc.dva_fc,'dva_conv':dva_conv.dva_conv}
 acc=np.zeros([500,1])
@@ -188,7 +188,8 @@ for j in range(len(Sim_err)):
     print('With simulation error: ', Err)
     print('\n\n*******************************************************************************************')
     
-    acc, media = MCsim.MCsim(string,test_images, test_labels,N,Err,Err,force,0,name,custom_objects,optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy',top5],top5=True)
+    acc, media = MCsim.MCsim(string,test_images, test_labels,N,Err,Err,force,0,name,custom_objects,optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9)
+    ,loss='sparse_categorical_crossentropy',metrics=['accuracy',top5],top5=True,run_model_eagerly=True,evaluate_batch_size=256)
     #np.savetxt('./Results/'+name+'_simerr_'+str(int(100*Err))+'_'+str(int(100*Err))+'.txt',acc,fmt="%.2f")
 
     now = datetime.now()
