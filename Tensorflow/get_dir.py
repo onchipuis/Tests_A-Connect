@@ -22,7 +22,7 @@ for i in range(5):
 		config.write(folder)
 		config.close()
 	elif i == 4:
-		config = open('./Images/config.txt','w')
+		config = open('./Images_Recognition/config.txt','w')
 		config.write(folder)
 		config.close()		
 

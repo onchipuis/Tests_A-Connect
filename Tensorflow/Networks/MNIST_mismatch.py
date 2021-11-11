@@ -6,18 +6,25 @@ import os
 config = open('config.txt','r')
 folder = config.read()
 sys.path.append(folder)
-import mylib as my
 sys.path.append(folder+'/Layers/')
 sys.path.append(folder+'/Scripts/')
 from Layers import FC_quant
 from Layers import DropConnect
 from Layers import fullyconnected
-from Layers import AConnect
 from Layers import Conv
-from Layers import ConvAConnect
-
+import aconnect.layers as layers
 #This scripts define the different network architecture for the training and testing.
-
+"""
+Model 0: Is a regular model using keras layers. This model was created only for learning 
+purposes
+Model 1: The same model 0 but this time we have the dropout layer.
+Model 2: Created using a custom dropconnect layer that is was not finished (does not work)
+Model 3: First model created to test the A-Connect methodology.
+Model 4: Custom layer with A-Connect for binary weights
+Model 5: Regular conv network with keras layers for comparison purposes.
+Model 6: CUstom convolutional network
+Model 7: Convolutional neural network with A-Connect
+"""
 def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no",pool=1000):
 
 	#Keras dense network with no regularization
@@ -74,10 +81,10 @@ def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no",pool=1000):
 		
 		model = tf.keras.Sequential([
 			tf.keras.layers.Flatten(input_shape=imgsize),	
-			AConnect.AConnect(128,Wstd,Bstd,isBin),
+			layers.FC_AConnect(128,Wstd,Bstd,isBin),
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.ReLU(),
-			AConnect.AConnect(10,Wstd,Bstd,isBin),
+			layers.FC_AConnect(10,Wstd,Bstd,isBin),
 			tf.keras.layers.Softmax()
 		])
 
@@ -139,14 +146,14 @@ def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no",pool=1000):
 		model = tf.keras.Sequential([
 			tf.keras.layers.InputLayer(input_shape=imgsize),
 			tf.keras.layers.Reshape((imgsize[0],imgsize[1],1)),
-			ConvAConnect.ConvAConnect(8, kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin, padding ="SAME"),
+			layers.Conv_AConnect(8, kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin, padding ="SAME"),
 			tf.keras.layers.BatchNormalization(name='BN1'),
 			tf.keras.layers.ReLU(),
 			tf.keras.layers.Flatten(),
-			AConnect.AConnect(128,Wstd,Bstd,isBin),
+			layers.Conv_AConnect(128,Wstd,Bstd,isBin),
 			tf.keras.layers.BatchNormalization(name='BN2'),
 			tf.keras.layers.ReLU(),
-			AConnect.AConnect(10,Wstd,Bstd,isBin),
+			layers.FC_AConnect(10,Wstd,Bstd,isBin),
 			tf.keras.layers.Softmax()
 		])
 		
