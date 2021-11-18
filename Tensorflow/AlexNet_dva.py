@@ -1,7 +1,6 @@
 from Layers import dva_fc
 from Layers import dva_conv
 from datetime import datetime
-from Scripts import MCsim
 import numpy as np
 import tensorflow as tf
 import math
@@ -10,6 +9,7 @@ import time
 import pathlib
 from keras.callbacks import LearningRateScheduler
 import matplotlib.pyplot as plt
+import aconnect.scripts as scripts
 tic=time.time()
 start_time = time.time()
 def hms_string(sec_elapsed):
@@ -188,7 +188,7 @@ for j in range(len(Sim_err)):
     print('With simulation error: ', Err)
     print('\n\n*******************************************************************************************')
     
-    acc, media = MCsim.MCsim(string,test_images, test_labels,N,Err,Err,force,0,name,custom_objects,optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9)
+    acc, media = scripts.MonteCarlo(string,test_images, test_labels,N,Err,Err,force,0,name,custom_objects,optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9)
     ,loss='sparse_categorical_crossentropy',metrics=['accuracy',top5],top5=True,run_model_eagerly=True,evaluate_batch_size=256)
     #np.savetxt('./Results/'+name+'_simerr_'+str(int(100*Err))+'_'+str(int(100*Err))+'.txt',acc,fmt="%.2f")
 
