@@ -47,7 +47,7 @@ for p in range (len(isBin)):
 		    model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,isBin=isBin)	#Same logic is applied here. But is for normal lenet5
 		    optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
 		    name = 'LeNet5'
-		    if isBin == "yes":
+		    if isBin[p] == "yes":
 		        name = name+'_BW'
 		    model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])
 		    print("*****************************TRAINING NETWORK*********************")
