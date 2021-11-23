@@ -22,7 +22,7 @@ for p in range(len(isBin)):
     for c in range(len(Wstd)): #Iterate over the Wstd and Bstd for training
         wstd = str(int(100*Wstd[c]))
         bstd = str(int(100*Bstd[c]))
-        name = 'AConnect_1Werr'+size+bits+'_Wstd_'+wstd+'_Bstd_'+bstd
+        name = 'AConnect_128Werr'+size+bits+'_Wstd_'+wstd+'_Bstd_'+bstd
         if isBin[p] == "yes":
             name = name+'_BW'
         print("*****************************TRAINING NETWORK*********************")
@@ -43,7 +43,7 @@ for k in range(len(isBin)): #Iterate over the networks
     for m in range(len(Wstd)): #Iterate over the training Wstd and Bstd
         wstd = str(int(100*Wstd[m]))
         bstd = str(int(100*Bstd[m]))
-        name = 'AConnect_1Werr'+size+bits+'_Wstd_'+wstd+'_Bstd_'+bstd
+        name = 'AConnect_128Werr'+size+bits+'_Wstd_'+wstd+'_Bstd_'+bstd
         if isBin[k] == "yes":
             name = name+'_BW'
         string = './Models/'+name+'.h5'
