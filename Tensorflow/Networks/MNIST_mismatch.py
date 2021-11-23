@@ -81,10 +81,31 @@ def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no",pool=1000):
 		
 		model = tf.keras.Sequential([
 			tf.keras.layers.Flatten(input_shape=imgsize),	
+<<<<<<< HEAD
 			layers.FC_AConnect(128,Wstd,Bstd,isBin, pool=64),
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.ReLU(),
 			layers.FC_AConnect(10,Wstd,Bstd,isBin, pool=64),
+=======
+<<<<<<< HEAD
+			layers.FC_AConnect(128,Wstd,Bstd,isBin, pool=32),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.ReLU(),
+			layers.FC_AConnect(10,Wstd,Bstd,isBin, pool=32),
+=======
+<<<<<<< HEAD
+			layers.FC_AConnect(128,Wstd,Bstd,isBin, pool=16),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.ReLU(),
+			layers.FC_AConnect(10,Wstd,Bstd,isBin, pool=16),
+=======
+			layers.FC_AConnect(128,Wstd,Bstd,isBin, pool=1),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.ReLU(),
+			layers.FC_AConnect(10,Wstd,Bstd,isBin, pool=1),
+>>>>>>> 3cbfc790f8f4f0427e4cf66f7257a79b6af8f8ae
+>>>>>>> 80edbcca7f94984d2999f052d184d1fcc5464d74
+>>>>>>> 7438869915bb6b1a28f44c520075a3a7d3776d47
 			tf.keras.layers.Softmax()
 		])
 
