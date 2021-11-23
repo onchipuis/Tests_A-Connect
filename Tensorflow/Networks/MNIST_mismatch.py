@@ -81,10 +81,66 @@ def Test_MNIST(opt,imgsize=[28,28],Wstd=0,Bstd=0,isBin="no",pool=1000):
 		
 		model = tf.keras.Sequential([
 			tf.keras.layers.Flatten(input_shape=imgsize),	
+<<<<<<< HEAD
 			layers.FC_AConnect(128,Wstd,Bstd,isBin),
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.ReLU(),
 			layers.FC_AConnect(10,Wstd,Bstd,isBin),
+=======
+<<<<<<< HEAD
+			layers.FC_AConnect(128,Wstd,Bstd,isBin, pool=4),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.ReLU(),
+			layers.FC_AConnect(10,Wstd,Bstd,isBin, pool=4),
+=======
+<<<<<<< HEAD
+			layers.FC_AConnect(128,Wstd,Bstd,isBin, pool=128),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.ReLU(),
+			layers.FC_AConnect(10,Wstd,Bstd,isBin, pool=128),
+=======
+<<<<<<< HEAD
+			layers.FC_AConnect(128,Wstd,Bstd,isBin, pool=8),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.ReLU(),
+			layers.FC_AConnect(10,Wstd,Bstd,isBin, pool=8),
+=======
+<<<<<<< HEAD
+			layers.FC_AConnect(128,Wstd,Bstd,isBin, pool=2),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.ReLU(),
+			layers.FC_AConnect(10,Wstd,Bstd,isBin, pool=2),
+=======
+<<<<<<< HEAD
+			layers.FC_AConnect(128,Wstd,Bstd,isBin, pool=64),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.ReLU(),
+			layers.FC_AConnect(10,Wstd,Bstd,isBin, pool=64),
+=======
+<<<<<<< HEAD
+			layers.FC_AConnect(128,Wstd,Bstd,isBin, pool=32),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.ReLU(),
+			layers.FC_AConnect(10,Wstd,Bstd,isBin, pool=32),
+=======
+<<<<<<< HEAD
+			layers.FC_AConnect(128,Wstd,Bstd,isBin, pool=16),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.ReLU(),
+			layers.FC_AConnect(10,Wstd,Bstd,isBin, pool=16),
+=======
+			layers.FC_AConnect(128,Wstd,Bstd,isBin, pool=1),
+			tf.keras.layers.BatchNormalization(),
+			tf.keras.layers.ReLU(),
+			layers.FC_AConnect(10,Wstd,Bstd,isBin, pool=1),
+>>>>>>> 3cbfc790f8f4f0427e4cf66f7257a79b6af8f8ae
+>>>>>>> 80edbcca7f94984d2999f052d184d1fcc5464d74
+>>>>>>> 7438869915bb6b1a28f44c520075a3a7d3776d47
+>>>>>>> 6e8ce98698ed07143340b86d6382efc37479386f
+>>>>>>> 8d1d24811413899458341a7116b38fd77a162812
+>>>>>>> bfac657704749c693732920857becd32528a7665
+>>>>>>> a13c2455ae13ba93606aa7c6eee9ca20785a5f0a
+>>>>>>> c8b6dcf029c2afa591e6becbb604c8cd0afad464
 			tf.keras.layers.Softmax()
 		])
 
