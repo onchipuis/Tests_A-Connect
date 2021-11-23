@@ -12,7 +12,11 @@ Sim_err = [0,0.3,0.5,0.7]	#Define all the simulation errors
 Wstd = [0.3,0.5,0.7] 			#Define the stddev for training
 Bstd = Wstd
 isBin = ["no"]					#Do you want binary weights?
+<<<<<<< HEAD
 bits = 8	#Dataset quantization
+=======
+bits = 8 	#Dataset quantization
+>>>>>>> 3cbfc790f8f4f0427e4cf66f7257a79b6af8f8ae
 imgSize = [28,28]	#Dataset size
 (x_train, y_train), (x_test, y_test) = scripts.load_ds(imgSize=imgSize, Quant=bits) #Load dataset
 opt = 3	#Model identifier from MNIST_mismtach
@@ -22,7 +26,11 @@ for p in range(len(isBin)):
     for c in range(len(Wstd)): #Iterate over the Wstd and Bstd for training
         wstd = str(int(100*Wstd[c]))
         bstd = str(int(100*Bstd[c]))
+<<<<<<< HEAD
         name = 'AConnect_16Werr'+size+bits+'_Wstd_'+wstd+'_Bstd_'+bstd
+=======
+        name = 'AConnect_1Werr'+size+bits+'_Wstd_'+wstd+'_Bstd_'+bstd
+>>>>>>> 3cbfc790f8f4f0427e4cf66f7257a79b6af8f8ae
         if isBin[p] == "yes":
             name = name+'_BW'
         print("*****************************TRAINING NETWORK*********************")
@@ -43,7 +51,11 @@ for k in range(len(isBin)): #Iterate over the networks
     for m in range(len(Wstd)): #Iterate over the training Wstd and Bstd
         wstd = str(int(100*Wstd[m]))
         bstd = str(int(100*Bstd[m]))
+<<<<<<< HEAD
         name = 'AConnect_16Werr'+size+bits+'_Wstd_'+wstd+'_Bstd_'+bstd
+=======
+        name = 'AConnect_1Werr'+size+bits+'_Wstd_'+wstd+'_Bstd_'+bstd
+>>>>>>> 3cbfc790f8f4f0427e4cf66f7257a79b6af8f8ae
         if isBin[k] == "yes":
             name = name+'_BW'
         string = './Models/'+name+'.h5'
@@ -65,8 +77,13 @@ for k in range(len(isBin)): #Iterate over the networks
             print('TESTING NETWORK: ', name)
             print('With simulation error: ', Err)
             print('\n\n*******************************************************************************************')
+<<<<<<< HEAD
             acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,name,custom_objects,
             run_model_eagerly=True,evaluate_batch_size=10000) #Perform the simulation
+=======
+            acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,name,custom_objects
+            ,run_model_eagerly=True,evaluate_batch_size=10000) #Perform the simulation
+>>>>>>> 3cbfc790f8f4f0427e4cf66f7257a79b6af8f8ae
             #For more information about MCSim please go to Scripts/MCsim.py
             #####
             now = datetime.now()
