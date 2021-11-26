@@ -3,12 +3,12 @@ Script for training and testing AlexNet with A-Connect
 INSTRUCTIONS:
 Due to the memory usage we recommend to uncomment the first train the model and save it. Then just comment the training stage and then load the model to test it using the Monte Carlo simulation.
 """
-import sys
+"""import sys
 config = open('config.txt','r')
 folder = config.read()
 sys.path.append(folder)
 sys.path.append(folder+'/Layers/')
-sys.path.append(folder+'/Scripts/')
+sys.path.append(folder+'/Scripts/')"""
 
 from datetime import datetime
 import aconnect.layers as layers
@@ -34,7 +34,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 	if(not(isAConnect)):
 		model = tf.keras.models.Sequential([
                         #tf.keras.layers.experimental.preprocessing.Rescaling(1./255, input_shape=(32, 32, 3)),
-		"""1"""	tf.keras.layers.InputLayer(input_shape=[32,32,3]),
+			tf.keras.layers.InputLayer(input_shape=[32,32,3]),
 			#tf.keras.layers.experimental.preprocessing.Resizing(145,145),           
 		"""2"""	tf.keras.layers.Conv2D(filters=64, kernel_size=(3,3),strides=(1,1), activation='relu',padding="same"),
 			tf.keras.layers.BatchNormalization(),
