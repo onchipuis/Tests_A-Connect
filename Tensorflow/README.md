@@ -22,9 +22,9 @@ All the work here was done using Python 3.8 and Tensorflow 2.4.X, so please, in 
 1. [aconnect](/Tensorflow/aconnect): This folder contains the final library for the methodology (git submodule from https://github.com/onchipuis/A-Connect).
 2. [Networks](/Tensorflow/Networks): All the networks used for testing purpose. Contains the scripts for training and testing (e.g., MC simulations). Please see local readme.
 
-···2.1. [Networks/Layers](/Tensorflow/Networks/Layers): Some additional layers created for testing (e.g., DVA). Please see local readme.
+...2.1. [Networks/Layers](/Tensorflow/Networks/Layers): Some additional layers created for testing (e.g., DVA). Please see local readme.
 
-···2.2. [Networks/Models](/Tensorflow/Networks/Models): Obtained NN architecture models after training.
+...2.2. [Networks/Models](/Tensorflow/Networks/Models): Obtained NN architecture models after training.
 
 3. [Results](/Tensorflow/Results): This folder contains the results of the Monte Carlo and other simulations.
 
