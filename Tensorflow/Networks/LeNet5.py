@@ -17,7 +17,7 @@ from Layers import dva_conv
 import aconnect.layers as layers
 
 
-def LeNet5(Xtrain=None,Xtest=None,isAConnect=False,Wstd=0,Bstd=0,isBin="no"):
+def LeNet5(Xtrain=None,Xtest=None,isAConnect=False,Wstd=0,Bstd=0,isBin="no", pool=None):
 	if(Xtrain is not None):
 	    Xtrain = np.pad(Xtrain, ((0,0),(2,2),(2,2)), 'constant')
 	if(Xtest is not None):        
@@ -52,19 +52,19 @@ def LeNet5(Xtrain=None,Xtest=None,isAConnect=False,Wstd=0,Bstd=0,isBin="no"):
 		model = tf.keras.Sequential([
 			tf.keras.layers.InputLayer(input_shape=[32,32]),
 			tf.keras.layers.Reshape((32,32,1)),
-			layers.Conv_AConnect(6,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin,Op=2,strides=1,padding="VALID"),
+			layers.Conv_AConnect(6,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin,Op=2,strides=1,padding="VALID", pool=pool),
             tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.Activation('tanh'),            
 			tf.keras.layers.AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
-			layers.Conv_AConnect(16,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin,Op=2 ,strides=1,padding="VALID"),
+			layers.Conv_AConnect(16,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin,Op=2 ,strides=1,padding="VALID", pool=pool),
             tf.keras.layers.BatchNormalization(),            
 			tf.keras.layers.Activation('tanh'),                        
 			tf.keras.layers.AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
 			tf.keras.layers.Flatten(),
-			layers.FC_AConnect(120,Wstd,Bstd,isBin=isBin),
+			layers.FC_AConnect(120,Wstd,Bstd,isBin=isBin, pool=pool),
             tf.keras.layers.BatchNormalization(),            
 			tf.keras.layers.Activation('tanh'),                        
-			layers.FC_AConnect(84,Wstd,Bstd,isBin=isBin),
+			layers.FC_AConnect(84,Wstd,Bstd,isBin=isBin, pool=pool),
             tf.keras.layers.BatchNormalization(),            
 			tf.keras.layers.Activation('tanh'),                        
 			layers.FC_AConnect(10,Wstd,Bstd,isBin=isBin),
