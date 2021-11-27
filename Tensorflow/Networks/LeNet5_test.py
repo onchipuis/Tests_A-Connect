@@ -20,7 +20,7 @@ batch_size = 256
 N = 9 #Number of error matrices to test, only 2^(n-1) size
 ####Training part
 for d in range(N): #Iterate over all the error matrices
-	M = 2^(N-1)
+	M = 2**(d)
 	nMatriz = str(M)
 	for p in range (len(isBin)):
 		for i in range(len(identifier)): #Iterate over the networks
@@ -30,12 +30,15 @@ for d in range(N): #Iterate over all the error matrices
 			    for c in range(len(Wstd)): #Iterate over the Wstd and Bstd for training
 			        wstd = str(int(100*Wstd[c]))
 			        bstd = str(int(100*Bstd[c]))
-			        name = 'LeNet5'+nMatriz+'Werr'+'_Wstd_'+wstd+'_Bstd_'+bstd
+			        name = 'LeNet5_'+nMatriz+'Werr'+'_Wstd_'+wstd+'_Bstd_'+bstd
 			        if isBin[p] == "yes":
 			            name = name+'_BW'
 			        print("*****************************TRAINING NETWORK*********************")
 			        print("\n\t\t\t", name)
-			        model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin[p], pool=M) #Get the model
+			        if M == batch_size:                    
+			            model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin[p]) #Get the model
+			        else:
+			            model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin[p], pool=M) #Get the model                                                
 			        optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum) #Define optimizer
 			        top5 = tf.keras.metrics.TopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None) #COnfigure the model to get the top-5 accuracy
 			        model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5])#Compile the model
@@ -68,7 +71,7 @@ for d in range(N): #Iterate over all the error matrices
 
 #This part is for inference. During the following lines the MCSim will be executed.
 for d in range(N): #Iterate over all the error matrices
-	M = 2^(n-1)
+	M = 2**(d)
 	nMatriz = str(M)
 	for k in range(len(identifier)): #Iterate over the networks
 	    isAConnect = identifier[k] #Select the network
@@ -76,7 +79,7 @@ for d in range(N): #Iterate over all the error matrices
 	        for m in range(len(Wstd)): #Iterate over the training Wstd and Bstd
 	            wstd = str(int(100*Wstd[m]))
 	            bstd = str(int(100*Bstd[m]))
-	            name = 'LeNet5'+nMatriz+'Werr'+'_Wstd_'+wstd+'_Bstd_'+bstd
+	            name = 'LeNet5_'+nMatriz+'Werr'+'_Wstd_'+wstd+'_Bstd_'+bstd
 	            if isBin == "yes":
 	                name = name+'_BW'
 	            string = './Models/'+name+'.h5'
