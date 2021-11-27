@@ -88,7 +88,9 @@ model.layers[41].set_weights(model_aux.layers[17].get_weights())
 print(model.summary())
 
 #TRAINING PARAMETERS
-model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.001, momentum=0.9), metrics=['accuracy'])
+model.compile(loss='sparse_categorical_crossentropy',
+        optimizer=tf.optimizers.SGD(learning_rate=0.01, momentum=0.9), 
+        metrics=['accuracy'])
 
 # TRAINING
 model.fit(X_train, Y_train,
