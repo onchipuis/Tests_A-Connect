@@ -68,20 +68,20 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.MaxPool2D(pool_size=(2,2), strides=(2,2)),
 			tf.keras.layers.Flatten(),
-			tf.keras.layers.Dropout(0.5),
+			#tf.keras.layers.Dropout(0.5),
 			tf.keras.layers.Dense(512, activation='relu'),
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.Dropout(0.5),
-			tf.keras.layers.Dense(512, activation='relu'),
-			tf.keras.layers.BatchNormalization(),
-			tf.keras.layers.Dropout(0.5),
+			#tf.keras.layers.Dense(512, activation='relu'),
+			#tf.keras.layers.BatchNormalization(),
+			#tf.keras.layers.Dropout(0.1),
 			tf.keras.layers.Dense(10, activation='softmax')
 	    ])
 	else:
 
 		model = tf.keras.models.Sequential([
 			tf.keras.layers.InputLayer(input_shape=[32,32,3]),
-			tf.keras.layers.experimental.preprocessing.Resizing(100,100),    
+			#tf.keras.layers.experimental.preprocessing.Resizing(100,100),    
 		        layers.Conv_AConnect(filters=64, kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd,pool=4, strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),
 		        tf.keras.layers.BatchNormalization(),
                         tf.keras.layers.ReLU(),
@@ -128,7 +128,10 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 		        tf.keras.layers.MaxPool2D(pool_size=(3,3), strides=(2,2),padding="SAME"),
 		        tf.keras.layers.Flatten(),
 		        #tf.keras.layers.Dropout(0.1),
-		        layers.FC_AConnect(256, Wstd=Wstd,Bstd=Bstd,pool=16,d_type=tf.dtypes.float16),
+		        layers.FC_AConnect(512, Wstd=Wstd,Bstd=Bstd,pool=16,d_type=tf.dtypes.float16),
+		        tf.keras.layers.BatchNormalization(),
+                        tf.keras.layers.ReLU(),
+		        layers.FC_AConnect(512, Wstd=Wstd,Bstd=Bstd,pool=16,d_type=tf.dtypes.float16),
 		        tf.keras.layers.BatchNormalization(),
                         tf.keras.layers.ReLU(),
 		        #tf.keras.layers.Dropout(0.1),
