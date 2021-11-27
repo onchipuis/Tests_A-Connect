@@ -40,10 +40,10 @@ train_datagen = ImageDataGenerator(
     horizontal_flip=True)
 
 train_datagen.fit(X_train)
-train_generator = train_datagen.flow(X_train, Y_train, batch_size=32)
+train_generator = train_datagen.flow(X_train, Y_train, batch_size=256)
 
 test_datagen = ImageDataGenerator(rescale=1. / 255)
-validation_generator = test_datagen.flow(X_test, Y_test, batch_size=32)
+validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
 
 # CREATING NN:
 model = vgg.model_creation(isAConnect=False,Wstd=0,Bstd=0)
