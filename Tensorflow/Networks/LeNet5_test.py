@@ -1,18 +1,16 @@
 import tensorflow as tf
 import numpy as np
 import time
-from Networks import LeNet5
+import LeNet5
 from datetime import datetime
-from Layers import dva_fc
-from Layers import dva_conv
 import aconnect.layers as layers
 import aconnect.scripts as scripts
 identifier = [True]				#Which network you want to train/test True for A-Connect false for normal LeNet
 Sim_err = [0,0.3,0.5,0.7]	#Define all the simulation errors
-Wstd = [0,0.3,0.5,0.7]			#Define the stddev for training
+Wstd = [0.3,0.5,0.7]			#Define the stddev for training
 Bstd = Wstd
 isBin = ["no"]					#Do you want binary weights?
-(x_train, y_train), (x_test, y_test) = load_ds.load_ds() #Load dataset
+(x_train, y_train), (x_test, y_test) = scripts.load_ds() #Load dataset
 _,x_train,x_test=LeNet5.LeNet5(x_train,x_test)	#Load x_train, x_test with augmented dimensions. i.e. 32x32
 x_test = np.float32(x_test) #Convert it to float32
 epochs = 20
@@ -22,7 +20,7 @@ batch_size = 256
 N = 9 #Number of error matrices to test, only 2^(n-1) size
 ####Training part
 for d in range(N): #Iterate over all the error matrices
-	M = 2^(n-1)
+	M = 2^(N-1)
 	nMatriz = str(M)
 	for p in range (len(isBin)):
 		for i in range(len(identifier)): #Iterate over the networks
@@ -37,7 +35,7 @@ for d in range(N): #Iterate over all the error matrices
 			            name = name+'_BW'
 			        print("*****************************TRAINING NETWORK*********************")
 			        print("\n\t\t\t", name)
-			        model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin) #Get the model
+			        model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin[p], pool=M) #Get the model
 			        optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum) #Define optimizer
 			        top5 = tf.keras.metrics.TopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None) #COnfigure the model to get the top-5 accuracy
 			        model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5])#Compile the model
