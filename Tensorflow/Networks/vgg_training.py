@@ -87,9 +87,14 @@ model.layers[41].set_weights(model_aux.layers[17].get_weights())
 
 print(model.summary())
 
+lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+    initial_learning_rate=0.01,
+    decay_steps=10000,
+    decay_rate=0.9)
+
 #TRAINING PARAMETERS
 model.compile(loss='sparse_categorical_crossentropy',
-        optimizer=tf.optimizers.SGD(learning_rate=0.1, momentum=0.9), 
+        optimizer=tf.optimizers.SGD(learning_rate=lr_schedule, momentum=0.9), 
         metrics=['accuracy'])
 
 # TRAINING
