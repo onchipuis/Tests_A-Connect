@@ -53,10 +53,10 @@ model.layers[8].set_weights(model_aux.layers[5].get_weights())
 model.layers[11].set_weights(model_aux.layers[7].get_weights())
 model.layers[13].set_weights(model_aux.layers[8].get_weights())
 model.layers[15].set_weights(model_aux.layers[9].get_weights())
-"""
 model.layers[18].set_weights(model_aux.layers[11].get_weights())
 model.layers[20].set_weights(model_aux.layers[12].get_weights())
 model.layers[22].set_weights(model_aux.layers[13].get_weights())
+"""
 model.layers[25].set_weights(model_aux.layers[15].get_weights())
 model.layers[27].set_weights(model_aux.layers[16].get_weights())
 model.layers[29].set_weights(model_aux.layers[17].get_weights())
