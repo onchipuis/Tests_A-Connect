@@ -86,7 +86,7 @@ model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SG
 model.fit(train_images, train_labels,
           batch_size=256,epochs=30,
           validation_data=(test_images,test_labels),
-          )
+          shuffle=True)
 model.evaluate(test_images,test_labels)    
 
 y_predict =model.predict(test_images)
