@@ -37,7 +37,20 @@ def get_top_n_score(target, prediction, n):
     return np.mean(precision)
 
 # LOADING DATASET:
-(train_images, train_labels), (test_images, test_labels) = tf.keras.datasets.cifar10.load_data()	
+(X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()	
+# prepare data augmentation configuration
+train_datagen = ImageDataGenerator(
+    rescale=1. / 255,
+    shear_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=True)
+
+train_datagen.fit(X_train)
+train_generator = train_datagen.flow(X_train, Y_train, batch_size=32)
+
+test_datagen = ImageDataGenerator(rescale=1. / 255)
+validation_generator = test_datagen.flow(X_test, Y_test, batch_size=32)
+
 # CREATING NN:
 model = vgg.model_creation(isAConnect=False,Wstd=0,Bstd=0)
 
@@ -83,15 +96,16 @@ print(model.summary())
 model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.001, momentum=0.9), metrics=['accuracy'])
 
 # TRAINING
-model.fit(train_images, train_labels,
-          batch_size=256,epochs=30,
-          validation_data=(test_images,test_labels),
+model.fit(train_generator,
+          batch_size=256,
+          epochs=30,
+          validation_data=validation_generator,
           shuffle=True)
-model.evaluate(test_images,test_labels)    
+model.evaluate(X_test,Y_test)    
 
-y_predict =model.predict(test_images)
+y_predict =model.predict(X_test)
 elapsed_time = time.time() - start_time
-print("top-1 score:", get_top_n_score(test_labels, y_predict, 1))
+print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
 print("Elapsed time: {}".format(hms_string(elapsed_time)))
 print('Tiempo de procesamiento (secs): ', time.time()-tic)
 
