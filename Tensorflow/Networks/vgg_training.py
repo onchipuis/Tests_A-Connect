@@ -89,7 +89,7 @@ print(model.summary())
 
 #TRAINING PARAMETERS
 model.compile(loss='sparse_categorical_crossentropy',
-        optimizer=tf.optimizers.SGD(learning_rate=0.01, momentum=0.9), 
+        optimizer=tf.optimizers.SGD(learning_rate=0.1, momentum=0.9), 
         metrics=['accuracy'])
 
 # TRAINING
