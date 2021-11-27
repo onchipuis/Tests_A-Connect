@@ -68,7 +68,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.MaxPool2D(pool_size=(2,2), strides=(2,2)),
 			tf.keras.layers.Flatten(),
-			#tf.keras.layers.Dropout(0.5),
+			tf.keras.layers.Dropout(0.5),
 			tf.keras.layers.Dense(512, activation='relu'),
 			tf.keras.layers.BatchNormalization(),
 			tf.keras.layers.Dropout(0.5),
