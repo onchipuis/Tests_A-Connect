@@ -11,7 +11,7 @@ identifier = [True]				#Which network you want to train/test True for A-Connect 
 Sim_err = [0,0.3,0.5,0.7]	#Define all the simulation errors
 Wstd = [0,0.3,0.5,0.7]			#Define the stddev for training
 Bstd = Wstd
-isBin = ["yes"]					#Do you want binary weights?
+isBin = ["no"]					#Do you want binary weights?
 (x_train, y_train), (x_test, y_test) = load_ds.load_ds() #Load dataset
 _,x_train,x_test=LeNet5.LeNet5(x_train,x_test)	#Load x_train, x_test with augmented dimensions. i.e. 32x32
 x_test = np.float32(x_test) #Convert it to float32
@@ -47,8 +47,8 @@ for d in range(N): #Iterate over all the error matrices
 			        val_acc = history.history['val_accuracy']
 			        string = './Models/'+name+'.h5' #Define the folder and the name of the model to be saved
 			        model.save(string,include_optimizer=True) #Save the model
-			        np.savetxt('./Models/Training_data/'+name+'_acc'+'.txt',acc,fmt="%.2f") #Save in a txt the accuracy and the validation accuracy for further analysis
-			        np.savetxt('./Models/Training_data/'+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
+			        np.savetxt('../Results/LeNet5_MNIST/Training_data/'+name+'_acc'+'.txt',acc,fmt="%.2f") #Save in a txt the accuracy and the validation accuracy for further analysis
+			        np.savetxt('../Results/LeNet5_MNIST/Training_data/'+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
 			else:
 			    model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,isBin=isBin)	#Same logic is applied here. But is for normal lenet5
 			    optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
@@ -64,8 +64,8 @@ for d in range(N): #Iterate over all the error matrices
 			    val_acc = history.history['val_accuracy']
 			    string = './Models/'+name+'.h5'
 			    model.save(string,include_optimizer=True)
-			    np.savetxt('./Models/Training_data/'+'LeNet5'+'_acc'+'.txt',acc,fmt="%.2f")
-			    np.savetxt('./Models/Training_data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")
+			    np.savetxt('../Results/LeNet5_MNIST/Training_data/'+'LeNet5'+'_acc'+'.txt',acc,fmt="%.2f")
+			    np.savetxt('../Results/LeNet5_MNIST/Training_data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")
 
 
 #This part is for inference. During the following lines the MCSim will be executed.
@@ -100,7 +100,7 @@ for d in range(N): #Iterate over all the error matrices
 	                print('TESTING NETWORK: ', name)
 	                print('With simulation error: ', Err)
 	                print('\n\n*******************************************************************************************')
-	                acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,name,custom_objects,
+	                acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,'../Results/LeNet5_MNIST/'+name,custom_objects,
 	                optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum),loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5],top5=False) #Perform the simulation
 	                #For more information about MCSim please go to Scripts/MCsim.py
 	                #####
@@ -131,7 +131,7 @@ for d in range(N): #Iterate over all the error matrices
 	            print('TESTING NETWORK: ', name)
 	            print('With simulation error: ', Err)
 	            print('\n\n*******************************************************************************************')
-	            acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,name,
+	            acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,'../Results/LeNet5_MNIST/'+name,
 	            optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])
 	            #####
 	            now = datetime.now()
