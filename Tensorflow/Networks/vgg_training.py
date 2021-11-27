@@ -54,21 +54,20 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
                                        input_shape=(32,32,3))
 
 # Without Aconnect
-layer_off = 1;
-model.layers[0+layer_off].set_weights(model_aux.layers[1].get_weights())
-model.layers[2+layer_off].set_weights(model_aux.layers[2].get_weights())
-model.layers[5+layer_off].set_weights(model_aux.layers[4].get_weights())
-model.layers[7+layer_off].set_weights(model_aux.layers[5].get_weights())
-model.layers[10+layer_off].set_weights(model_aux.layers[7].get_weights())
-model.layers[12+layer_off].set_weights(model_aux.layers[8].get_weights())
-model.layers[14+layer_off].set_weights(model_aux.layers[9].get_weights())
-model.layers[17+layer_off].set_weights(model_aux.layers[11].get_weights())
-model.layers[19+layer_off].set_weights(model_aux.layers[12].get_weights())
-model.layers[21+layer_off].set_weights(model_aux.layers[13].get_weights())
+model.layers[1].set_weights(model_aux.layers[1].get_weights())
+model.layers[3].set_weights(model_aux.layers[2].get_weights())
+model.layers[6].set_weights(model_aux.layers[4].get_weights())
+model.layers[8].set_weights(model_aux.layers[5].get_weights())
+model.layers[11].set_weights(model_aux.layers[7].get_weights())
+model.layers[13].set_weights(model_aux.layers[8].get_weights())
+model.layers[15].set_weights(model_aux.layers[9].get_weights())
+model.layers[18].set_weights(model_aux.layers[11].get_weights())
+model.layers[20].set_weights(model_aux.layers[12].get_weights())
+model.layers[22].set_weights(model_aux.layers[13].get_weights())
 """
-model.layers[24].set_weights(model_aux.layers[15].get_weights())
-model.layers[26].set_weights(model_aux.layers[16].get_weights())
-model.layers[28].set_weights(model_aux.layers[17].get_weights())
+model.layers[25].set_weights(model_aux.layers[15].get_weights())
+model.layers[27].set_weights(model_aux.layers[16].get_weights())
+model.layers[29].set_weights(model_aux.layers[17].get_weights())
 
 ## With Aconnect
 model.layers[1].set_weights(model_aux.layers[1].get_weights())
