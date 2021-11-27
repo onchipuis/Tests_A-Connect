@@ -33,8 +33,8 @@ def hms_string(sec_elapsed):
 def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 	if(not(isAConnect)):
 		model = tf.keras.models.Sequential([
-                        #tf.keras.layers.experimental.preprocessing.Rescaling(1./255, input_shape=(32, 32, 3)),
-			tf.keras.layers.InputLayer(input_shape=(32,32,3)),
+                        tf.keras.layers.experimental.preprocessing.Rescaling(1./255, input_shape=(32, 32, 3)),
+			#tf.keras.layers.InputLayer(input_shape=(32,32,3)),
 			#tf.keras.layers.experimental.preprocessing.Resizing(145,145),           
 			tf.keras.layers.Conv2D(filters=64, kernel_size=(3,3),strides=(1,1), activation='relu',padding="same"),
 			tf.keras.layers.BatchNormalization(),
