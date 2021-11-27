@@ -32,6 +32,7 @@ def get_top_n_score(target, prediction, n):
 
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()	
+"""
 # prepare data augmentation configuration
 train_datagen = ImageDataGenerator(
     rescale=1. / 255,
@@ -44,7 +45,7 @@ train_generator = train_datagen.flow(X_train, Y_train, batch_size=256)
 
 test_datagen = ImageDataGenerator(rescale=1. / 255)
 validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
-
+"""
 # CREATING NN:
 model = vgg.model_creation(isAConnect=False,Wstd=0,Bstd=0)
 
@@ -90,10 +91,10 @@ print(model.summary())
 model.compile(loss='sparse_categorical_crossentropy', optimizer=tf.optimizers.SGD(lr=0.001, momentum=0.9), metrics=['accuracy'])
 
 # TRAINING
-model.fit(train_generator,
+model.fit(X_train, Y_train,
           batch_size=256,
           epochs=30,
-          validation_data=validation_generator,
+          validation_data=(X_test, Y_test),
           shuffle=True)
 model.evaluate(X_test,Y_test)    
 
