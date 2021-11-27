@@ -1,4 +1,4 @@
-# A-Connect for TensorFlow
+# Testing A-Connect on Multiple Neural Networks (TensorFlow)
 
 ***
 
