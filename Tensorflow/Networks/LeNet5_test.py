@@ -103,7 +103,7 @@ for d in range(N): #Iterate over all the error matrices
 	                print('With simulation error: ', Err)
 	                print('\n\n*******************************************************************************************')
 	                acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,'../Results/LeNet5_MNIST/'+name,custom_objects,
-	                optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum),loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5],top5=False) #Perform the simulation
+	                optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum),loss=['sparse_categorical_crossentropy'],metrics=['accuracy'],top5=False) #Perform the simulation
 	                #For more information about MCSim please go to Scripts/MCsim.py
 	                #####
 	                now = datetime.now()
