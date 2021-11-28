@@ -47,7 +47,7 @@ test_datagen = ImageDataGenerator(rescale=1. / 255)
 validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
 """
 # CREATING NN:
-model = vgg.model_creation(isAConnect=False,Wstd=0,Bstd=0)
+model = vgg.model_creation(isAConnect=True,Wstd=80,Bstd=80)
 
 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
 model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
