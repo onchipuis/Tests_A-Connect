@@ -19,9 +19,10 @@ def hms_string(sec_elapsed):
     s = sec_elapsed % 60
     return f"{h}:{m:>02}:{s:>05.2f}"
 
+# LOADING DATASET:
+(X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()	
+
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
-
-
 top5 = tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None)
 #Sim_err = [0, 0.3, 0.5, 0.7]
 Sim_err = [0.8]
@@ -46,7 +47,7 @@ for j in range(len(Sim_err)):
     print('With simulation error: ', Err)
     print('\n\n*******************************************************************************************')
     
-    acc, media = scripts.MonteCarlo(string,test_images, test_labels,N,
+    acc, media = scripts.MonteCarlo(string,X_test, Y_test,N,
             Err,Err,force,0,name,custom_objects,
             optimizer=tf.optimizers.SGD(lr=0.001,momentum=0.9),
             loss='sparse_categorical_crossentropy',
@@ -65,4 +66,4 @@ for j in range(len(Sim_err)):
 
             #####
            
-#acc,media=MCsim.MCsim("../Models/AlexNet.h5",test_images, test_labels,1000,0.3,0.3,"no","AlexNet_30",SRAMsz=[10000,50000],optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
+#acc,media=MCsim.MCsim("../Models/AlexNet.h5",X_test, Y_test,1000,0.3,0.3,"no","AlexNet_30",SRAMsz=[10000,50000],optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
