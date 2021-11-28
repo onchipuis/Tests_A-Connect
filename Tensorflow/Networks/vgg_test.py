@@ -22,13 +22,14 @@ def hms_string(sec_elapsed):
     m = int((sec_elapsed % (60 * 60)) / 60)
     s = sec_elapsed % 60
     return f"{h}:{m:>02}:{s:>05.2f}"
-"""
+
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 
 
 top5 = tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None)
-Sim_err = [0, 0.3, 0.5, 0.7]
-name = 'CifarVGG_Aconnect03'                      
+#Sim_err = [0, 0.3, 0.5, 0.7]
+Sim_err = 0.8
+name = 'Wstd_80_Bstd_80'                      
 string = './Models/'+name+'.h5'
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 acc=np.zeros([500,1])
@@ -38,7 +39,7 @@ for j in range(len(Sim_err)):
     if Err == 0:
         N = 1
     else:
-        N = 500
+        N = 1000
             #####
     elapsed_time = time.time() - start_time
     print("Elapsed time: {}".format(hms_string(elapsed_time)))
@@ -49,8 +50,13 @@ for j in range(len(Sim_err)):
     print('With simulation error: ', Err)
     print('\n\n*******************************************************************************************')
     
-    acc, media = scripts.MonteCarlo(string,test_images, test_labels,N,Err,Err,force,0,name,custom_objects,optimizer=tf.optimizers.SGD(lr=0.001,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy',top5],top5=True)
-    np.savetxt('../Results/'+name+'_simerr_'+str(int(100*Err))+'_'+str(int(100*Err))+'.txt',acc,fmt="%.2f")
+    acc, media = scripts.MonteCarlo(string,test_images, test_labels,N,
+            Err,Err,force,0,name,custom_objects,
+            optimizer=tf.optimizers.SGD(lr=0.001,momentum=0.9),
+            loss='sparse_categorical_crossentropy',
+            metrics=['accuracy',top5],top5=True
+            )
+    np.savetxt('../Results/VGG16_CIFAR10/'+name+'_simerr_'+str(int(100*Err))+'_'+str(int(100*Err))+'.txt',acc,fmt="%.2f")
 
     now = datetime.now()
     endtime = now.time()
@@ -63,7 +69,4 @@ for j in range(len(Sim_err)):
 
             #####
            
-
-
 #acc,media=MCsim.MCsim("../Models/AlexNet.h5",test_images, test_labels,1000,0.3,0.3,"no","AlexNet_30",SRAMsz=[10000,50000],optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),loss='sparse_categorical_crossentropy',metrics=['accuracy'])
-"""
