@@ -53,6 +53,7 @@ model = vgg.model_creation(isAConnect=True,Wstd=0.8,Bstd=0.8)
 model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
                                        input_shape=(32,32,3))
 
+"""
 # Without Aconnect
 model.layers[1].set_weights(model_aux.layers[1].get_weights())
 model.layers[3].set_weights(model_aux.layers[2].get_weights())
@@ -64,10 +65,10 @@ model.layers[15].set_weights(model_aux.layers[9].get_weights())
 model.layers[18].set_weights(model_aux.layers[11].get_weights())
 model.layers[20].set_weights(model_aux.layers[12].get_weights())
 model.layers[22].set_weights(model_aux.layers[13].get_weights())
-"""
 model.layers[25].set_weights(model_aux.layers[15].get_weights())
 model.layers[27].set_weights(model_aux.layers[16].get_weights())
 model.layers[29].set_weights(model_aux.layers[17].get_weights())
+"""
 
 ## With Aconnect
 model.layers[1].set_weights(model_aux.layers[1].get_weights())
@@ -83,7 +84,6 @@ model.layers[31].set_weights(model_aux.layers[13].get_weights())
 model.layers[35].set_weights(model_aux.layers[15].get_weights())
 model.layers[38].set_weights(model_aux.layers[16].get_weights())
 model.layers[41].set_weights(model_aux.layers[17].get_weights())
-"""
 
 print(model.summary())
 
