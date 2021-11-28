@@ -26,7 +26,7 @@ for p in range(len(isBin)):
             name = name+'_BW'
         print("*****************************TRAINING NETWORK*********************")
         print("\n\t\t\t", name)
-        model = build_model(imgsize=imgSize,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin[p], pool=None) #Get the model
+        model = build_model(imgsize=imgSize,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin[p], pool=256) #Get the model
         optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)#Define optimizer #Model training parameters
         model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy']) #Compile the model
         print(model.summary()) #Print the summary

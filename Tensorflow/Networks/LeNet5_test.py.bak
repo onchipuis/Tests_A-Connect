@@ -19,7 +19,6 @@ momentum = 0.9
 batch_size = 256
 N = 9 #Number of error matrices to test, only 2^(n-1) size
 ####Training part
-"""
 for d in range(N): #Iterate over all the error matrices
 	M = 2**(d)
 	nMatriz = str(M)
@@ -68,7 +67,7 @@ for d in range(N): #Iterate over all the error matrices
 			    model.save(string,include_optimizer=True)
 			    np.savetxt('../Results/LeNet5_MNIST/Training_data/'+'LeNet5'+'_acc'+'.txt',acc,fmt="%.2f")
 			    np.savetxt('../Results/LeNet5_MNIST/Training_data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")
-"""
+
 
 #This part is for inference. During the following lines the MCSim will be executed.
 for d in range(N): #Iterate over all the error matrices
