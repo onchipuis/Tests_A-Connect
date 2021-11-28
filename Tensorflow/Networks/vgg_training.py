@@ -117,4 +117,4 @@ for j in range(len(Wstd_err)):
 
     # SAVE MODEL:
     name = 'Wstd_'+str(int(100*Err))+'_Bstd_'+str(int(100*Err))                      
-    model.save('./Models/VGG16_CIFAR10/'+name+'.h5",include_optimizer=True)
+    model.save('./Models/VGG16_CIFAR10/'+name+'.h5',include_optimizer=True)
