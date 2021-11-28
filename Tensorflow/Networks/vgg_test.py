@@ -3,17 +3,13 @@ Script for training VGG with A-Connect, DVA, or none (Baseline)
 INSTRUCTIONS:
 Due to the memory usage we recommend to uncomment the first train the model and save it. Then just comment the training stage and then load the model to test it using the Monte Carlo simulation.
 """
-import sys
-config = open('config.txt','r')
-folder = config.read()
-sys.path.append(folder)
-sys.path.append(folder+'/Layers/')
-sys.path.append(folder+'/Scripts/')
-
 import numpy as np
 import tensorflow as tf
 import VGG as vgg
 import time
+from datetime import datetime
+import aconnect.layers as layers
+import aconnect.scripts as scripts
 #from keras.callbacks import LearningRateScheduler
 tic=time.time()
 start_time = time.time()
