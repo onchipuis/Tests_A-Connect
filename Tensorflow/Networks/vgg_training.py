@@ -47,7 +47,7 @@ test_datagen = ImageDataGenerator(rescale=1. / 255)
 validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
 """
 # CREATING NN:
-model = vgg.model_creation(isAConnect=True,Wstd=0.8,Bstd=0.8)
+model = vgg.model_creation(isAConnect=True,Wstd=0.7,Bstd=0.7)
 
 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
 model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
@@ -111,4 +111,4 @@ print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
 print("Elapsed time: {}".format(hms_string(elapsed_time)))
 print('Tiempo de procesamiento (secs): ', time.time()-tic)
 
-model.save("./Models/VGG16_CIFAR10/Wstd_80_Bstd_80.h5",include_optimizer=True) ### MODEL SAVING LOGIC
+model.save("./Models/VGG16_CIFAR10/Wstd_70_Bstd_70.h5",include_optimizer=True) ### MODEL SAVING LOGIC
