@@ -71,10 +71,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 			MaxPool2D(pool_size=(2,2), strides=(2,2)),
 			Flatten(),
 			Dropout(0.5),
-			Dense(512, activation='relu'),
-			BatchNormalization(),
-			Dropout(0.5),
-			Dense(512, activation='relu'),
+			Dense(256, activation='relu'),
 			BatchNormalization(),
 			Dropout(0.5),
 			Dense(10, activation='softmax')
