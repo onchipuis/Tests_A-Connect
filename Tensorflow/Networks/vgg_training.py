@@ -111,4 +111,4 @@ print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
 print("Elapsed time: {}".format(hms_string(elapsed_time)))
 print('Tiempo de procesamiento (secs): ', time.time()-tic)
 
-model.save("./Models/VGG_CIFAR10/Wstd_80_Bstd_80.h5",include_optimizer=True) ### MODEL SAVING LOGIC
+model.save("./Models/VGG16_CIFAR10/Wstd_80_Bstd_80.h5",include_optimizer=True) ### MODEL SAVING LOGIC
