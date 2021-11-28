@@ -46,69 +46,75 @@ train_generator = train_datagen.flow(X_train, Y_train, batch_size=256)
 test_datagen = ImageDataGenerator(rescale=1. / 255)
 validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
 """
-# CREATING NN:
-model = vgg.model_creation(isAConnect=True,Wstd=0.7,Bstd=0.7)
-
 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
 model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
-                                       input_shape=(32,32,3))
+                                           input_shape=(32,32,3))
 
-"""
-# Without Aconnect
-model.layers[1].set_weights(model_aux.layers[1].get_weights())
-model.layers[3].set_weights(model_aux.layers[2].get_weights())
-model.layers[6].set_weights(model_aux.layers[4].get_weights())
-model.layers[8].set_weights(model_aux.layers[5].get_weights())
-model.layers[11].set_weights(model_aux.layers[7].get_weights())
-model.layers[13].set_weights(model_aux.layers[8].get_weights())
-model.layers[15].set_weights(model_aux.layers[9].get_weights())
-model.layers[18].set_weights(model_aux.layers[11].get_weights())
-model.layers[20].set_weights(model_aux.layers[12].get_weights())
-model.layers[22].set_weights(model_aux.layers[13].get_weights())
-model.layers[25].set_weights(model_aux.layers[15].get_weights())
-model.layers[27].set_weights(model_aux.layers[16].get_weights())
-model.layers[29].set_weights(model_aux.layers[17].get_weights())
-"""
+#### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
+Wstd_err = [0.3, 0.5, 0.7, 0.8]
+for j in range(len(Wstd_err)):
+    Err = Wstd_err[j]
+    # CREATING NN:
+    model = vgg.model_creation(isAConnect=True,Wstd=Err,Bstd=Err)
 
-## With Aconnect
-model.layers[1].set_weights(model_aux.layers[1].get_weights())
-model.layers[4].set_weights(model_aux.layers[2].get_weights())
-model.layers[8].set_weights(model_aux.layers[4].get_weights())
-model.layers[11].set_weights(model_aux.layers[5].get_weights())
-model.layers[15].set_weights(model_aux.layers[7].get_weights())
-model.layers[18].set_weights(model_aux.layers[8].get_weights())
-model.layers[21].set_weights(model_aux.layers[9].get_weights())
-model.layers[25].set_weights(model_aux.layers[11].get_weights())
-model.layers[28].set_weights(model_aux.layers[12].get_weights())
-model.layers[31].set_weights(model_aux.layers[13].get_weights())
-model.layers[35].set_weights(model_aux.layers[15].get_weights())
-model.layers[38].set_weights(model_aux.layers[16].get_weights())
-model.layers[41].set_weights(model_aux.layers[17].get_weights())
+    """
+    # Without Aconnect
+    model.layers[1].set_weights(model_aux.layers[1].get_weights())
+    model.layers[3].set_weights(model_aux.layers[2].get_weights())
+    model.layers[6].set_weights(model_aux.layers[4].get_weights())
+    model.layers[8].set_weights(model_aux.layers[5].get_weights())
+    model.layers[11].set_weights(model_aux.layers[7].get_weights())
+    model.layers[13].set_weights(model_aux.layers[8].get_weights())
+    model.layers[15].set_weights(model_aux.layers[9].get_weights())
+    model.layers[18].set_weights(model_aux.layers[11].get_weights())
+    model.layers[20].set_weights(model_aux.layers[12].get_weights())
+    model.layers[22].set_weights(model_aux.layers[13].get_weights())
+    model.layers[25].set_weights(model_aux.layers[15].get_weights())
+    model.layers[27].set_weights(model_aux.layers[16].get_weights())
+    model.layers[29].set_weights(model_aux.layers[17].get_weights())
+    """
 
-print(model.summary())
+    ## With Aconnect
+    model.layers[1].set_weights(model_aux.layers[1].get_weights())
+    model.layers[4].set_weights(model_aux.layers[2].get_weights())
+    model.layers[8].set_weights(model_aux.layers[4].get_weights())
+    model.layers[11].set_weights(model_aux.layers[5].get_weights())
+    model.layers[15].set_weights(model_aux.layers[7].get_weights())
+    model.layers[18].set_weights(model_aux.layers[8].get_weights())
+    model.layers[21].set_weights(model_aux.layers[9].get_weights())
+    model.layers[25].set_weights(model_aux.layers[11].get_weights())
+    model.layers[28].set_weights(model_aux.layers[12].get_weights())
+    model.layers[31].set_weights(model_aux.layers[13].get_weights())
+    model.layers[35].set_weights(model_aux.layers[15].get_weights())
+    model.layers[38].set_weights(model_aux.layers[16].get_weights())
+    model.layers[41].set_weights(model_aux.layers[17].get_weights())
 
-lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-    initial_learning_rate=0.01,
-    decay_steps=10000,
-    decay_rate=0.9)
+    print(model.summary())
 
-#TRAINING PARAMETERS
-model.compile(loss='sparse_categorical_crossentropy',
-        optimizer=tf.optimizers.SGD(learning_rate=lr_schedule, momentum=0.9), 
-        metrics=['accuracy'])
+    lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+        initial_learning_rate=0.01,
+        decay_steps=10000,
+        decay_rate=0.9)
 
-# TRAINING
-model.fit(X_train, Y_train,
-          batch_size=256,
-          epochs=23,
-          validation_data=(X_test, Y_test),
-          shuffle=True)
-model.evaluate(X_test,Y_test)    
+    #TRAINING PARAMETERS
+    model.compile(loss='sparse_categorical_crossentropy',
+            optimizer=tf.optimizers.SGD(learning_rate=lr_schedule, momentum=0.9), 
+            metrics=['accuracy'])
 
-y_predict =model.predict(X_test)
-elapsed_time = time.time() - start_time
-print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
-print("Elapsed time: {}".format(hms_string(elapsed_time)))
-print('Tiempo de procesamiento (secs): ', time.time()-tic)
+    # TRAINING
+    model.fit(X_train, Y_train,
+              batch_size=256,
+              epochs=50,
+              validation_data=(X_test, Y_test),
+              shuffle=True)
+    model.evaluate(X_test,Y_test)    
 
-model.save("./Models/VGG16_CIFAR10/Wstd_70_Bstd_70.h5",include_optimizer=True) ### MODEL SAVING LOGIC
+    y_predict =model.predict(X_test)
+    elapsed_time = time.time() - start_time
+    print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
+    print("Elapsed time: {}".format(hms_string(elapsed_time)))
+    print('Tiempo de procesamiento (secs): ', time.time()-tic)
+
+    # SAVE MODEL:
+    name = 'Wstd_'+str(int(100*Err))+'_Bstd_'+str(int(100*Err))                      
+    model.save('./Models/VGG16_CIFAR10/'+name+'.h5",include_optimizer=True)
