@@ -49,7 +49,7 @@ for j in range(len(Sim_err)):
     
     acc, media = scripts.MonteCarlo(string,X_test, Y_test,N,
             Err,Err,force,0,name,custom_objects,
-            optimizer=tf.optimizers.SGD(lr=0.001,momentum=0.9),
+            optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),
             loss='sparse_categorical_crossentropy',
             metrics=['accuracy',top5],top5=True
             )

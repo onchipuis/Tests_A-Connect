@@ -100,7 +100,7 @@ model.compile(loss='sparse_categorical_crossentropy',
 # TRAINING
 model.fit(X_train, Y_train,
           batch_size=256,
-          epochs=30,
+          epochs=23,
           validation_data=(X_test, Y_test),
           shuffle=True)
 model.evaluate(X_test,Y_test)    
