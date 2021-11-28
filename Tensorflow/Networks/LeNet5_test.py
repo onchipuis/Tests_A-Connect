@@ -84,7 +84,7 @@ for d in range(N): #Iterate over all the error matrices
 	            if isBin == "yes":
 	                name = name+'_BW'
 	            string = './Models/LeNet5_MNIST/'+name+'.h5'
-	            custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.AConnect} #Custom objects for model loading purposes
+	            custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect} #Custom objects for model loading purposes
 	            for j in range(len(Sim_err)): #Iterate over the sim error vector
 	                Err = Sim_err[j]
 	                if Err != Wstd[m]: #If the sim error is different from the training error, do not force the error
