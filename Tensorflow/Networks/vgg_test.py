@@ -24,7 +24,7 @@ def hms_string(sec_elapsed):
 
 top5 = tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None)
 #Sim_err = [0, 0.3, 0.5, 0.7]
-Sim_err = 0.8
+Sim_err = [0.8]
 name = 'Wstd_80_Bstd_80'                      
 string = './Models/'+name+'.h5'
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
