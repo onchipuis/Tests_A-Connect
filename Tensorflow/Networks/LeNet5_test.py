@@ -17,7 +17,7 @@ epochs = 20
 learning_rate = 0.01
 momentum = 0.9
 batch_size = 256
-N = 9 #Number of error matrices to test, only 2^(n-1) size
+N = 7 #Number of error matrices to test, only 2^(n-1) size
 ####Training part
 """
 for d in range(N): #Iterate over all the error matrices
@@ -71,7 +71,7 @@ for d in range(N): #Iterate over all the error matrices
 """
 
 #This part is for inference. During the following lines the MCSim will be executed.
-for d in range(N): #Iterate over all the error matrices
+for d in range(6,N): #Iterate over all the error matrices
 	M = 2**(d)
 	nMatriz = str(M)
 	for k in range(len(identifier)): #Iterate over the networks
@@ -102,7 +102,7 @@ for d in range(N): #Iterate over all the error matrices
 	                print('TESTING NETWORK: ', name)
 	                print('With simulation error: ', Err)
 	                print('\n\n*******************************************************************************************')
-	                acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,'../Results/LeNet5_MNIST/'+name,custom_objects,
+	                acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,'../Results/LeNet5_MNIST/Matrices_Test/'+name,custom_objects,
 	                optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum),loss=['sparse_categorical_crossentropy'],metrics=['accuracy']
                     ,run_model_eagerly=True,evaluate_batch_size=10000) #Perform the simulation
 	                #For more information about MCSim please go to Scripts/MCsim.py
