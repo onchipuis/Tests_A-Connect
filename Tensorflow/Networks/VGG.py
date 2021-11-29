@@ -32,7 +32,7 @@ def hms_string(sec_elapsed):
     return f"{h}:{m:>02}:{s:>05.2f}"
 
 
-def model_creation(isAConnect=False,Wstd=0,Bstd=0):
+def model_creation(isAConnect=False,Wstd=0,Bstd=0,FC_pool=16):
 	if(not(isAConnect)):
 		model = tf.keras.models.Sequential([
 			InputLayer(input_shape=(32,32,3)),
@@ -128,11 +128,11 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 		        MaxPool2D(pool_size=(3,3), strides=(2,2),padding="SAME"),
 		        Flatten(),
 		        #Dropout(0.1),
-		        FC_AConnect(256, Wstd=Wstd,Bstd=Bstd,pool=16,d_type=tf.dtypes.float16),
+		        FC_AConnect(256, Wstd=Wstd,Bstd=Bstd,pool=FC_pool,d_type=tf.dtypes.float16),
 		        BatchNormalization(),
                         ReLU(),
 		        #Dropout(0.1),
-		        FC_AConnect(10, Wstd=Wstd,Bstd=Bstd,pool=16,d_type=tf.dtypes.float16),
+		        FC_AConnect(10, Wstd=Wstd,Bstd=Bstd,pool=FC_pool,d_type=tf.dtypes.float16),
                         Softmax()
 	    ])
 
