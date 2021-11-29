@@ -24,8 +24,10 @@ def hms_string(sec_elapsed):
 
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 top5 = tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None)
-Sim_err = [0, 0.3, 0.5, 0.7, 0.8]
-Wstd_err = [0.3, 0.5, 0.7, 0.8]
+#Sim_err = [0, 0.3, 0.5, 0.7, 0.8]
+#Wstd_err = [0.3, 0.5, 0.7]
+Sim_err = [0.8]
+Wstd_err = [0.7]
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 acc=np.zeros([500,1])
 
@@ -57,7 +59,7 @@ for j in range(len(Sim_err)):
         
         acc, media = scripts.MonteCarlo(string,X_test, Y_test,N,
                 Err,Err,force,0,name,custom_objects,
-                optimizer=tf.optimizers.SGD(lr=0.01,momentum=0.9),
+                optimizer=tf.optimizers.SGD(lr=0.001,momentum=0.9),
                 loss='sparse_categorical_crossentropy',
                 metrics=['accuracy',top5],top5=True
                 )
