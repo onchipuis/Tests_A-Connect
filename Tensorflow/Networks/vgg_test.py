@@ -29,12 +29,15 @@ Wstd_err = [0.3, 0.5, 0.7, 0.8]
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 acc=np.zeros([500,1])
 
-for i in range(len(Wstd_err)):
-    Wstd_int = int(100*Wstd_err[i])
-    name = 'Wstd_'+str(Wstd_int)+'_Bstd_'+str(Wstd_int)                      
-    string = './Models/VGG16_CIFAR10/'+name+'.h5'
+for j in range(len(Sim_err)):
+
+    for i in range(len(Wstd_err)):
     
-    for j in range(len(Sim_err)):
+        # Model NAME:
+        Wstd_int = int(100*Wstd_err[i])
+        name = 'Wstd_'+str(Wstd_int)+'_Bstd_'+str(Wstd_int)                      
+        string = './Models/VGG16_CIFAR10/'+name+'.h5'
+        
         Err = Sim_err[j]
         force = "yes"
         if Err == 0:
