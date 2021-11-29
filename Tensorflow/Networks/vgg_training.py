@@ -51,7 +51,8 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
                                            input_shape=(32,32,3))
 
 #### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
-Wstd_err = [0.3, 0.5, 0.7, 0.8]
+#Wstd_err = [0.3, 0.5, 0.7, 0.8]
+Wstd_err = [0.8]
 for j in range(len(Wstd_err)):
     Err = Wstd_err[j]
     # CREATING NN:
