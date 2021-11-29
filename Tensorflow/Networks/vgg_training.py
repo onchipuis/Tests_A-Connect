@@ -91,10 +91,13 @@ for j in range(len(Wstd_err)):
 
     print(model.summary())
 
+    """
     lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
         initial_learning_rate=0.01,
         decay_steps=10000,
         decay_rate=0.9)
+    """
+    lr_schedule = 0.001
 
     #TRAINING PARAMETERS
     model.compile(loss='sparse_categorical_crossentropy',
@@ -104,7 +107,7 @@ for j in range(len(Wstd_err)):
     # TRAINING
     model.fit(X_train, Y_train,
               batch_size=256,
-              epochs=50,
+              epochs=30,
               validation_data=(X_test, Y_test),
               shuffle=True)
     model.evaluate(X_test,Y_test)    
