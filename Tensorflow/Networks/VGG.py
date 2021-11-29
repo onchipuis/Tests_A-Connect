@@ -80,8 +80,8 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0):
 
 		model = tf.keras.models.Sequential([
 			InputLayer(input_shape=[32,32,3]),
-			#tf.keras.layers.experimental.preprocessing.Resizing(100,100),    
-			tf.keras.layers.UpSampling2D(),           
+			tf.keras.layers.experimental.preprocessing.Resizing(100,100),    
+			#tf.keras.layers.UpSampling2D(),           
 		        Conv_AConnect(filters=64, kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd,pool=4, strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),
 		        BatchNormalization(),
                         ReLU(),
