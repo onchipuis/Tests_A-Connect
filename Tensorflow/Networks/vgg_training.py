@@ -94,7 +94,7 @@ for j in range(len(Wstd_err)):
 
     lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
         initial_learning_rate=0.01,
-        decay_steps=200,
+        decay_steps=196,
         decay_rate=0.9,
         staircase=True)
     
