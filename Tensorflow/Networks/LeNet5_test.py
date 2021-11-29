@@ -71,7 +71,11 @@ for d in range(N): #Iterate over all the error matrices
 """
 
 #This part is for inference. During the following lines the MCSim will be executed.
+<<<<<<< HEAD
 for d in range(2,N): #Iterate over all the error matrices
+=======
+for d in range(N,N): #Iterate over all the error matrices
+>>>>>>> 4ee2a60f81a6ae25f6aebd0502a0543f0fa99f5d
 	M = 2**(d)
 	nMatriz = str(M)
 	for k in range(len(identifier)): #Iterate over the networks
