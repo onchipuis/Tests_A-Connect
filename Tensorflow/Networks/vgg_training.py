@@ -59,7 +59,10 @@ for j in range(len(Wstd_err)):
     for i in range(len(pool)):
         Err = Wstd_err[j]
         # CREATING NN:
-        model = vgg.model_creation(isAConnect=True,Wstd=Err,Bstd=Err,FC_pool=pool[i])
+        model = vgg.model_creation(isAConnect=True,
+                                    Wstd=Err,Bstd=Err,
+                                    FC_pool=pool[i],
+                                    errDistr="normal")
 
         """
         # Without Aconnect
