@@ -14,9 +14,8 @@ import numpy as np
 import tensorflow as tf
 import time
 from datetime import datetime
-import ..aconnect.aconnect as aconnect 
-from aconnect.layers import Conv_AConnect, FC_AConnect 
-from aconnect import scripts 
+from .aconnect.aconnect.layers import Conv_AConnect, FC_AConnect 
+from .aconnect.aconnect import scripts 
 from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatten
 from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax
 #import math
