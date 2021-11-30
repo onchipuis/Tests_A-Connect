@@ -623,7 +623,8 @@ def Merr_distr(shape,stddev,dtype,errDistr): #Used to reshape the output of the 
                         dtype=dtype)
     
     if errDistr == "normal":
-        return Merr = abs(1+N)
+      Merr = abs(1+N)
     elif errDistr == "log-normal":
-        return Merr = exp(-N)
-
+      Merr = exp(-N)
+    return Merr
+   
