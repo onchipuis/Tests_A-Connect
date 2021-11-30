@@ -17,19 +17,7 @@ epochs = 20
 learning_rate = 0.01
 momentum = 0.9
 batch_size = 256
-<<<<<<< HEAD
-N = 2 #Number of error matrices to test, only 2^(n-1) size
-=======
-<<<<<<< HEAD
-N = 7 #Number of error matrices to test, only 2^(n-1) size
-=======
-<<<<<<< HEAD
-N = 5 #Number of error matrices to test, only 2^(n-1) size
-=======
-N = 3 #Number of error matrices to test, only 2^(n-1) size
->>>>>>> f7756440a6259cc66e9c0f9e3b2e377465bfea9e
->>>>>>> 6cc8b7e05c0d77061f5eae04ec9ca8d06fc22915
->>>>>>> 2e119bccef4bcc658d9758505685c996a41b39e5
+N = 9 #Number of error matrices to test, only 2^(n-1) size
 ####Training part
 """
 for d in range(N): #Iterate over all the error matrices
@@ -83,19 +71,7 @@ for d in range(N): #Iterate over all the error matrices
 """
 
 #This part is for inference. During the following lines the MCSim will be executed.
-<<<<<<< HEAD
-for d in range(6,N): #Iterate over all the error matrices
-=======
-<<<<<<< HEAD
-for d in range(4,N): #Iterate over all the error matrices
-=======
-<<<<<<< HEAD
-for d in range(2,N): #Iterate over all the error matrices
-=======
-for d in range(N,N): #Iterate over all the error matrices
->>>>>>> 4ee2a60f81a6ae25f6aebd0502a0543f0fa99f5d
->>>>>>> f7756440a6259cc66e9c0f9e3b2e377465bfea9e
->>>>>>> 6cc8b7e05c0d77061f5eae04ec9ca8d06fc22915
+for d in range(8,N): #Iterate over all the error matrices
 	M = 2**(d)
 	nMatriz = str(M)
 	for k in range(len(identifier)): #Iterate over the networks
@@ -167,6 +143,3 @@ for d in range(N,N): #Iterate over all the error matrices
 	            print('\n\n*******************************************************************************************')
 	            print('\n Simulation started at: ',starttime)
 	            print('Simulation finished at: ', endtime)
-
-
-
