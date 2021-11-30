@@ -19,6 +19,7 @@ momentum = 0.9
 batch_size = 256
 N = 9 #Number of error matrices to test, only 2^(n-1) size
 ####Training part
+"""
 for d in range(N): #Iterate over all the error matrices
 	M = 2**(d)
 	nMatriz = str(M)
@@ -67,7 +68,7 @@ for d in range(N): #Iterate over all the error matrices
 			    model.save(string,include_optimizer=True)
 			    np.savetxt('../Results/LeNet5_MNIST/Training_data/'+'LeNet5'+'_acc'+'.txt',acc,fmt="%.2f")
 			    np.savetxt('../Results/LeNet5_MNIST/Training_data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")
-
+"""
 
 #This part is for inference. During the following lines the MCSim will be executed.
 for d in range(N): #Iterate over all the error matrices
@@ -83,7 +84,7 @@ for d in range(N): #Iterate over all the error matrices
 	            if isBin == "yes":
 	                name = name+'_BW'
 	            string = './Models/LeNet5_MNIST/'+name+'.h5'
-	            custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.AConnect} #Custom objects for model loading purposes
+	            custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect} #Custom objects for model loading purposes
 	            for j in range(len(Sim_err)): #Iterate over the sim error vector
 	                Err = Sim_err[j]
 	                if Err != Wstd[m]: #If the sim error is different from the training error, do not force the error
@@ -102,7 +103,7 @@ for d in range(N): #Iterate over all the error matrices
 	                print('With simulation error: ', Err)
 	                print('\n\n*******************************************************************************************')
 	                acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,'../Results/LeNet5_MNIST/'+name,custom_objects,
-	                optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum),loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5],top5=False) #Perform the simulation
+	                optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum),loss=['sparse_categorical_crossentropy'],metrics=['accuracy'],top5=False) #Perform the simulation
 	                #For more information about MCSim please go to Scripts/MCsim.py
 	                #####
 	                now = datetime.now()
