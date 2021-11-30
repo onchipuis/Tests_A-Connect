@@ -1,0 +1,3 @@
+[submodule "Tensorflow/A-Connect"]
+	path = Tensorflow/A-Connect
+	url = https://github.com/onchipuis/A-Connect.git

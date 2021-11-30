@@ -1,108 +1,38 @@
-# Library for A-Connect
-Here you will find the main script for the library. 
+# A-Connect
+Custom library for A-Connect training methodology for neural networks. Available only in Keras/TensorFlow.
 
-## How to
+## What is A-Connect?
 
-You can copy and paste this folder in your project folder or simply install the library latest stable version using pip3. Then in your project import the library writing the code below.
+A-Connect, is an ex-situ statistical training methodology to mitigate analog computation stochastic variability in neural networks, like the one caused by the mismatch in the synaptic cells. A-Connect methodology can include other types of neural network parameter corruption during training (e.g., weight quantization). Currently, A-Connect only supports the extreme case with binary weights.
+
+## How A-Connect works?
+
+Consider first a fully-connected layer like the one shown in Figure 1(a), which is the kind of neural network layer that naturally fits in an analog-based CIM architecture. a<sub>k−1</sub> represents the input activations (output activations from the previous layer), W<sub>k</sub> the synaptic weights of the layer k, f<sub>a</sub>(·) the activation function, and a<sub>k</sub> the output activation. In an ideal digital implementation, these weights are unmodified by the hardware executing the neural network, but in an analog implementation, the weights will deviate from their ideal values due to hardware non-idealities, namely, stochastic variability. We modelled this deviation as represented in Figure 1(b), by multiplying (element-wise) the actual weights W with an error mask W<sub>err</sub>. Supposing the behaviour of the synaptic cells follow a normal distribution, this mask will have a mean equal to 1 (ideal values), and 0 ≤ σ% ≤ 1, which represents the standard deviation relative to the absolute mean of the cells (σ% = σ<sub>W</sub> /µ<sub>W</sub> ).
+
+![Figure 1](./gitImage.png "Fig1")
+
+Below, you can find a description about how A-Connect modifies the forward and backward propagation for a fully connected layer.
+
+### Forward Propagation
+During forward-propagation, a mini-batch of inputs a<sub>0</sub> are passed through the network. The weights W<sub>k</sub><sup>t−1</sup>
+(as well as the biases b<sub>k</sub><sup>t−1</sup>), are multiplied element-wise by an error matrix randomly selected using a normal distribution (W<sub>k</sub><sup>err</sup> ←N<sub>n,m</sub>(1, σ<sub>%</sub><sup>2</sup>)). For A-Connect to be effective, it is important to select a different W<sub>k</sub><sup>err</sup>(and b<sub>k</sub><sup>err</sup>) mask for each training example within the mini-batch, since only one mask per mini-batch is not enough to regularize the model.
+
+### Backward Propagation and Parameter Update
+With A-Connect, the parameters update can be done using stochastic gradient descent (SGD) by back-propagating gradients of the loss function with respect to the layer’s parameters. The gradients of the loss function with respect to the weights (g<sub>Ŵ<sub>k</sub></sub>) and biases (g<sub>b̂<sub>k</sub></sub>), are multiplied by the error masks W<sub>k</sub><sup>err</sup> and b<sub>k</sub><sup>err</sup>, respectively, to obtain the proper gradients for the parameters update (g<sub>W<sub>k</sub><sup>t−1</sup></sub>, and g<sub>b<sub>k</sub><sup>t−1</sup></sub>). Finally, when back-propagating the activation gradients (g<sub>a<sub>k−1</sub></sub>), the masked weight matrix (Ŵ<sub>k</sub><sup>t−1</sup> = W<sub>k</sub><sup>t−1</sup>*W<sub>k</sub><sup>err</sup>) is used instead of the weight matrix (W<sub>k</sub><sup>t−1</sup> ). The gradients
+for each parameter are averaged over the training examples in each mini-batch.
+
+## What do we need to use A-Connect in a project?
+
+A-Connect was developed using Python 3.7 (in general 3.X), [TensorFlow 2.4.1](https://www.tensorflow.org/install) and [Numpy 1.20](https://numpy.org/install/). So you must have this three components on your system in order to avoid compatibility issues.
+If you want to plot some box charts you need to install [matplotlib 3.X](https://matplotlib.org/stable/users/installing.html).
+## How to install A-Connect
+If you want, you can use pip to install A-Connect typing:
 ```
-import aconnect.layers
-import aconnect.scripts
+pip3 install aconnect
 ```
-
+Or you can copy and paste the folder aconnect to your project folder.
 ## Content description
+In [AConnect](./AConnect) you can find the library and a fully description of project. [Examples](./Examples) there are some examples of how to use the library with two simple neural networks. One fully connected network and one convolutional network.
 
-### layers.py
-
-High level script with the both layers available for A-Connect. Fully connected layer (FC_AConnect) and Convolutional layer (Conv_AConnect).
-
-#### Fully-Connected A-Connect layer
-FC_AConnect(output_size,Wstd=0,Bstd=0,isBin="no",pool=None,Slice=1,d_type=tf.dtypes.float32,weights_regularizer=None,bias_regularizer=None)
-
-Custom fully-connected or dense layer with A-Connect during the training process. This layer has this attributes:
-
-1. **output_size**: This is the number of neurons that you want to use.
-2. **Wstd**: Standard deviation for the weights. Should be a number between 0 and 1. By default is 0.
-3. **Bstd**: Standard deviation for the bias. Should be a number between 0 and 1. By default is 0.
-4. **isBin**: String, "yes" or "no", for using or not using weights binarization. By default is "no".
-5. **pool**: Number of error matrices that you want to use for model regularization or mismatch mitigation. This value should be equal or less than the batch size. By default is None. (Same number of error matrices as the batch size).
-6. **Slice**: Integer for batch slicing. Used for reducing memory consumption. The layer only accepts slice into 2,4 or 8 minibatches. By default is 1 (no slice).
-7. **d_type**: Data type of the weights, bias and error matrices. By default is floating point 32 bits. (tf.float32)
-8. **weights_regularizer**: Any of tf.keras.regularizers for the weights. By default is None.
-9. **bias_regularizer**: Any of tf.keras.regularizers for the biases. By default is None.
-
-#### Convolutional A-Connect layer
-Conv_AConnect(filters,kernel_size,strides=1,padding="VALID",Wstd=0,Bstd=0,pool=None,isBin='no',Op=1,Slice=1,d_type=tf.dtypes.float32,weights_regularizer=None,bias_regularizer=None)
-
-Custom convolutional layer with A-Connect during the training process. This layer has this attributes:
-
-1. **filters**: This is the number of filters that you want to use. 
-2. **kernel_size**: Kernel size. Must be a tuple (n,n).
-3. **strides**: Strides for the convolution. Must be a integer to generate a stride of (1,n,n,1).
-4. **padding**:  Integer for padding. Use "VALID" if you want to reduce the input size. Use "SAME" if you want to keep the input size.
-5. **Wstd**: Standard deviation for the kernel. Should be a number between 0 and 1. By default is 0.
-6. **Bstd**: Standard deviation for the bias. Should be a number between 0 and 1. By default is 0.
-7. **pool**: Number of error matrices that you want to use for model regularization or mismatch mitigation. This value should be equal or less than the batch size. By default is None. (Same number of error matrices as the batch size).
-8. **isBin**: String, "yes" or "no", for using or not using weights binarization. By default is "no".
-9. **Op**:  Integer 1 or 2. There are two options to make the batch convolution. The first option, 1, uses a function from tensorflow called tf.map_fn, this function applies the convolution to all the elements in axis 0 or batch axis. This option has less memory consumption, but it is slower. The second one, 2, applies some reshapes to the input data and the kernel to do a depth-wise convolution. This option is faster when it is used for smaller images, but has higher memory usage.
-10. **Slice**: Integer for batch slicing. Used for reducing memory consumption. The layer only accepts slice into 2,4 or 8 minibatches. By default is 1 (no slice).
-11. **d_type**: Data type of the weights, bias and error matrices. By default is floating point 32 bits. (tf.float32)
-12. **weights_regularizer**: Any of tf.keras.regularizers for the weights. By default is None.
-13. **bias_regularizer**: Any of tf.keras.regularizers for the biases. By default is None.
-
-### scripts.py
-
-High level script with auxiliar functions for neural network testing.
-
-#### Monte Carlo method
-MonteCarlo(net,Xtest,Ytest,M,Wstd,Bstd,force,Derr=0,net_name="Network",custom_objects=None,dtype='float32',optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy'],top5=False)
-
-Applies the monte carlo method to all the layers that has weights in a saved neural network model. Only works for fully connected and convolutional networks
-
-1. **net**: String with the path and the format of your pre-trained neural network. 
-2. **Xtest**: Numpy array with the test images.
-3. **Ytest**: Numpy array with the test labels.
-4. **M**: Integer. Number of samples for the test.
-5. **Wstd**: Float. Simulation error for the weights.
-6. **Bstd**: Float. Simulation error for the bias.
-7. **force**: String. Must be yes or no. Used if you want to test the network with a different Wstd or Bstd from that one you used during training process.
-8. **Derr**: Float. Adds a deterministic error to a binary weights.
-9. **net_name**: String. Name that you want to use for saving the results in a txt.
-10. **custom_objects**: Python dictionary. When you are using a custom layers, you need to specify this layers for loading the model with this attribute.
-11. **dtype**: Data type of the layer parameters.
-12. **optimizer**: Optimizer used during the training process.
-13. **loss**: Loss function during the training process.
-14. **metrics**: Metrics used during the training process.
-15. **top5**: Boolean. If you specified a top-5 function in metrics, please use True here. Otherwise use False.
-
-This function returns the top-1 accuracy and the media of this accuracy.
-#### Classify
-classify(net,Xtest,Ytest,top5)
-
-Function that calculates the network accuracy during the inference.
-
-1. **net**: Model trained.
-2. **Xtest**: Test images.
-3. **Ytest**: Test labels.
-4. **top5***: Boolean, if you want top-5 accuracy.
-
-#### Load MNIST dataset
-load_ds(imgSize=[28,28], Quant=8)
-
-Function for loading the standard or a custom MNIST dataset. With this function you cand load MNIST 28x28 8/4 bits or MNIST 11x11 8/4 bits.
-
-1. **imgSize**: Tuple with the image size. Must be [28,28] or [11,11]
-2. **Quant**: Integer for image quantization. 8 or 4 bits.
-
-Returns (x_train,y_train),(x_test,y_test) with the size and configuration that you used.
-
-#### Plot Box
-
-plotBox(data,labels,legends,color,color_fill,path)
-
-Function for plotting a box with the monte carlo accuracy results.
-
-1. **data**: A list with the data from the monte carlo. Or a list of 2 list for plotting 2 NN results. Or a list of 3 list for plotting 3 NN results.
-2. **labels**: List with the labels for X-axis.
-3. **color**: List with the RGB values of the color for the lines.
-4. **color_fill**: List with the RGB values of the color for filling the boxes.
-5. **path**: String with the path and the file name for saving the graph.
+## Citing A-Connect
+A-Connect is a project developed by Ricardo Vergel,Edward Silva, Luis Rueda and Elkim Roa. If A-Connect contributes to your project, please acknowledge this work by citing the original paper and citing this library.

@@ -15,7 +15,8 @@ All the work here was done using Python 3.8 and Tensorflow 2.4.X, so please, in 
 3. Install Matplotlib.
 4. [Install Tensorflow 2.4.X](https://www.tensorflow.org/install)
 5. [Install Tensorflow Probability](https://www.tensorflow.org/probability/install)
-6. [Install A-Connect Library](https://github.com/onchipuis/A-Connect)
+6. [Install A-Connect Library](https://github.com/onchipuis/A-Connect) or...
+7. Include the A-Connect git submodule in (/Tensorflow/aconnect)
 
 
 ### Table of Contents
