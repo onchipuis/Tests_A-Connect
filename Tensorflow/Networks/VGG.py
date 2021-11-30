@@ -32,7 +32,7 @@ def hms_string(sec_elapsed):
     return f"{h}:{m:>02}:{s:>05.2f}"
 
 
-def model_creation(isAConnect=False,Wstd=0,Bstd=0,FC_pool=16,err_Distr="normal"):
+def model_creation(isAConnect=False,Wstd=0,Bstd=0,FC_pool=16,errDistr="normal"):
 	if(not(isAConnect)):
 		model = tf.keras.models.Sequential([
 			InputLayer(input_shape=(32,32,3)),
