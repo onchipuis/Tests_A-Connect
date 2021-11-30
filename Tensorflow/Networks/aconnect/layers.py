@@ -623,8 +623,8 @@ def Merr_distr(shape,stddev,dtype,errDistr): #Used to reshape the output of the 
                         dtype=dtype)
     
     if errDistr == "normal":
-      Merr = abs(1+N)
+      Merr = tf.math.abs(1+N)
     elif errDistr == "log-normal":
-      Merr = exp(-N)
+      Merr = tf.math.exp(-N)
     return Merr
    
