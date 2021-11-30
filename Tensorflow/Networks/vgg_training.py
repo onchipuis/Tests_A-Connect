@@ -62,7 +62,7 @@ for j in range(len(Wstd_err)):
         model = vgg.model_creation(isAConnect=True,
                                     Wstd=Err,Bstd=Err,
                                     FC_pool=pool[i],
-                                    errDistr="normal")
+                                    errDistr="lognormal")
 
         """
         # Without Aconnect

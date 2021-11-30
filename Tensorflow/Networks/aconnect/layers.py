@@ -235,7 +235,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                 if self.Bstd > 1 or self.Bstd < 0:
                     raise ValueError('Bstd must be a number between 0 and 1. \n' 'Found %d' %(self.Bstd,))
                 if not isinstance(self.errDistr, str):
-                    raise TypeError('errDistr must be a string. Only two distributions supported: "normal", "log-normal"' 
+                    raise TypeError('errDistr must be a string. Only two distributions supported: "normal", "lognormal"' 
                             'Found %s' %(type(self.errDistr),))
                 if not isinstance(self.isBin, str):
                     raise TypeError('isBin must be a string, yes or no. ' 'Found %s' %(type(self.isBin),))
@@ -556,7 +556,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 if self.Bstd > 1 or self.Bstd < 0:
                     raise ValueError('Bstd must be a number between 0 and 1. \n' 'Found %d' %(self.Bstd,))    
                 if not isinstance(self.errDistr, str):
-                    raise TypeError('errDistr must be a string. Only two distributions supported: "normal", "log-normal"' 
+                    raise TypeError('errDistr must be a string. Only two distributions supported: "normal", "lognormal"' 
                             'Found %s' %(type(self.errDistr),))
                 if not isinstance(self.isBin, str):
                     raise TypeError('isBin must be a string, yes or no. ' 'Found %s' %(type(self.isBin),))
@@ -624,7 +624,7 @@ def Merr_distr(shape,stddev,dtype,errDistr): #Used to reshape the output of the 
     
     if errDistr == "normal":
       Merr = tf.math.abs(1+N)
-    elif errDistr == "log-normal":
+    elif errDistr == "lognormal":
       Merr = tf.math.exp(-N)
     return Merr
    
