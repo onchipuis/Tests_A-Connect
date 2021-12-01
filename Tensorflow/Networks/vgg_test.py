@@ -60,8 +60,9 @@ for j in range(len(Sim_err)):
             print('With simulation error: ', Err)
             print('\n\n*******************************************************************************************')
             
-            acc, media = scripts.MonteCarlo(string,X_test, Y_test,N,
-                    Err,Err,force,0,name,custom_objects,
+            acc, media = scripts.MonteCarlo(net=string,Xtest=X_test,Ytest=Y_test,M=N,
+                    Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
+                    custom_objects=custom_objects,
                     optimizer=tf.optimizers.SGD(lr=0.001,momentum=0.9),
                     loss='sparse_categorical_crossentropy',
                     metrics=['accuracy'],top5=False,dtype='float16',
