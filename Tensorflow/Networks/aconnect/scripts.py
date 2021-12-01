@@ -1,8 +1,7 @@
 import numpy as np
 import tensorflow as tf
 #Function to make the monte carlo simulation. To see more please go to the original file in Scripts
-def
-MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="normal",
+def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="normal",
         force="no",Derr=0,net_name="Network",custom_objects=None,dtype='float32',
         optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),
         loss=['sparse_categorical_crossentropy'],
