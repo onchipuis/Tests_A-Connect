@@ -32,7 +32,7 @@ def get_top_n_score(target, prediction, n):
     return np.mean(precision)
 
 ### TRAINING STAGE ###
-isAConnect=False
+isAConnect=True
 
 def step_decay (epoch): 
    initial_lrate = 0.01 
@@ -50,8 +50,8 @@ callbacks_list = [lrate]
 
 # CREATING NN:
 model = alexnet.model_creation(isAConnect=isAConnect,
-                                Wstd=0.0,
-                                Bstd=0.0)
+                                Wstd=0.5,
+                                Bstd=0.5)
 
 #TRAINING PARAMETERS
 model.compile(loss='sparse_categorical_crossentropy', 
