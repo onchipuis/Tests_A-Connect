@@ -28,7 +28,7 @@ N = 1 #Number of error matrices to test, only 2^(n-1) size
 for d in range(N): #Iterate over all the error matrices
 	M = 2**(d)
 	if N == 1:
-        M = batch_size
+		M = batch_size
 	nMatriz = str(M)
 	for p in range (len(isBin)):
 		for i in range(len(identifier)): #Iterate over the networks
