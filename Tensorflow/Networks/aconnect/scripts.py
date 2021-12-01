@@ -78,7 +78,7 @@ def MonteCarlo(net,Xtest,Ytest,M,Wstd,Bstd,errDistr="normal",force,Derr=0,net_na
                                         if hasattr(layers[i],'Werr') or hasattr(layers[i],'Berr') or hasattr(layers[i],'infWerr') or hasattr(layers[i],'infBerr'): #Now if the layer have Werr or Berr is an A-Conenct or DropConnect layer
                                                 #print(i)#                              
                                                 
-                                                rCreate the error matrix taking into account the Wstd and Bstd
+                                                #Create the error matrix taking into account the Wstd and Bstd
                                                 Werr = Merr_distr(Merr_aux,Wstd,errDistr)
                                                 Berr = Merr_distr(MBerr_aux,Bstd,errDistr)
                                                 if(layers[i].isBin == 'yes'): 
