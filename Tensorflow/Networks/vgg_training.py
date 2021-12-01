@@ -53,7 +53,7 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
 #### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
 #Wstd_err = [0.3, 0.5, 0.7, 0.8]
 Wstd_err = [0.65]
-pool = [1 2 4 8 16 32 64]
+pool = [1, 2, 4, 8, 16, 32, 64]
 
 for j in range(len(Wstd_err)):
     for i in range(len(pool)):
