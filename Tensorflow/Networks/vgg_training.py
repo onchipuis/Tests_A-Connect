@@ -112,7 +112,7 @@ for j in range(len(Wstd_err)):
         # TRAINING
         model.fit(X_train, Y_train,
                   batch_size=256,
-                  epochs=2,
+                  epochs=30,
                   validation_data=(X_test, Y_test),
                   shuffle=True)
         model.evaluate(X_test,Y_test)    
