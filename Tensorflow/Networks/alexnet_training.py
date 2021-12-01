@@ -32,6 +32,7 @@ def get_top_n_score(target, prediction, n):
     return np.mean(precision)
 
 ### TRAINING STAGE ###
+isAConnect=False
 
 def step_decay (epoch): 
    initial_lrate = 0.01 
@@ -48,7 +49,7 @@ callbacks_list = [lrate]
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()
 
 # CREATING NN:
-model = alexnet.model_creation(isAConnect=True,
+model = alexnet.model_creation(isAConnect=isAConnect,
                                 Wstd=0.0,
                                 Bstd=0.0)
 

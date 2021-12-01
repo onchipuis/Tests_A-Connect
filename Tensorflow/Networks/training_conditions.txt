@@ -9,3 +9,8 @@ GPU Mem: 93%-100% of 15.6GB
 CPU RAM: 2.3GB
 training time: 125s/epoch
 
+AlexNet CIFAR10
+Nr. error matrices: 8
+GPU Mem: 95%-100% of 15.6GB
+CPU RAM: 2GB
+training time: 29s/epoch
