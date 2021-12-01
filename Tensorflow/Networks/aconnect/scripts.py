@@ -126,8 +126,10 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         _,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         return accuracy 
 
-        def MCsim(net,Xtest,Ytest,M,Wstd,Bstd,errDistr=errDistr,force,Derr=Derr,net_name=net_name,custom_objects=custom_objects,dtype=dtype,
-        optimizer=optimizer,loss=loss,metrics=metrics,top5=top5):
+        def MCsim(net=net,Xtest=Xtest,Ytest=Ytest,M=M,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,
+                force=force,Derr=Derr,net_name=net_name,custom_objects=custom_objects,dtype=dtype,
+                optimizer=optimizer,loss=loss,metrics=metrics,top5=top5):
+                
                 acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy
                 top5acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy   top5       
                 local_net = tf.keras.models.load_model(net,custom_objects = custom_objects) #Load the trained model
