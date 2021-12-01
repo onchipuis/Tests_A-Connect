@@ -53,18 +53,17 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
 #### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
 #Wstd_err = [0.3, 0.5, 0.7, 0.8]
 Wstd_err = [0.65]
-pool = [1, 2, 4, 8, 16, 32, 64]
+pool = [1]
 
 for j in range(len(Wstd_err)):
     for i in range(len(pool)):
         Err = Wstd_err[j]
         # CREATING NN:
-        model = vgg.model_creation(isAConnect=True,
+        model = vgg.model_creation(isAConnect=False,
                                     Wstd=Err,Bstd=Err,
                                     FC_pool=pool[i],
                                     errDistr="lognormal")
 
-        """
         # Without Aconnect
         model.layers[1].set_weights(model_aux.layers[1].get_weights())
         model.layers[3].set_weights(model_aux.layers[2].get_weights())
@@ -95,6 +94,7 @@ for j in range(len(Wstd_err)):
         model.layers[35].set_weights(model_aux.layers[15].get_weights())
         model.layers[38].set_weights(model_aux.layers[16].get_weights())
         model.layers[41].set_weights(model_aux.layers[17].get_weights())
+        """
 
         #print(model.summary())
 
