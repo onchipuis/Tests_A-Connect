@@ -5,7 +5,11 @@ import LeNet5
 from datetime import datetime
 import aconnect.layers as layers
 import aconnect.scripts as scripts
-identifier = [True]				#Which network you want to train/test True for A-Connect false for normal LeNet
+from tensorflow.python.client import device_lib
+
+device_lib.list_local_devices()
+
+identifier = [False,True]				#Which network you want to train/test True for A-Connect false for normal LeNet
 Sim_err = [0,0.3,0.5,0.7]	#Define all the simulation errors
 Wstd = [0.3,0.5,0.7]			#Define the stddev for training
 Bstd = Wstd
@@ -18,8 +22,9 @@ learning_rate = 0.01
 momentum = 0.9
 batch_size = 256
 N = 9 #Number of error matrices to test, only 2^(n-1) size
-####Training part
-"""
+
+###Training part
+
 for d in range(N): #Iterate over all the error matrices
 	M = 2**(d)
 	nMatriz = str(M)
@@ -68,10 +73,11 @@ for d in range(N): #Iterate over all the error matrices
 			    model.save(string,include_optimizer=True)
 			    np.savetxt('../Results/LeNet5_MNIST/Training_data/'+'LeNet5'+'_acc'+'.txt',acc,fmt="%.2f")
 			    np.savetxt('../Results/LeNet5_MNIST/Training_data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")
-"""
+
 
 #This part is for inference. During the following lines the MCSim will be executed.
-for d in range(N): #Iterate over all the error matrices
+for d in range(3,N): #Iterate over all the error matrices
+
 	M = 2**(d)
 	nMatriz = str(M)
 	for k in range(len(identifier)): #Iterate over the networks
@@ -102,8 +108,9 @@ for d in range(N): #Iterate over all the error matrices
 	                print('TESTING NETWORK: ', name)
 	                print('With simulation error: ', Err)
 	                print('\n\n*******************************************************************************************')
-	                acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,'../Results/LeNet5_MNIST/'+name,custom_objects,
-	                optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum),loss=['sparse_categorical_crossentropy'],metrics=['accuracy'],top5=False) #Perform the simulation
+	                acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,'../Results/LeNet5_MNIST/Matrices_Test/'+name,custom_objects,
+	                optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum),loss=['sparse_categorical_crossentropy'],metrics=['accuracy']
+                    ,run_model_eagerly=True,evaluate_batch_size=10000) #Perform the simulation
 	                #For more information about MCSim please go to Scripts/MCsim.py
 	                #####
 	                now = datetime.now()
@@ -142,6 +149,3 @@ for d in range(N): #Iterate over all the error matrices
 	            print('\n\n*******************************************************************************************')
 	            print('\n Simulation started at: ',starttime)
 	            print('Simulation finished at: ', endtime)
-
-
-

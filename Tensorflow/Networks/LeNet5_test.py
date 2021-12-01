@@ -5,7 +5,11 @@ import LeNet5
 from datetime import datetime
 import aconnect.layers as layers
 import aconnect.scripts as scripts
-identifier = [True]				#Which network you want to train/test True for A-Connect false for normal LeNet
+from tensorflow.python.client import device_lib
+
+device_lib.list_local_devices()
+
+identifier = [False,True]				#Which network you want to train/test True for A-Connect false for normal LeNet
 Sim_err = [0,0.3,0.5,0.7]	#Define all the simulation errors
 Wstd = [0.3,0.5,0.7]			#Define the stddev for training
 Bstd = Wstd
@@ -17,23 +21,14 @@ epochs = 20
 learning_rate = 0.01
 momentum = 0.9
 batch_size = 256
-<<<<<<< HEAD
-N = 9 #Number of error matrices to test, only 2^(n-1) size
-=======
-<<<<<<< HEAD
-N = 8 #Number of error matrices to test, only 2^(n-1) size
-=======
-<<<<<<< HEAD
-N = 6 #Number of error matrices to test, only 2^(n-1) size
-=======
-N = 4 #Number of error matrices to test, only 2^(n-1) size
->>>>>>> a486dd3da16702b53d50002659b943ec355cfe49
->>>>>>> dac845b7ae90255f1553f8ed5e2070750e7eab55
->>>>>>> 6a3cb166f9e0555a7408349aded2d80e1f76b92a
-####Training part
-"""
+N = 1 #Number of error matrices to test, only 2^(n-1) size
+
+###Training part
+
 for d in range(N): #Iterate over all the error matrices
 	M = 2**(d)
+    if N == 1:
+        M = batch_size
 	nMatriz = str(M)
 	for p in range (len(isBin)):
 		for i in range(len(identifier)): #Iterate over the networks
@@ -80,22 +75,11 @@ for d in range(N): #Iterate over all the error matrices
 			    model.save(string,include_optimizer=True)
 			    np.savetxt('../Results/LeNet5_MNIST/Training_data/'+'LeNet5'+'_acc'+'.txt',acc,fmt="%.2f")
 			    np.savetxt('../Results/LeNet5_MNIST/Training_data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")
-"""
+
 
 #This part is for inference. During the following lines the MCSim will be executed.
-<<<<<<< HEAD
-for d in range(8,N): #Iterate over all the error matrices
-=======
-<<<<<<< HEAD
-for d in range(7,N): #Iterate over all the error matrices
-=======
-<<<<<<< HEAD
-for d in range(5,N): #Iterate over all the error matrices
-=======
 for d in range(3,N): #Iterate over all the error matrices
->>>>>>> a486dd3da16702b53d50002659b943ec355cfe49
->>>>>>> dac845b7ae90255f1553f8ed5e2070750e7eab55
->>>>>>> 6a3cb166f9e0555a7408349aded2d80e1f76b92a
+
 	M = 2**(d)
 	nMatriz = str(M)
 	for k in range(len(identifier)): #Iterate over the networks
