@@ -169,7 +169,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         np.savetxt(net_name+'_TOP5'+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',top5acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt    
                 np.savetxt(net_name+'_stats'+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',stats,fmt="%.2f") #Save the median and iqr of M samples in a txt
                 return acc_noisy, media 
-        return MCsim(net,Xtest,Ytest,M,Wstd,Bstd,errDistr=errDistr,force,Derr=Derr,net_name=net_name,custom_objects=custom_objects,dtype=dtype,
+        return MCsim(net=net,Xtest=Xtest,Ytest=Ytest,M=M,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,force,
+                Derr=Derr,net_name=net_name,custom_objects=custom_objects,dtype=dtype,
                 optimizer=optimizer,loss=loss,metrics=metrics,top5=top5)                
         #Function to do inference. You also could have the top-5 accuracy if you passed to the model metrics and then setting top5=True
 def classify(net,Xtest,Ytest,top5,ev_batch_size=None):
