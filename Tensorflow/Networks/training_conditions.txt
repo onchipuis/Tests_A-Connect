@@ -1,11 +1,11 @@
 VGG16 CIFAR10
 Nr. error matrices: 0
-GPU Mem: 15.6GB
-RAM: 2GB
+GPU Mem: 95% of 15.6GB
+CPU RAM: 2GB
 training time: 89s/epoch
 
 Nr. error matrices: 16
-GPU Mem: 15.6GB
-RAM: 2.9GB
+GPU Mem: 93%-100% of 15.6GB
+CPU RAM: 2.3GB
 training time: 125s/epoch
 

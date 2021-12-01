@@ -54,7 +54,7 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
 #Wstd_err = [0.3, 0.5, 0.7, 0.8]
 Wstd_err = [0.65]
 pool = [16]
-isAConnect = True
+isAConnect = False
 
 for j in range(len(Wstd_err)):
     for i in range(len(pool)):
