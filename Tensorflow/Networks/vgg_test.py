@@ -40,7 +40,7 @@ for j in range(len(Sim_err)):
             # Model NAME:
             Werr = int(100*Wstd_err[i])
             Nm = str(int(pool[l]))
-            name = Nm+'Werr_'+'Wstd_'+str(Wstd_int)+'_Bstd_'+str(Wstd_int) 
+            name = Nm+'Werr_'+'Wstd_'+str(Werr)+'_Bstd_'+str(Werr) 
             string = './Models/VGG16_CIFAR10/'+name+'.h5'
             
             Err = Sim_err[j]
