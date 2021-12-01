@@ -4,6 +4,7 @@ INSTRUCTIONS:
 Due to the memory usage we recommend to uncomment the first train the model and save it. Then just comment the training stage and then load the model to test it using the Monte Carlo simulation.
 """
 import numpy as np
+import math
 import tensorflow as tf
 import AlexNet as alexnet
 import time
@@ -53,7 +54,7 @@ model = alexnet.model_creation(isAConnect=True,
 
 #TRAINING PARAMETERS
 model.compile(loss='sparse_categorical_crossentropy', 
-        optimizer=tf.optimizers.SGD(lr=0.0,momentum=0.9), 
+        optimizer=tf.optimizers.SGD(learning_rate=0.0,momentum=0.9), 
         metrics=['accuracy'])
 
 # TRAINING
@@ -61,7 +62,6 @@ model.fit(X_train, Y_train,
             batch_size=256,
             epochs=2,
             validation_data=(X_test, Y_test),
-            validation_split=0.2,
             callbacks=callbacks_list,
             shuffle=True)
 

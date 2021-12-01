@@ -8,12 +8,9 @@ import aconnect.scripts as scripts
 from datetime import datetime
 import numpy as np
 import tensorflow as tf
-import math
 import numpy
 import time
-import pathlib
 from keras.callbacks import LearningRateScheduler
-import matplotlib.pyplot as plt
 tic=time.time()
 start_time = time.time()
 def hms_string(sec_elapsed):
