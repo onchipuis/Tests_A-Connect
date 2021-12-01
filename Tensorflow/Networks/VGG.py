@@ -36,8 +36,8 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,FC_pool=16,errDistr="normal"):
 	if(not(isAConnect)):
 		model = tf.keras.models.Sequential([
 			InputLayer(input_shape=(32,32,3)),
-			#tf.keras.layers.experimental.preprocessing.Resizing(64,64),           
-			tf.keras.layers.UpSampling2D(),           
+			tf.keras.layers.experimental.preprocessing.Resizing(100,100),           
+			#tf.keras.layers.UpSampling2D(),           
 			Conv2D(filters=64, kernel_size=(3,3),strides=(1,1), activation='relu',padding="same"),
 			BatchNormalization(),
 			Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), activation='relu',padding="same"),
