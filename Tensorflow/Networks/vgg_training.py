@@ -96,7 +96,7 @@ for j in range(len(Wstd_err)):
         model.layers[38].set_weights(model_aux.layers[16].get_weights())
         model.layers[41].set_weights(model_aux.layers[17].get_weights())
 
-        print(model.summary())
+        #print(model.summary())
 
         lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
             initial_learning_rate=0.01,
