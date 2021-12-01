@@ -8,7 +8,7 @@ import tensorflow as tf
 import VGG as vgg
 import time
 from datetime import datetime
-from .aconnect import layers, scripts
+from aconnect import layers, scripts
 #from keras.callbacks import LearningRateScheduler
 tic=time.time()
 start_time = time.time()
