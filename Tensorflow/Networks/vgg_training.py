@@ -8,6 +8,7 @@ import tensorflow as tf
 import VGG as vgg
 import time
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from aconnect import layers, scripts
 #from keras.callbacks import LearningRateScheduler
 tic=time.time()
 start_time = time.time()
@@ -57,11 +58,15 @@ Conv_pool = [32]
 FC_pool = [8]
 isAConnect = True
 errDistr = "lognormal"
+custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
+net='Models/VGG16_CIFAR10/16Werr_Wstd_65_Bstd_65.h5'
 
 for j in range(len(Wstd_err)):
     for i in range(len(FC_pool)):
         Err = Wstd_err[j]
         # CREATING NN:
+        model = tf.keras.models.load_model(net,custom_objects = custom_objects)
+        """
         model = vgg.model_creation(isAConnect=isAConnect,
                                     Wstd=Err,Bstd=Err,
                                     Conv_pool=Conv_pool[i],
@@ -96,7 +101,7 @@ for j in range(len(Wstd_err)):
             model.layers[25].set_weights(model_aux.layers[15].get_weights())
             model.layers[27].set_weights(model_aux.layers[16].get_weights())
             model.layers[29].set_weights(model_aux.layers[17].get_weights())
-
+        """
         #print(model.summary())
 
         lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
