@@ -53,17 +53,19 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
 #### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
 #Wstd_err = [0.3, 0.5, 0.7, 0.8]
 Wstd_err = [0.8]
-pool = [32]
+Conv_pool = [32]
+FC_pool = [8]
 isAConnect = True
 errDistr = "lognormal"
 
 for j in range(len(Wstd_err)):
-    for i in range(len(pool)):
+    for i in range(len(FC_pool)):
         Err = Wstd_err[j]
         # CREATING NN:
         model = vgg.model_creation(isAConnect=isAConnect,
                                     Wstd=Err,Bstd=Err,
-                                    pool=pool[i],
+                                    Conv_pool=Conv_pool[i],
+                                    FC_pool=FC_pool[i],
                                     errDistr=errDistr)
         
         if (isAConnect==True): # With Aconnect
@@ -126,6 +128,6 @@ for j in range(len(Wstd_err)):
 
         # SAVE MODEL:
         Werr = str(int(100*Err))
-        Nm = str(int(pool[i]))
+        Nm = str(int(FC_pool[i]))
         name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr
         model.save('./Models/VGG16_CIFAR10/'+name+'.h5',include_optimizer=True)
