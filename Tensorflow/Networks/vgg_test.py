@@ -25,10 +25,11 @@ def hms_string(sec_elapsed):
 #Sim_err = [0, 0.3, 0.5, 0.7 0.8]
 #Wstd_err = [0.3, 0.5, 0.7]
 pool = [16]
-Sim_err = [0.65]
-Wstd_err = [0.65]
+#Sim_err = [0.65, 0.8]
+Wstd_err = [0.65, 0.8]
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 acc=np.zeros([500,1])
+force = "no"
 
 for j in range(len(Sim_err)):
 
@@ -43,7 +44,6 @@ for j in range(len(Sim_err)):
             string = './Models/VGG16_CIFAR10/'+name+'.h5'
             
             Err = Sim_err[j]
-            force = "yes"
             if Err == 0:
                 N = 1
             else:
