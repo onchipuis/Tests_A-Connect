@@ -54,7 +54,8 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
 #Wstd_err = [0.3, 0.5, 0.7, 0.8]
 Wstd_err = [0.65]
 pool = [16]
-isAConnect = False
+isAConnect = True
+errDistr = "lognormal"
 
 for j in range(len(Wstd_err)):
     for i in range(len(pool)):
@@ -62,8 +63,8 @@ for j in range(len(Wstd_err)):
         # CREATING NN:
         model = vgg.model_creation(isAConnect=isAConnect,
                                     Wstd=Err,Bstd=Err,
-                                    FC_pool=pool[i],
-                                    errDistr="lognormal")
+                                    pool=pool[i],
+                                    errDistr=errDistr)
         
         if (isAConnect==True): # With Aconnect
             model.layers[1].set_weights(model_aux.layers[1].get_weights())
