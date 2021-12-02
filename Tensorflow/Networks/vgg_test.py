@@ -25,8 +25,8 @@ def hms_string(sec_elapsed):
 #Sim_err = [0, 0.3, 0.5, 0.7 0.8]
 #Wstd_err = [0.3, 0.5, 0.7]
 pool = [16]
-Sim_err = [0.65]
-Wstd_err = [0.65, 0.8]
+Sim_err = [0.8]
+Wstd_err = [0.8]
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 acc=np.zeros([500,1])
 force = "no"
@@ -59,16 +59,18 @@ for j in range(len(Sim_err)):
             print('With simulation error: ', Err)
             print('\n\n*******************************************************************************************')
             
-            acc, media = scripts.MonteCarlo(net=string,Xtest=X_test,Ytest=Y_test,M=N,
+            acc, stats = scripts.MonteCarlo(net=string,Xtest=X_test,Ytest=Y_test,M=N,
                     Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
                     custom_objects=custom_objects,
-                    optimizer=tf.optimizers.SGD(lr=0.001,momentum=0.9),
+                    optimizer=tf.optimizers.SGD(learning_rate=0.001,momentum=0.9),
                     loss='sparse_categorical_crossentropy',
                     metrics=['accuracy'],top5=False,dtype='float16',
                     errDistr="lognormal"
                     )
             name_sim = name+'_simErr_'+str(int(100*Err))                      
+            name_stats = name+'_stats_simErr_'+str(int(100*Err))                      
             np.savetxt('../Results/VGG16_CIFAR10/'+name_sim+'.txt',acc,fmt="%.2f")
+            np.savetxt('../Results/VGG16_CIFAR10/'+name_stats+'.txt',stats,fmt="%.2f")
 
             now = datetime.now()
             endtime = now.time()

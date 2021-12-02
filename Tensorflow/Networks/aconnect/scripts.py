@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import os
 #Function to make the monte carlo simulation. To see more please go to the original file in Scripts
 def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="normal",
         force="no",Derr=0,net_name="Network",custom_objects=None,dtype='float32',
@@ -134,7 +135,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 top5acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy   top5       
                 local_net = tf.keras.models.load_model(net,custom_objects = custom_objects) #Load the trained model
                 local_net.save_weights(filepath=(net_name+'_weights.h5')) #Save the weights. It is used to optimize the script RAM consumption
-                print(local_net.summary()) #Print the network summary
+                #print(local_net.summary()) #Print the network summary
                 print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy | \tTop-5 Accuracy\n')
                 print('---------------------------------------------------------------------------------------')
         #       global parallel
@@ -156,23 +157,28 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 #acc_noisy = pool.map(parallel, range(M))
                 #pool.close()
                 media = np.median(acc_noisy)
+                Xmin = np.amin(acc_noisy)
+                Xmax = np.amax(acc_noisy)
                 IQR = np.percentile(acc_noisy,75) - np.percentile(acc_noisy,25)
-                stats = [media,IQR]
+                stats = [media,IQR,Xmax,Xmin]
                 print('---------------------------------------------------------------------------------------')
                 print('Median: %.2f%%\n' % media)
                 print('IQR Accuracy: %.2f%%\n' % IQR)
-                print('Min. Accuracy: %.2f%%\n' % np.amin(acc_noisy))
-                print('Max. Accuracy: %.2f%%\n'% np.amax(acc_noisy))
+                print('Min. Accuracy: %.2f%%\n' % Xmin)
+                print('Max. Accuracy: %.2f%%\n'% Xmax)
 
-                np.savetxt(net_name+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt
-                if top5: 
-                        np.savetxt(net_name+'_TOP5'+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',top5acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt    
-                np.savetxt(net_name+'_stats'+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',stats,fmt="%.2f") #Save the median and iqr of M samples in a txt
-                return acc_noisy, media 
+
+                os.remove(net_name+'_weights.h5')   #Delete created weight file
+                #np.savetxt(net_name+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt
+                #np.savetxt(net_name+'_stats'+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',stats,fmt="%.2f") #Save the median and iqr of M samples in a txt
+                #if top5: 
+                #        np.savetxt(net_name+'_TOP5'+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',top5acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt    
+                return acc_noisy, stats 
         return  MCsim(net=net,Xtest=Xtest,Ytest=Ytest,M=M,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,
                 force=force,Derr=Derr,net_name=net_name,custom_objects=custom_objects,dtype=dtype,
                 optimizer=optimizer,loss=loss,metrics=metrics,top5=top5)                
-        #Function to do inference. You also could have the top-5 accuracy if you passed to the model metrics and then setting top5=True
+
+#Function to do inference. You also could have the top-5 accuracy if you passed to the model metrics and then setting top5=True
 def classify(net,Xtest,Ytest,top5,ev_batch_size=None):
         def classify(net,Xtest,Ytest,top5):
                 if top5:
@@ -182,7 +188,8 @@ def classify(net,Xtest,Ytest,top5,ev_batch_size=None):
                         _,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         return accuracy 
         return classify(net,Xtest,Ytest,top5)
-        #Function to load the MNIST dataset. THis function could load the standard 28x28 8 or 4 bits dataset, or 11x11 8 or 4 bits dataset.             
+
+#Function to load the MNIST dataset. THis function could load the standard 28x28 8 or 4 bits dataset, or 11x11 8 or 4 bits dataset.             
 def load_ds(imgSize=[28,28], Quant=8): 
         (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()  
         if (imgSize != [28,28]):
@@ -199,7 +206,8 @@ def load_ds(imgSize=[28,28], Quant=8):
                 x_train = tf.cast(x_train,tf.uint8)  
                 x_test = tf.cast(x_test,tf.uint8)    
         return (x_train,y_train),(x_test,y_test)        
-        #Function to plot the box chart
+
+#Function to plot the box chart
 def plotBox(data,labels,legends,color,color_fill,path):
         import matplotlib.pyplot as plt
         """
