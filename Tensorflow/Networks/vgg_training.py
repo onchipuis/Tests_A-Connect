@@ -52,7 +52,7 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
 
 #### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
 #Wstd_err = [0.3, 0.5, 0.7, 0.8]
-Wstd_err = [0.65]
+Wstd_err = [0.65,0.8]
 pool = [16]
 isAConnect = True
 errDistr = "lognormal"
@@ -128,4 +128,4 @@ for j in range(len(Wstd_err)):
         Werr = str(int(100*Err))
         Nm = str(int(pool[i]))
         name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr
-        #model.save('./Models/VGG16_CIFAR10/'+name+'.h5',include_optimizer=True)
+        model.save('./Models/VGG16_CIFAR10/'+name+'.h5',include_optimizer=True)
