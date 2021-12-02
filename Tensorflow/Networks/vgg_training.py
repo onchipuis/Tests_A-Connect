@@ -52,8 +52,8 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
 
 #### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
 #Wstd_err = [0.3, 0.5, 0.7, 0.8]
-Wstd_err = [0.65,0.8]
-pool = [16]
+Wstd_err = [0.8]
+pool = [32]
 isAConnect = True
 errDistr = "lognormal"
 

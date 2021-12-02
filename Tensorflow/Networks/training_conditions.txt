@@ -1,0 +1,33 @@
+VGG16 CIFAR10
+Nr. error matrices: 0
+GPU Mem: 95%-100% of 15.6GB
+CPU RAM: 2.1GB
+training time: 89s/epoch
+
+Nr. error matrices: 16
+GPU Mem: 93%-100% of 15.6GB
+CPU RAM: 2.3GB
+training time: 125s/epoch
+
+Nr. error matrices (conv&FC): 16
+GPU Mem: 93%-100% of 15.6GB
+CPU RAM: 2.6GB
+training time: 160s/epoch
+
+AlexNet CIFAR10
+Nr. error matrices: 0
+GPU Mem: 95%-100% of 15.6GB
+CPU RAM: 2GB
+training time: 26s/epoch
+
+Nr. error matrices: 8
+GPU Mem: 95%-100% of 15.6GB
+CPU RAM: 2.3GB
+training time: 39s/epoch
+
+LeNet-5 MNIST
+Nr. error matrices: 0
+training time: 1s/epoch
+
+Nr. error matrices: 0
+training time: 3s/epo3h
