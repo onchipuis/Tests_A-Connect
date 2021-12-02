@@ -167,7 +167,6 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 print('Min. Accuracy: %.2f%%\n' % Xmin)
                 print('Max. Accuracy: %.2f%%\n'% Xmax)
 
-
                 os.remove(net_name+'_weights.h5')   #Delete created weight file
                 #np.savetxt(net_name+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt
                 #np.savetxt(net_name+'_stats'+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',stats,fmt="%.2f") #Save the median and iqr of M samples in a txt
