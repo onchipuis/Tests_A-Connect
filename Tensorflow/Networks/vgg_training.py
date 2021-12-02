@@ -65,14 +65,16 @@ for j in range(len(Wstd_err)):
     for i in range(len(FC_pool)):
         Err = Wstd_err[j]
         # CREATING NN:
-        model = tf.keras.models.load_model(net,custom_objects = custom_objects)
-        """
+        model_aux = tf.keras.models.load_model(net,custom_objects = custom_objects)
         model = vgg.model_creation(isAConnect=isAConnect,
                                     Wstd=Err,Bstd=Err,
                                     Conv_pool=Conv_pool[i],
                                     FC_pool=FC_pool[i],
                                     errDistr=errDistr)
         
+
+        model.set_weights(model_aux.get_weights())
+        """
         if (isAConnect==True): # With Aconnect
             model.layers[1].set_weights(model_aux.layers[1].get_weights())
             model.layers[4].set_weights(model_aux.layers[2].get_weights())
