@@ -59,7 +59,7 @@ FC_pool = [16]
 isAConnect = True
 errDistr = "lognormal"
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
-net='Models/VGG16_CIFAR10/16Werr_Wstd_65_Bstd_65.h5'
+net='Models/VGG16_CIFAR10/16Werr_Wstd_80_Bstd_80.h5'
 
 for j in range(len(Wstd_err)):
     for i in range(len(FC_pool)):
