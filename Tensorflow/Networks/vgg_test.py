@@ -29,7 +29,7 @@ Sim_err = [0.8]
 Wstd_err = [0.8]
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 acc=np.zeros([500,1])
-force = "no"
+force = "yes"
 
 for j in range(len(Sim_err)):
 
