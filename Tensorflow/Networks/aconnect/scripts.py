@@ -74,8 +74,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                                 if(layers[i].Bstd != 0):
                                                         Bstd_layer = layers[i].Bstd
                                                         if force == "no":
-                                                                Bstd
-                                                                = Bstd_layer
+                                                                Bstd = Bstd_layer
                                                         else:
                                                                 Bstd = Bstd
                                                 else:
