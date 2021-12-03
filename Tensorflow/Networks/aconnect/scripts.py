@@ -78,12 +78,14 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                                         Bstd = Bstd
                                         else:
                                                 Bstd = Bstd
-                                        if hasattr(layers[i],'Werr') or hasattr(layers[i],'Berr') or hasattr(layers[i],'infWerr') or hasattr(layers[i],'infBerr'): #Now if the layer have Werr or Berr is an A-Conenct or DropConnect layer
+                                        
+                                        #Create the error matrix taking into account the Wstd and Bstd
+                                        Werr = Merr_distr(Merr_aux,Wstd,errDistr)
+                                        Berr = Merr_distr(MBerr_aux,Bstd,errDistr)
+                                        #Now if the layer have Werr or Berr is an A-Conenct or DropConnect layer
+                                        if hasattr(layers[i],'Werr') or hasattr(layers[i],'Berr') or hasattr(layers[i],'infWerr') or hasattr(layers[i],'infBerr'): 
                                                 #print(i)#                              
                                                 
-                                                #Create the error matrix taking into account the Wstd and Bstd
-                                                Werr = Merr_distr(Merr_aux,Wstd,errDistr)
-                                                Berr = Merr_distr(MBerr_aux,Bstd,errDistr)
                                                 if(layers[i].isBin == 'yes'): 
                                                         if(Derr != 0): #Introduce the deterministic error when BW are used
                                                                 weights = layers[i].weights[0]
@@ -107,9 +109,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                                                 layers[i].Berr = Berr
                                                 else:
                                                         layers[i].Berr = Berr
-                                        else:                #if the layer is not A-Conenct or DropCOnnect the error must be introduced to the weights because it is a normal FC or normal Conv layer
-                                                Werr = abs(1+Wstd*Merr_aux) #Error matrices
-                                                Berr = abs(1+Bstd*MBerr_aux)
+                                        #if the layer is not A-Conenct or DropCOnnect the error must be introduced to the weights because it is a normal FC or normal Conv layer
+                                        else:                
                                                 weights = layers[i].weights[0]*Werr #Introduce the mismatch to the weights
                                                 bias = layers[i].weights[1]*Berr #Introduce the mismatch to the bias
                                                 local_weights = [weights,bias] #Create the tuple of modified values
@@ -279,6 +280,6 @@ def Merr_distr(Merr,stddev,errDistr): #Used to reshape the output of the layer
     if errDistr == "normal":
       Merr = np.abs(1+N)
     elif errDistr == "lognormal":
-      Merr = np.exp(-N)
+      Merr = np.exp(-N)/np.exp(0.5*stddev)
     return Merr
  
