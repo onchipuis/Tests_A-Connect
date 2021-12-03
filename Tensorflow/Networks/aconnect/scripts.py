@@ -60,18 +60,22 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                         
                                         if hasattr(layers[i], 'Wstd'): #Does the layer have Wstd? if it is true is an A-Connect or DropConnect network
                                                 if(layers[i].Wstd != 0): #IF the value it is different from zero, the layer is working with the algorithm
+                                                        Wstd_layer = layers[i].Wstd
                                                         if force == "no": #Do you want to take the training or simulation Wstd value?
-                                                                Wstd = layers[i].Wstd
+                                                                Wstd = Wstd_layer
                                                         else:
                                                                 Wstd = Wstd
                                                 else: #If it is false, it means that is working as a normal FC layer
+                                                        Wstd_layer = 0
                                                         Wstd = Wstd
                                         else:
                                                 Wstd = Wstd #If it is false, is a FC layers
                                         if hasattr(layers[i], 'Bstd'): #The same logic is applied for Bstd
                                                 if(layers[i].Bstd != 0):
+                                                        Bstd_layer = layers[i].Bstd
                                                         if force == "no":
-                                                                Bstd = layers[i].Bstd
+                                                                Bstd
+                                                                = Bstd_layer
                                                         else:
                                                                 Bstd = Bstd
                                                 else:
@@ -80,8 +84,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                                 Bstd = Bstd
                                         
                                         #Create the error matrix taking into account the Wstd and Bstd
-                                        Werr = Merr_distr(Merr_aux,Wstd,errDistr)
-                                        Berr = Merr_distr(MBerr_aux,Bstd,errDistr)
+                                        Werr = Merr_distr(Merr_aux,Wstd,Wstd_layer,errDistr)
+                                        Berr = Merr_distr(MBerr_aux,Bstd,Bstd_layer,errDistr)
                                         #Now if the layer have Werr or Berr is an A-Conenct or DropConnect layer
                                         if hasattr(layers[i],'Werr') or hasattr(layers[i],'Berr') or hasattr(layers[i],'infWerr') or hasattr(layers[i],'infBerr'): 
                                                 #print(i)#                              
@@ -273,13 +277,13 @@ def plotBox(data,labels,legends,color,color_fill,path):
                 plt.savefig(path, bbox_inches='tight')   
         return plotBox(data,labels,legends,color,color_fill,path)
 
-def Merr_distr(Merr,stddev,errDistr): #Used to reshape the output of the layer
+def Merr_distr(Merr,stddev,stddev_layer,errDistr): #Used to reshape the output of the layer
     
     N = stddev*Merr
 
     if errDistr == "normal":
       Merr = np.abs(1+N)
     elif errDistr == "lognormal":
-      Merr = np.exp(-N)/np.exp(0.5*stddev)
+      Merr = np.exp(-N)*np.exp(0.5*(stddev_layer-stddev))
     return Merr
  
