@@ -47,7 +47,7 @@ for j in range(len(Sim_err)):
             if Err == 0:
                 N = 1
             else:
-                N = 1
+                N = 100
                     #####
             
             elapsed_time = time.time() - start_time
