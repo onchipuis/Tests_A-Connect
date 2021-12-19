@@ -140,8 +140,12 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 local_net = tf.keras.models.load_model(net,custom_objects = custom_objects) #Load the trained model
                 local_net.save_weights(filepath=(net_name+'_weights.h5')) #Save the weights. It is used to optimize the script RAM consumption
                 #print(local_net.summary()) #Print the network summary
-                print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy | \tTop-5 Accuracy\n')
-                print('---------------------------------------------------------------------------------------')
+                if top5:       
+                    print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy | \tTop-5 Accuracy\n')
+                    print('---------------------------------------------------------------------------------------')
+                else:
+                    print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy\n')
+                    print('---------------------------------------------------------------------------------------')
         #       global parallel
 
                 for i in range(M): #Iterate over M samples
@@ -150,10 +154,12 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         if top5:       
                                 acc_noisy[i],top5acc_noisy[i] = classify(NetNoisy, Xtest, Ytest,top5,ev_batch_size=evaluate_batch_size) #Get the accuracy of the network
                                 top5acc_noisy[i] = 100*top5acc_noisy[i]              
+                                acc_noisy[i] = 100*acc_noisy[i]      
+                                print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i],top5acc_noisy[i]))
                         else:
                                 acc_noisy[i] = classify(NetNoisy, Xtest, Ytest,top5,ev_batch_size=evaluate_batch_size) #Get the accuracy of the network                        
-                        acc_noisy[i] = 100*acc_noisy[i]      
-                        print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i],top5acc_noisy[i]))
+                                acc_noisy[i] = 100*acc_noisy[i]      
+                                print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i]))
                         local_net.load_weights(filepath=(net_name+'_weights.h5')) #Takes the original weights value.
         #               return acc_noisy
 
