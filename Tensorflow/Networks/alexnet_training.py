@@ -40,7 +40,7 @@ def get_top_n_score(target, prediction, n):
 Wstd_err = [0.7]
 Conv_pool = [8,1]
 FC_pool = [8,1]
-isAConnect = False
+isAConnect = True
 #errDistr = "lognormal"
 errDistr = "normal"
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
