@@ -48,8 +48,7 @@ test_datagen = ImageDataGenerator(rescale=1. / 255)
 validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
 """
 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
-                                           input_shape=(32,32,3))
+model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,input_shape=(32,32,3))
 
 #### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
 #Wstd_err = [0.3, 0.5, 0.7, 0.8]
