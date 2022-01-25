@@ -10,6 +10,7 @@ import AlexNet as alexnet
 import time
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import LearningRateScheduler
+from aconnect import layers, scripts
 tic=time.time()
 start_time = time.time()
 def hms_string(sec_elapsed):
