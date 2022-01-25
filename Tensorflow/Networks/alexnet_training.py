@@ -31,48 +31,65 @@ def get_top_n_score(target, prediction, n):
     #se retorna la precision
     return np.mean(precision)
 
-### TRAINING STAGE ###
-isAConnect=True
-
-def step_decay (epoch): 
-   initial_lrate = 0.01 
-   drop = 0.5 
-   epochs_drop = 30.0 
-   lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
-   return lrate
-
-#parametros para el entrenamiento
-lrate = LearningRateScheduler(step_decay)
-callbacks_list = [lrate]
-
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()
 
-# CREATING NN:
-model = alexnet.model_creation(isAConnect=isAConnect,
-                                Wstd=0.5,
-                                Bstd=0.5)
+#### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
+#Wstd_err = [0.3, 0.5, 0.7, 0.8]
+Wstd_err = [0.7]
+Conv_pool = [8,1]
+FC_pool = [8,1]
+isAConnect = False
+#errDistr = "lognormal"
+errDistr = "normal"
+custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
-#TRAINING PARAMETERS
-model.compile(loss='sparse_categorical_crossentropy', 
-        optimizer=tf.optimizers.SGD(learning_rate=0.0,momentum=0.9), 
-        metrics=['accuracy'])
+for j in range(len(Wstd_err)):
+    for i in range(len(FC_pool)):
+        Err = Wstd_err[j]
+        ### TRAINING STAGE ###
+        # CREATING NN:
+        model = alexnet.model_creation(isAConnect=isAConnect,
+                                        Wstd=Err,Bstd=Err,
+                                        Conv_pool=Conv_pool[i],
+                                        FC_pool=FC_pool[i],
+                                        errDistr=errDistr)
 
-# TRAINING
-model.fit(X_train, Y_train,
-            batch_size=256,
-            epochs=2,
-            validation_data=(X_test, Y_test),
-            callbacks=callbacks_list,
-            shuffle=True)
+        def step_decay (epoch): 
+           initial_lrate = 0.01 
+           drop = 0.5 
+           epochs_drop = 30.0 
+           lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
+           return lrate
 
-model.evaluate(X_test,Y_test)    
+        #parametros para el entrenamiento
+        lrate = LearningRateScheduler(step_decay)
+        callbacks_list = [lrate]
 
-y_predict =model.predict(X_test)
-elapsed_time = time.time() - start_time
-print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
-print("Elapsed time: {}".format(hms_string(elapsed_time)))
-print('Tiempo de procesamiento (secs): ', time.time()-tic)
 
-#SAVE MODEL:
-#model.save('./Models/AlexNet_CIFAR10/'+name+'.h5',include_optimizer=True)
+        #TRAINING PARAMETERS
+        model.compile(loss='sparse_categorical_crossentropy', 
+                optimizer=tf.optimizers.SGD(learning_rate=0.0,momentum=0.9), 
+                metrics=['accuracy'])
+
+        # TRAINING
+        model.fit(X_train, Y_train,
+                    batch_size=256,
+                    epochs=2,
+                    validation_data=(X_test, Y_test),
+                    callbacks=callbacks_list,
+                    shuffle=True)
+
+        model.evaluate(X_test,Y_test)    
+
+        y_predict =model.predict(X_test)
+        elapsed_time = time.time() - start_time
+        print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
+        print("Elapsed time: {}".format(hms_string(elapsed_time)))
+        print('Tiempo de procesamiento (secs): ', time.time()-tic)
+
+        # SAVE MODEL:
+        Werr = str(int(100*Err))
+        Nm = str(int(FC_pool[i]))
+        name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_" +errDistr+'Distr'
+        model.save('./Models/AlexNet_CIFAR10/'+name+'.h5',include_optimizer=True)
