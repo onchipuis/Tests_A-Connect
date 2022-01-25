@@ -53,11 +53,12 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,
 
 #### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
 #Wstd_err = [0.3, 0.5, 0.7, 0.8]
-Wstd_err = [0.8]
+Wstd_err = [0.7]
 Conv_pool = [16]
 FC_pool = [16]
 isAConnect = True
-errDistr = "lognormal"
+#errDistr = "lognormal"
+errDistr = "normal"
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 net='Models/VGG16_CIFAR10/16Werr_Wstd_80_Bstd_80.h5'
 
@@ -65,7 +66,7 @@ for j in range(len(Wstd_err)):
     for i in range(len(FC_pool)):
         Err = Wstd_err[j]
         # CREATING NN:
-        model_aux = tf.keras.models.load_model(net,custom_objects = custom_objects)
+        #model_aux = tf.keras.models.load_model(net,custom_objects = custom_objects)
         model = vgg.model_creation(isAConnect=isAConnect,
                                     Wstd=Err,Bstd=Err,
                                     Conv_pool=Conv_pool[i],
@@ -73,8 +74,7 @@ for j in range(len(Wstd_err)):
                                     errDistr=errDistr)
         
 
-        model.set_weights(model_aux.get_weights())
-        """
+        #model.set_weights(model_aux.get_weights())
         if (isAConnect==True): # With Aconnect
             model.layers[1].set_weights(model_aux.layers[1].get_weights())
             model.layers[4].set_weights(model_aux.layers[2].get_weights())
@@ -103,7 +103,6 @@ for j in range(len(Wstd_err)):
             model.layers[25].set_weights(model_aux.layers[15].get_weights())
             model.layers[27].set_weights(model_aux.layers[16].get_weights())
             model.layers[29].set_weights(model_aux.layers[17].get_weights())
-        """
         #print(model.summary())
 
         lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
@@ -136,5 +135,5 @@ for j in range(len(Wstd_err)):
         # SAVE MODEL:
         Werr = str(int(100*Err))
         Nm = str(int(FC_pool[i]))
-        name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr
+        name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_" +errDistr+'Distr'
         model.save('./Models/VGG16_CIFAR10/'+name+'.h5',include_optimizer=True)
