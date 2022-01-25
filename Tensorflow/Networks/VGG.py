@@ -30,13 +30,14 @@ def hms_string(sec_elapsed):
     m = int((sec_elapsed % (60 * 60)) / 60)
     s = sec_elapsed % 60
     return f"{h}:{m:>02}:{s:>05.2f}"
+Xsz = 100
 
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=16,FC_pool=16,errDistr="normal"):
 	if(not(isAConnect)):
 		model = tf.keras.models.Sequential([
 			InputLayer(input_shape=(32,32,3)),
-			tf.keras.layers.experimental.preprocessing.Resizing(32,32),           
+			tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),           
 			#tf.keras.layers.UpSampling2D(),           
 			Conv2D(filters=64, kernel_size=(3,3),strides=(1,1), activation='relu',padding="same"),
 			BatchNormalization(),
@@ -80,7 +81,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=16,FC_pool=16,errDis
 
 		model = tf.keras.models.Sequential([
 			InputLayer(input_shape=[32,32,3]),
-			tf.keras.layers.experimental.preprocessing.Resizing(32,32),    
+			tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),    
 			#tf.keras.layers.UpSampling2D(),           
 		        Conv_AConnect(filters=64, kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd, errDistr=errDistr,pool=Conv_pool, padding="SAME",d_type=tf.dtypes.float16),
 		        BatchNormalization(),
