@@ -52,10 +52,10 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,inpu
 
 #### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
 #Wstd_err = [0.3, 0.5, 0.7, 0.8]
-Wstd_err = [0.7]
+Wstd_err = [0.0]
 Conv_pool = [16]
 FC_pool = [4]
-isAConnect = True
+isAConnect = False
 #errDistr = "lognormal"
 errDistr = "normal"
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
