@@ -1,75 +1,65 @@
 
 
 #############################Script to define the LeNet-5 models. With and without A-Connect################3
-import tensorflow as tf
-import numpy as np
-import sys
 config = open('config.txt','r')
 folder = config.read()
 sys.path.append(folder)
 sys.path.append(folder+'/Layers/')
-from Layers import ConvAConnect
-from Layers import AConnect
-from Layers import Conv
-from Layers import FC_quant
+import numpy as np
+import tensorflow as tf
+import sys
+from aconnect.layers import Conv_AConnect, FC_AConnect 
+from aconnect import scripts 
 from Layers import dva_fc
 from Layers import dva_conv
-import aconnect.layers as layers
 
 
-def LeNet5(Xtrain=None,Xtest=None,isAConnect=False,Wstd=0,Bstd=0,isBin="no", pool=None):
-	if(Xtrain is not None):
-	    Xtrain = np.pad(Xtrain, ((0,0),(2,2),(2,2)), 'constant')
-	if(Xtest is not None):        
-	    Xtest = np.pad(Xtest, ((0,0),(2,2),(2,2)), 'constant')
-	
-	#print("Updated training data shape: {}".format(Xtrain[0].shape))
-	#print("Updated test data shape: {}".format(Xtest[0].shape))
+def model_creation(isAConnect=False,Wstd=0,Bstd=0,isBin="no",Conv_pool=8,FC_pool=8,errDistr="normal"):
 		
 	if(not(isAConnect)):
 		model = tf.keras.Sequential([
-			tf.keras.layers.InputLayer(input_shape=[32,32]),
-			tf.keras.layers.Reshape((32,32,1)),
-			tf.keras.layers.Conv2D(6,kernel_size=(5,5),strides=(1,1),padding="valid",activation="tanh"),
-            tf.keras.layers.BatchNormalization(),            
-			#tf.keras.layers.Activation('tanh'),            
-            tf.keras.layers.AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
-			tf.keras.layers.Conv2D(16,kernel_size=(5,5),strides=(1,1),padding="valid",activation="tanh"),
-            tf.keras.layers.BatchNormalization(),            
-			#tf.keras.layers.Activation('tanh'),			
-            tf.keras.layers.AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
-			tf.keras.layers.Flatten(),
-			tf.keras.layers.Dense(120,activation="tanh"),
-            tf.keras.layers.BatchNormalization(),            
-			#tf.keras.layers.Activation('tanh'),            
-			tf.keras.layers.Dense(84,activation="tanh"),
-            tf.keras.layers.BatchNormalization(),            
-			#tf.keras.layers.Activation('tanh'),            
-			tf.keras.layers.Dense(10),
-			tf.keras.layers.Softmax()							
+			InputLayer(input_shape=[32,32]),
+			Reshape((32,32,1)),
+			Conv2D(6,kernel_size=(5,5),strides=(1,1),padding="valid",activation="tanh"),
+                        BatchNormalization(),           
+			#Activation('tanh'),           
+                        AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
+			Conv2D(16,kernel_size=(5,5),strides=(1,1),padding="valid",activation="tanh"),
+                        BatchNormalization(),           
+			#Activation('tanh'),			
+                        AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
+			Flatten(),
+			Dense(120,activation="tanh"),
+                        BatchNormalization(),           
+			#Activation('tanh'),           
+			Dense(84,activation="tanh"),
+                        BatchNormalization(),           
+			#Activation('tanh'),           
+			Dense(10),
+			Softmax()							
 		])
 	else:
 		model = tf.keras.Sequential([
-			tf.keras.layers.InputLayer(input_shape=[32,32]),
-			tf.keras.layers.Reshape((32,32,1)),
-			layers.Conv_AConnect(6,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin,Op=2,strides=1,padding="VALID", pool=pool),
-            tf.keras.layers.BatchNormalization(),
-			tf.keras.layers.Activation('tanh'),            
-			tf.keras.layers.AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
-			layers.Conv_AConnect(16,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,isBin=isBin,Op=2 ,strides=1,padding="VALID", pool=pool),
-            tf.keras.layers.BatchNormalization(),            
-			tf.keras.layers.Activation('tanh'),                        
-			tf.keras.layers.AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
-			tf.keras.layers.Flatten(),
-			layers.FC_AConnect(120,Wstd,Bstd,isBin=isBin, pool=pool),
-            tf.keras.layers.BatchNormalization(),            
-			tf.keras.layers.Activation('tanh'),                        
-			layers.FC_AConnect(84,Wstd,Bstd,isBin=isBin, pool=pool),
-            tf.keras.layers.BatchNormalization(),            
-			tf.keras.layers.Activation('tanh'),                        
-			layers.FC_AConnect(10,Wstd,Bstd,isBin=isBin),
-			tf.keras.layers.Softmax()							
+			InputLayer(input_shape=[32,32]),
+			Reshape((32,32,1)),
+			Conv_AConnect(6,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,isBin=isBin,Op=2,strides=1,padding="VALID",pool=Conv_pool,d_type=tf.dtypes.float16),
+                        BatchNormalization(),
+			Activation('tanh'),           
+			AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
+			Conv_AConnect(16,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,isBin=isBin,Op=2 ,strides=1,padding="VALID",pool=Conv_pool,d_type=tf.dtypes.float16),
+                        BatchNormalization(),           
+			Activation('tanh'),                       
+			AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
+			Flatten(),
+			FC_AConnect(120,Wstd,Bstd,errDistr=errDistr,isBin=isBin,pool=FC_pool,d_type=tf.dtypes.float16),
+                        BatchNormalization(),           
+			Activation('tanh'),                       
+			FC_AConnect(84,Wstd,Bstd,errDistr=errDistr,isBin=isBin,pool=FC_pool,d_type=tf.dtypes.float16),
+                        BatchNormalization(),           
+			Activation('tanh'),                       
+			FC_AConnect(10,Wstd,Bstd,errDistr=errDistr,isBin=isBin,pool=FC_pool,d_type=tf.dtypes.float16),
+			Softmax()							
 		])		
 		
 	
-	return model,Xtrain,Xtest
+	return model

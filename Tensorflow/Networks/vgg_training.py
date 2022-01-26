@@ -135,4 +135,5 @@ for j in range(len(Wstd_err)):
         Werr = str(int(100*Err))
         Nm = str(int(FC_pool[i]))
         name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_" +errDistr+'Distr'
-        model.save('./Models/VGG16_CIFAR10/'+name+'.h5',include_optimizer=True)
+        string = './Models/VGG16_CIFAR10/'+name+'.h5'
+        model.save(string,include_optimizer=True)
