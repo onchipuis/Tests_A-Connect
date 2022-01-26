@@ -10,6 +10,8 @@ import tensorflow as tf
 import sys
 from aconnect.layers import Conv_AConnect, FC_AConnect 
 from aconnect import scripts 
+from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatten
+from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax
 
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,isBin="no",Conv_pool=8,FC_pool=8,errDistr="normal"):
