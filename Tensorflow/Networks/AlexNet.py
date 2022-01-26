@@ -4,22 +4,10 @@ INSTRUCTIONS:
 Due to the memory usage we recommend to uncomment the first train the model and save it. Then just comment the training 
 stage and then load the model to test it using the Monte Carlo simulation.
 """
-import numpy as np
 import tensorflow as tf
-import time
-from datetime import datetime
 from aconnect.layers import Conv_AConnect, FC_AConnect 
-from aconnect import scripts 
 from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatten
 from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax
-from keras.callbacks import LearningRateScheduler
-tic=time.time()
-start_time = time.time()
-def hms_string(sec_elapsed):
-    h = int(sec_elapsed / (60 * 60))
-    m = int((sec_elapsed % (60 * 60)) / 60)
-    s = sec_elapsed % 60
-    return f"{h}:{m:>02}:{s:>05.2f}"
 Xsz = 227
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr="normal"):

@@ -31,14 +31,19 @@ X_test = np.pad(X_test, ((0,0),(2,2),(2,2)), 'constant')
 X_test = np.float32(X_test) #Convert it to float32
 
 # INPUT PARAMTERS:
-isAConnect = [False,True]				#Which network you want to train/test True for A-Connect false for normal LeNet
-#Wstd_err = [0.3,0.5,0.7]			#Define the stddev for training
-Wstd_err = [0.3]			#Define the stddev for training
+isAConnect = [False,True]   # Which network you want to train/test True for A-Connect false for normal LeNet
+#Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
+Wstd_err = [0.3]	    # Define the stddev for training
 Conv_pool = [1,8]
 FC_pool = [1,8]
-isBin = ["no"]					#Do you want binary weights?
+isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
 errDistr = "normal"
+model_name = 'LeNet5_MNIST/'
+folder_models = './Models/'+model_name
+folder_results = '../Results/'+model_name+'Training_data/'
+
+# TRAINING PARAMETERS
 learning_rate = 0.01
 momentum = 0.9
 optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum) #Define optimizer
@@ -99,8 +104,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 val_acc = history.history['val_accuracy']
                 
                 # SAVE MODEL:
-                string = './Models/LeNet5_MNIST/'+name+'.h5'
+                string = folder_models + name + '.h5'
                 model.save(string,include_optimizer=True)
                 #Save in a txt the accuracy and the validation accuracy for further analysis
-                np.savetxt('../Results/LeNet5_MNIST/Training_data/'+name+'_acc'+'.txt',acc,fmt="%.2f") 
-                np.savetxt('../Results/LeNet5_MNIST/Training_data/'+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
+                np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
+                np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")

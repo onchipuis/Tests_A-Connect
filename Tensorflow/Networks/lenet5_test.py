@@ -23,60 +23,6 @@ momentum = 0.9
 batch_size = 256
 N = 1 #Number of error matrices to test, only 2^(n-1) size
 
-###Training part
-
-for d in range(N): #Iterate over all the error matrices
-	M = 2**(d)
-	if N == 1:
-		M = batch_size
-	nMatriz = str(M)
-	for p in range (len(isBin)):
-		for i in range(len(identifier)): #Iterate over the networks
-			#print(type(x_test))
-			isAConnect = identifier[i] #Which network should be selected
-			if isAConnect: #is a network with A-Connect?
-			    for c in range(len(Wstd)): #Iterate over the Wstd and Bstd for training
-			        wstd = str(int(100*Wstd[c]))
-			        bstd = str(int(100*Bstd[c]))
-			        name = 'LeNet5_'+nMatriz+'Werr'+'_Wstd_'+wstd+'_Bstd_'+bstd
-			        if isBin[p] == "yes":
-			            name = name+'_BW'
-			        print("*****************************TRAINING NETWORK*********************")
-			        print("\n\t\t\t", name)
-			        if M == batch_size:                    
-			            model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin[p]) #Get the model
-			        else:
-			            model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,Wstd=Wstd[c],Bstd=Bstd[c],isBin=isBin[p], pool=M) #Get the model                                                
-			        optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum) #Define optimizer
-			        top5 = tf.keras.metrics.TopKCategoricalAccuracy(k=5, name='top_5_categorical_accuracy', dtype=None) #COnfigure the model to get the top-5 accuracy
-			        model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy',top5])#Compile the model
-			        print(model.summary()) #Print the summary
-			        history = model.fit(x_train,y_train,validation_split=0.2,epochs = epochs,batch_size=batch_size) #Train the model
-			        acc = history.history['accuracy'] #Save the accuracy and the validation accuracy
-			        val_acc = history.history['val_accuracy']
-			        string = './Models/LeNet5_MNIST/'+name+'.h5' #Define the folder and the name of the model to be saved
-			        model.save(string,include_optimizer=True) #Save the model
-			        np.savetxt('../Results/LeNet5_MNIST/Training_data/'+name+'_acc'+'.txt',acc,fmt="%.2f") #Save in a txt the accuracy and the validation accuracy for further analysis
-			        np.savetxt('../Results/LeNet5_MNIST/Training_data/'+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
-			else:
-			    model,_,_=LeNet5.LeNet5(isAConnect=isAConnect,isBin=isBin)	#Same logic is applied here. But is for normal lenet5
-			    optimizer = tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9)
-			    name = 'LeNet5'
-			    if isBin[p] == "yes":
-			        name = name+'_BW'
-			    model.compile(optimizer=optimizer,loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])
-			    print("*****************************TRAINING NETWORK*********************")
-			    print("\n\t\t\t", name)
-			    print(model.summary())
-			    history = model.fit(x_train,y_train,validation_split=0.2,epochs = epochs,batch_size=batch_size)
-			    acc = history.history['accuracy']
-			    val_acc = history.history['val_accuracy']
-			    string = './Models/'+name+'.h5'
-			    model.save(string,include_optimizer=True)
-			    np.savetxt('../Results/LeNet5_MNIST/Training_data/'+'LeNet5'+'_acc'+'.txt',acc,fmt="%.2f")
-			    np.savetxt('../Results/LeNet5_MNIST/Training_data/'+'LeNet5'+'_val_acc'+'.txt',val_acc,fmt="%.2f")
-
-
 #This part is for inference. During the following lines the MCSim will be executed.
 for d in range(3,N): #Iterate over all the error matrices
 
