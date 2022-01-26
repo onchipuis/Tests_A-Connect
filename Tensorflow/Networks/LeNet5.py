@@ -1,17 +1,15 @@
 
 
 #############################Script to define the LeNet-5 models. With and without A-Connect################3
-config = open('config.txt','r')
-folder = config.read()
-sys.path.append(folder)
-sys.path.append(folder+'/Layers/')
+#config = open('config.txt','r')
+#folder = config.read()
+#sys.path.append(folder)
+#sys.path.append(folder+'/Layers/')
 import numpy as np
 import tensorflow as tf
 import sys
 from aconnect.layers import Conv_AConnect, FC_AConnect 
 from aconnect import scripts 
-from Layers import dva_fc
-from Layers import dva_conv
 
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,isBin="no",Conv_pool=8,FC_pool=8,errDistr="normal"):
