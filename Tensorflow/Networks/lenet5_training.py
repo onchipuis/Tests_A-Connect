@@ -52,9 +52,9 @@ for d in range(len(isAConnect)): #Iterate over the networks
         FC_pool_aux = FC_pool
         Conv_pool_aux = Conv_pool
     else:
-        Wstd_aux = 0
-        FC_pool_aux = 0
-        Conv_pool_aux = 0
+        Wstd_aux = [0]
+        FC_pool_aux = [0]
+        Conv_pool_aux = [0]
     
     for i in range(len(FC_pool_aux)):
         for p in range (len(isBin)):
