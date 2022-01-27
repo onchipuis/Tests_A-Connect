@@ -55,7 +55,7 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,inpu
 Wstd_err = [0.3]
 Conv_pool = [16]
 FC_pool = [4]
-isAConnect = False
+isAConnect = True
 #errDistr = "lognormal"
 errDistr = "normal"
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
