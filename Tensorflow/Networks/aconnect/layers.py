@@ -26,7 +26,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                 bw=[1,1],
                 pool=None,
                 Slice=1,
-                d_type=tf.dtypes.float32,
+                d_type=tf.dtypes.float16,
                 weights_regularizer=None,
                 bias_regularizer=None,
                 **kwargs): #__init__ method is the first method used for an object in python to initialize the ...
@@ -368,7 +368,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 bw=[1,1],
                 Op=1,
                 Slice=1,
-                d_type=tf.dtypes.float32,
+                d_type=tf.dtypes.float16,
                 weights_regularizer=None,
                 bias_regularizer=None,
                 **kwargs):

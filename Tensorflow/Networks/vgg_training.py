@@ -100,7 +100,9 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                             Wstd=Err,Bstd=Err,
                                             Conv_pool=Conv_pool_aux[i],
                                             FC_pool=FC_pool_aux[i],
-                                            errDistr=errDistr[k])
+                                            errDistr=errDistr[k],
+                                            isQuant=['yes','yes'],
+                                            bw=[8,8])
                
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                 if isAConnect[d]:
