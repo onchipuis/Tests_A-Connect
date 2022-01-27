@@ -10,9 +10,11 @@ from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatte
 from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax
 Xsz = 100
 
-def
-model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=16,FC_pool=16,errDistr="normal",isQuant=['no','no'],bw=[8,8]):
-	if(not(isAConnect)):
+def model_creation(isAConnect=False,Wstd=0,Bstd=0,
+        Conv_pool=16,FC_pool=16,errDistr="normal",
+        isQuant=['no','no'],bw=[8,8]):
+	
+        if(not(isAConnect)):
 		model = tf.keras.models.Sequential([
 			InputLayer(input_shape=(32,32,3)),
 			tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),          
