@@ -54,10 +54,10 @@ for j in range(len(Sim_err)):
             print("Elapsed time: {}".format(hms_string(elapsed_time)))
             now = datetime.now()
             starttime = now.time()
-            print('\n\n*******************************************************************************************\n\n')
+            print('\n\n***********************************************************************************\n\n')
             print('TESTING NETWORK: ', name)
             print('With simulation error: ', Err)
-            print('\n\n*******************************************************************************************')
+            print('\n\n***************************************************************************************')
             
             acc, stats = scripts.MonteCarlo(net=string,Xtest=X_test,Ytest=Y_test,M=N,
                     Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
@@ -77,7 +77,7 @@ for j in range(len(Sim_err)):
             elapsed_time = time.time() - start_time
             print("Elapsed time: {}".format(hms_string(elapsed_time)))
 
-            print('\n\n*******************************************************************************************')
+            print('\n\n***************************************************************************************')
             print('\n Simulation started at: ',starttime)
             print('Simulation finished at: ', endtime)        
 

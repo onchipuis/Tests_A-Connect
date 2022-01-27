@@ -53,14 +53,14 @@ validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
 model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,input_shape=(32,32,3))
 
 # INPUT PARAMTERS:
-isAConnect = [False,True]   # Which network you want to train/test True for A-Connect false for normal LeNet
+isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 #Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
 Wstd_err = [0.3]	    # Define the stddev for training
-Conv_pool = [1,8]
-FC_pool = [1,8]
+Conv_pool = [16]
+FC_pool = [4]
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
-errDistr = "normal"
+errDistr = ["normal"]
 model_name = 'VGG16_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
@@ -70,7 +70,7 @@ net = folder_models+'16Werr_Wstd_80_Bstd_80.h5'
 learning_rate = 0.01
 momentum = 0.9
 batch_size = 256
-epochs = 30
+epochs = 5
 lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 initial_learning_rate=0.01,
                 decay_steps=196,
