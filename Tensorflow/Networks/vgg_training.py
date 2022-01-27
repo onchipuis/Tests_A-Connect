@@ -92,75 +92,76 @@ for d in range(len(isAConnect)): #Iterate over the networks
         
     for i in range(len(FC_pool_aux)):
         for j in range(len(Wstd_aux)):
-            Err = Wstd_aux[j]
-            # CREATING NN:
-            #model_aux = tf.keras.models.load_model(net,custom_objects = custom_objects)
-            model = vgg.model_creation(isAConnect=isAConnect,
-                                        Wstd=Err,Bstd=Err,
-                                        Conv_pool=Conv_pool[i],
-                                        FC_pool=FC_pool[i],
-                                        errDistr=errDistr)
-           
-            ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-            if isAConnect[d]:
-                model.layers[1].set_weights(model_aux.layers[1].get_weights())
-                model.layers[4].set_weights(model_aux.layers[2].get_weights())
-                model.layers[8].set_weights(model_aux.layers[4].get_weights())
-                model.layers[11].set_weights(model_aux.layers[5].get_weights())
-                model.layers[15].set_weights(model_aux.layers[7].get_weights())
-                model.layers[18].set_weights(model_aux.layers[8].get_weights())
-                model.layers[21].set_weights(model_aux.layers[9].get_weights())
-                model.layers[25].set_weights(model_aux.layers[11].get_weights())
-                model.layers[28].set_weights(model_aux.layers[12].get_weights())
-                model.layers[31].set_weights(model_aux.layers[13].get_weights())
-                model.layers[35].set_weights(model_aux.layers[15].get_weights())
-                model.layers[38].set_weights(model_aux.layers[16].get_weights())
-                model.layers[41].set_weights(model_aux.layers[17].get_weights())
-            else:
-                model.layers[1].set_weights(model_aux.layers[1].get_weights())
-                model.layers[3].set_weights(model_aux.layers[2].get_weights())
-                model.layers[6].set_weights(model_aux.layers[4].get_weights())
-                model.layers[8].set_weights(model_aux.layers[5].get_weights())
-                model.layers[11].set_weights(model_aux.layers[7].get_weights())
-                model.layers[13].set_weights(model_aux.layers[8].get_weights())
-                model.layers[15].set_weights(model_aux.layers[9].get_weights())
-                model.layers[18].set_weights(model_aux.layers[11].get_weights())
-                model.layers[20].set_weights(model_aux.layers[12].get_weights())
-                model.layers[22].set_weights(model_aux.layers[13].get_weights())
-                model.layers[25].set_weights(model_aux.layers[15].get_weights())
-                model.layers[27].set_weights(model_aux.layers[16].get_weights())
-                model.layers[29].set_weights(model_aux.layers[17].get_weights())
+            for k in range(len(errDistr)):
+                Err = Wstd_aux[j]
+                # CREATING NN:
+                #model_aux = tf.keras.models.load_model(net,custom_objects = custom_objects)
+                model = vgg.model_creation(isAConnect=isAConnect,
+                                            Wstd=Err,Bstd=Err,
+                                            Conv_pool=Conv_pool[i],
+                                            FC_pool=FC_pool[i],
+                                            errDistr=errDistr[k])
+               
+                ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
+                if isAConnect[d]:
+                    model.layers[1].set_weights(model_aux.layers[1].get_weights())
+                    model.layers[4].set_weights(model_aux.layers[2].get_weights())
+                    model.layers[8].set_weights(model_aux.layers[4].get_weights())
+                    model.layers[11].set_weights(model_aux.layers[5].get_weights())
+                    model.layers[15].set_weights(model_aux.layers[7].get_weights())
+                    model.layers[18].set_weights(model_aux.layers[8].get_weights())
+                    model.layers[21].set_weights(model_aux.layers[9].get_weights())
+                    model.layers[25].set_weights(model_aux.layers[11].get_weights())
+                    model.layers[28].set_weights(model_aux.layers[12].get_weights())
+                    model.layers[31].set_weights(model_aux.layers[13].get_weights())
+                    model.layers[35].set_weights(model_aux.layers[15].get_weights())
+                    model.layers[38].set_weights(model_aux.layers[16].get_weights())
+                    model.layers[41].set_weights(model_aux.layers[17].get_weights())
+                else:
+                    model.layers[1].set_weights(model_aux.layers[1].get_weights())
+                    model.layers[3].set_weights(model_aux.layers[2].get_weights())
+                    model.layers[6].set_weights(model_aux.layers[4].get_weights())
+                    model.layers[8].set_weights(model_aux.layers[5].get_weights())
+                    model.layers[11].set_weights(model_aux.layers[7].get_weights())
+                    model.layers[13].set_weights(model_aux.layers[8].get_weights())
+                    model.layers[15].set_weights(model_aux.layers[9].get_weights())
+                    model.layers[18].set_weights(model_aux.layers[11].get_weights())
+                    model.layers[20].set_weights(model_aux.layers[12].get_weights())
+                    model.layers[22].set_weights(model_aux.layers[13].get_weights())
+                    model.layers[25].set_weights(model_aux.layers[15].get_weights())
+                    model.layers[27].set_weights(model_aux.layers[16].get_weights())
+                    model.layers[29].set_weights(model_aux.layers[17].get_weights())
 
-            # NAME
-            Werr = str(int(100*Err))
-            Nm = str(int(FC_pool[i]))
-            name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_" +errDistr+'Distr'
-            
-            print("*************************TRAINING NETWORK*********************")
-            print("\n\t\t\t", name)
+                # NAME
+                Werr = str(int(100*Err))
+                Nm = str(int(FC_pool[i]))
+                name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
                 
-            #TRAINING PARAMETERS
-            model.compile(loss='sparse_categorical_crossentropy',
-                    optimizer=optimizer, 
-                    metrics=['accuracy'])
+                print("*************************TRAINING NETWORK*********************")
+                print("\n\t\t\t", name)
+                    
+                #TRAINING PARAMETERS
+                model.compile(loss='sparse_categorical_crossentropy',
+                        optimizer=optimizer, 
+                        metrics=['accuracy'])
 
-            # TRAINING
-            model.fit(X_train, Y_train,
-                      batch_size=batch_size,
-                      epochs=epochs,
-                      validation_data=(X_test, Y_test),
-                      shuffle=True)
-            model.evaluate(X_test,Y_test)    
+                # TRAINING
+                model.fit(X_train, Y_train,
+                          batch_size=batch_size,
+                          epochs=epochs,
+                          validation_data=(X_test, Y_test),
+                          shuffle=True)
+                model.evaluate(X_test,Y_test)    
 
-            y_predict =model.predict(X_test)
-            elapsed_time = time.time() - start_time
-            print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
-            print("Elapsed time: {}".format(hms_string(elapsed_time)))
-            print('Tiempo de procesamiento (secs): ', time.time()-tic)
+                y_predict =model.predict(X_test)
+                elapsed_time = time.time() - start_time
+                print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
+                print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                print('Tiempo de procesamiento (secs): ', time.time()-tic)
 
-            # SAVE MODEL:
-            string = folder_models + name + '.h5'
-            model.save(string,include_optimizer=True)
-            #Save in a txt the accuracy and the validation accuracy for further analysis
-            np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
-            np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
+                # SAVE MODEL:
+                string = folder_models + name + '.h5'
+                model.save(string,include_optimizer=True)
+                #Save in a txt the accuracy and the validation accuracy for further analysis
+                np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
+                np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
