@@ -8,7 +8,7 @@ import tensorflow as tf
 import VGG as vgg
 import time
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from aconnect import layers, scripts
+from .aconnect import layers, scripts
 #from keras.callbacks import LearningRateScheduler
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
