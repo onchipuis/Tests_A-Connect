@@ -98,8 +98,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 #model_aux = tf.keras.models.load_model(net,custom_objects = custom_objects)
                 model = vgg.model_creation(isAConnect=isAConnect,
                                             Wstd=Err,Bstd=Err,
-                                            Conv_pool=Conv_pool[i],
-                                            FC_pool=FC_pool[i],
+                                            Conv_pool=Conv_pool_aux[i],
+                                            FC_pool=FC_pool_aux[i],
                                             errDistr=errDistr[k])
                
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
@@ -134,7 +134,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
 
                 # NAME
                 Werr = str(int(100*Err))
-                Nm = str(int(FC_pool[i]))
+                Nm = str(int(FC_pool_aux[i]))
                 name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
                 
                 print("*************************TRAINING NETWORK*********************")
