@@ -11,7 +11,7 @@ from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax
 Xsz = 227
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr="normal"):
-        if(not(isAConnect)):
+        if(isAConnect==False):
                 model = tf.keras.models.Sequential([
                         InputLayer(input_shape=[32,32,3]),
                         tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),           
