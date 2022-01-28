@@ -52,7 +52,7 @@ model_name = 'AlexNet_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 net_base = folder_models+'Base.h5'
-model_base = tf.keras.models.load_model(net_base)
+model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
 momentum = 0.9
@@ -86,7 +86,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 if isAConnect[d]:
                     for m in range(len(Nlayers_base)):
                         model.layers[Nlayers[m]].set_weights(
-                                model_aux.layers[Nlayers_base[m]].get_weights()
+                                model_base.layers[Nlayers_base[m]].get_weights()
                                 )
                 
                 # NAME
