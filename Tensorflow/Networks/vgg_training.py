@@ -119,6 +119,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                     model.layers[35].set_weights(model_aux.layers[15].get_weights())
                     model.layers[38].set_weights(model_aux.layers[16].get_weights())
                     model.layers[41].set_weights(model_aux.layers[17].get_weights())
+                """
                 else:
                     model.layers[1].set_weights(model_aux.layers[1].get_weights())
                     model.layers[3].set_weights(model_aux.layers[2].get_weights())
@@ -133,7 +134,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                     model.layers[25].set_weights(model_aux.layers[15].get_weights())
                     model.layers[27].set_weights(model_aux.layers[16].get_weights())
                     model.layers[29].set_weights(model_aux.layers[17].get_weights())
-
+"""
                 # NAME
                 Werr = str(int(100*Err))
                 Nm = str(int(FC_pool_aux[i]))
