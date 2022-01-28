@@ -57,7 +57,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 # TRAINING PARAMETERS
 momentum = 0.9
 batch_size = 256
-epochs = 20
+epochs = 30
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
 
