@@ -31,41 +31,39 @@ class FC_AConnect(tf.keras.layers.Layer):
                 bias_regularizer=None,
                 **kwargs): #__init__ method is the first method used for an object in python to initialize the ...
 
-                super(FC_AConnect, self).__init__()                                                             #...object attributes
-                self.output_size = output_size                                                                  #output_size is the number of neurons of the layer
-                self.Wstd = Wstd                                                                                                #Wstd standard deviation of the weights(number between 0-1. By default is 0)
-                self.Bstd = Bstd                                                                                                #Bstd standard deviation of the bias(number between 0-1. By default is 0)
-                self.errDistr = errDistr                                         #Distribution followed by the error matrices
-                self.isQuant = isQuant                                           #if the layer will binarize the weights, bias or both (list [weights_quat (yes or no) , bias_quant (yes or no)]. By default is ["no","no"])
-                self.bw = bw                                                     #Number of bits of weights and bias quantization (List [bw_weights, bw_bias]. By default is [1,1])
+                super(FC_AConnect, self).__init__()         #...object attributes
+                self.output_size = output_size              #output_size is the number of neurons of the layer
+                self.Wstd = Wstd                            #Wstd standard deviation of the weights(number between 0-1. By default is 0)
+                self.Bstd = Bstd                            #Bstd standard deviation of the bias(number between 0-1. By default is 0)
+                self.errDistr = errDistr                    #Distribution followed by the error matrices
+                self.isQuant = isQuant                      #if the layer will binarize the weights, bias or both (list [weights_quat (yes or no) , bias_quant (yes or no)]. By default is ["no","no"])
+                self.bw = bw                                                    #Number of bits of weights and bias quantization (List [bw_weights, bw_bias]. By default is [1,1])
                 self.pool = pool                                                #Number of error that you want to use
                 self.Slice = Slice                                              #If you want to slice the batch in order to reduce the memory usage
                 self.d_type = d_type                                            #Data type of the weights and other variables. Default is fp32. Please see tf.dtypes.Dtype
-                self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)                  #Weights regularizer. Default is None
-                self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
+                self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)       #Weights regularizer. Default is None
+                self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)             #Bias regularizer. Default is None
                 self.validate_init()
-        def build(self,input_shape):                                                             #This method is used for initialize the layer variables that depend on input_shape
-                                                                                                    #input_shape is automatically computed by tensorflow
+        def build(self,input_shape):                                                            #This method is used for initialize the layer variables that depend on input_shape
+                                                                                                #input_shape is automatically computed by tensorflow
                 self.W = self.add_weight("W",
-                                                                                shape = [int(input_shape[-1]),self.output_size], #Weights matrix
-                                                                                initializer = "glorot_uniform",
-                                        dtype = self.d_type,
-                                        regularizer = self.weights_regularizer,
-                                                                                trainable=True)
+                            shape = [int(input_shape[-1]),self.output_size], #Weights matrix
+                            initializer = "glorot_uniform",
+                            dtype = self.d_type,
+                            regularizer = self.weights_regularizer,
+                            trainable=True)
 
                 self.bias = self.add_weight("bias",
-                                                                                shape = [self.output_size,],                                    #Bias vector
-                                                                                initializer = "zeros",
-                                        dtype = self.d_type,
-                                        regularizer = self.bias_regularizer,
-                                                                                trainable=True)
+                                shape = [self.output_size,],                                    #Bias vector
+                                initializer = "zeros",
+                                dtype = self.d_type,
+                                regularizer = self.bias_regularizer,
+                                trainable=True)
                 if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
                         if(self.Bstd != 0):
                                 self.infBerr = Merr_distr([self.output_size],self.Bstd,self.d_type,self.errDistr)
-                                self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
-                                                                                                         #This was necessary to change the error matrix/array when Monte Carlo was running.
-
-
+                                self.infBerr = self.infBerr.numpy() #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
+                                                                    #This was necessary to change the error matrix/array when Monte Carlo was running.
                         else:
                                 self.Berr = tf.constant(1,dtype=self.d_type)
                         if(self.Wstd != 0):
@@ -83,9 +81,9 @@ class FC_AConnect(tf.keras.layers.Layer):
         def call(self, X, training=None): #With call we can define all the operations that the layer do in the forward propagation.
                 self.X = tf.cast(X, dtype=self.d_type)
                 row = tf.shape(self.X)[-1]
-                self.batch_size = tf.shape(self.X)[0] #Numpy arrays and tensors have the number of array/tensor in the first dimension.
-                                                                                          #i.e. a tensor with this shape [1000,784,128] are 1000 matrix of [784,128].
-                                                                                          #Then the batch_size of the input data also is the first dimension.
+                self.batch_size = tf.shape(self.X)[0]   #Numpy arrays and tensors have the number of array/tensor in the first dimension.
+                                                        #i.e. a tensor with this shape [1000,784,128] are 1000 matrix of [784,128].
+                                                        #Then the batch_size of the input data also is the first dimension.
 
                 #This code will train the network. For inference, please go to the else part
                 if(training):
@@ -246,8 +244,8 @@ class FC_AConnect(tf.keras.layers.Layer):
                         'Bstd': self.Bstd,
                         'isBin': self.isQuant,
                         'bw': self.bw,
-            'pool' : self.pool,
-            'Slice': self.Slice,
+                        'pool' : self.pool,
+                        'Slice': self.Slice,
             'd_type': self.d_type,
             'weights_regularizer': self.weights_regularizer,
             'bias_regularizer' : self.bias_regularizer})
