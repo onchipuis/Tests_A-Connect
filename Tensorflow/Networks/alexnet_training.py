@@ -39,10 +39,9 @@ def get_top_n_score(target, prediction, n):
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-#Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-Wstd_err = [0.3]	    # Define the stddev for training
-Conv_pool = [16]
-FC_pool = [4]
+Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
+FC_pool = np.power(2,list(range(0,7)))    # 1,2,4,...,64
+Conv_pool = FC_pool
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
 errDistr = ["normal"]
@@ -65,14 +64,6 @@ optimizer = tf.optimizers.SGD(learning_rate=0,
                             momentum=momentum) #Define optimizer
 lrate = LearningRateScheduler(step_decay)
 callbacks_list = [lrate]
-
-#### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
-Wstd_err = [0.3, 0.5, 0.7]
-FC_pool = np.power(list(range(0,7)))    # 1,2,4,...,64
-Conv_pool = FC_pool
-isAConnect = True
-#errDistr = "lognormal"
-errDistr = "normal"
 
 for d in range(len(isAConnect)): #Iterate over the networks
     if isAConnect[d]: #is a network with A-Connect?
