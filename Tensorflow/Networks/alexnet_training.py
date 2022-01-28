@@ -38,21 +38,26 @@ def get_top_n_score(target, prediction, n):
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()
 
 # INPUT PARAMTERS:
-isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
+isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
 FC_pool = [1,2,4,8,16,32]
 Conv_pool = FC_pool
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
 errDistr = ["normal"]
+Nlayers_base = [1,4,7,9,11,19]
+Nlayers = [1,5,9,12,15,30]
+
 model_name = 'AlexNet_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
+net_base = folder_models+'Base.h5'
+model_base = tf.keras.models.load_model(net)
 
 # TRAINING PARAMETERS
 momentum = 0.9
 batch_size = 256
-epochs = 30
+epochs = 20
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
 
@@ -77,6 +82,13 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                 Conv_pool=Conv_pool_aux[i],
                                                 FC_pool=FC_pool_aux[i],
                                                 errDistr=errDistr[k])
+                ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
+                if isAConnect[d]:
+                    for m in range(len(Nlayers_base)):
+                        model.layers[Nlayers[m]].set_weights(
+                                model_aux.layers[Nlayers_base[m]].get_weights()
+                                )
+                
                 # NAME
                 if isAConnect[d]:
                     Werr = str(int(100*Err))
