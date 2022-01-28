@@ -62,8 +62,6 @@ batch_size = 256
 epochs = 100
 optimizer = tf.optimizers.SGD(learning_rate=0, 
                             momentum=momentum) #Define optimizer
-lrate = LearningRateScheduler(step_decay)
-callbacks_list = [lrate]
 
 for d in range(len(isAConnect)): #Iterate over the networks
     if isAConnect[d]: #is a network with A-Connect?
@@ -78,7 +76,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
     for i in range(len(FC_pool_aux)):
         for j in range(len(Wstd_aux)):
             for k in range(len(errDistr)):
-                Err = Wstd_err[j]
+                Err = Wstd_aux[j]
                 ### TRAINING STAGE ###
                 # CREATING NN:
                 model = alexnet.model_creation(isAConnect=isAConnect,
@@ -100,6 +98,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         metrics=['accuracy'])
 
                 # TRAINING
+                lrate = LearningRateScheduler(step_decay)
+                callbacks_list = [lrate]
                 model.fit(X_train, Y_train,
                             batch_size=batch_size,
                             epochs=epochs,
