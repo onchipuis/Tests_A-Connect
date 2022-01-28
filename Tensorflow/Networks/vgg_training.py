@@ -143,7 +143,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 print("\n\t\t\t", name)
                     
                 #TRAINING PARAMETERS
-                model.compile(loss='sparse_categorical_crossentropy',
+                history = model.compile(loss='sparse_categorical_crossentropy',
                         optimizer=optimizer, 
                         metrics=['accuracy'])
 
@@ -160,6 +160,9 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
                 print("Elapsed time: {}".format(hms_string(elapsed_time)))
                 print('Tiempo de procesamiento (secs): ', time.time()-tic)
+                #Save the accuracy and the validation accuracy
+                acc = history.history['accuracy'] 
+                val_acc = history.history['val_accuracy']
 
                 # SAVE MODEL:
                 string = folder_models + name + '.h5'

@@ -11,6 +11,8 @@ import time
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import LearningRateScheduler
 from aconnect import layers, scripts
+custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
+
 tic=time.time()
 start_time = time.time()
 def hms_string(sec_elapsed):
@@ -35,62 +37,98 @@ def get_top_n_score(target, prediction, n):
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()
 
-#### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
-#Wstd_err = [0.3, 0.5, 0.7, 0.8]
-Wstd_err = [0.7]
-Conv_pool = [8,1]
-FC_pool = [8,1]
-isAConnect = True
+# INPUT PARAMTERS:
+isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
+#Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
+Wstd_err = [0.3]	    # Define the stddev for training
+Conv_pool = [16]
+FC_pool = [4]
+isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
-errDistr = "normal"
-custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
+errDistr = ["normal"]
+model_name = 'AlexNet_CIFAR10/'
+folder_models = './Models/'+model_name
+folder_results = '../Results/'+model_name+'Training_data/'
 
-for j in range(len(Wstd_err)):
-    for i in range(len(FC_pool)):
-        Err = Wstd_err[j]
-        ### TRAINING STAGE ###
-        # CREATING NN:
-        model = alexnet.model_creation(isAConnect=isAConnect,
-                                        Wstd=Err,Bstd=Err,
-                                        Conv_pool=Conv_pool[i],
-                                        FC_pool=FC_pool[i],
-                                        errDistr=errDistr)
-
-        def step_decay (epoch): 
+# TRAINING PARAMETERS
+def step_decay (epoch): 
            initial_lrate = 0.01 
            drop = 0.5 
-           epochs_drop = 30.0 
+           epochs_drop = 20.0 
            lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
            return lrate
 
-        #parametros para el entrenamiento
-        lrate = LearningRateScheduler(step_decay)
-        callbacks_list = [lrate]
+momentum = 0.9
+batch_size = 256
+epochs = 100
+optimizer = tf.optimizers.SGD(learning_rate=0, 
+                            momentum=momentum) #Define optimizer
+lrate = LearningRateScheduler(step_decay)
+callbacks_list = [lrate]
 
+#### RUN TRAINING FOR DIFFERENT LEVEL OF STOCHASTICITY
+Wstd_err = [0.3, 0.5, 0.7]
+FC_pool = np.power(list(range(0,7)))    # 1,2,4,...,64
+Conv_pool = FC_pool
+isAConnect = True
+#errDistr = "lognormal"
+errDistr = "normal"
 
-        #TRAINING PARAMETERS
-        model.compile(loss='sparse_categorical_crossentropy', 
-                optimizer=tf.optimizers.SGD(learning_rate=0.0,momentum=0.9), 
-                metrics=['accuracy'])
+for d in range(len(isAConnect)): #Iterate over the networks
+    if isAConnect[d]: #is a network with A-Connect?
+        Wstd_aux = Wstd_err
+        FC_pool_aux = FC_pool
+        Conv_pool_aux = Conv_pool
+    else:
+        Wstd_aux = [0]
+        FC_pool_aux = [0]
+        Conv_pool_aux = [0]
+        
+    for i in range(len(FC_pool_aux)):
+        for j in range(len(Wstd_aux)):
+            for k in range(len(errDistr)):
+                Err = Wstd_err[j]
+                ### TRAINING STAGE ###
+                # CREATING NN:
+                model = alexnet.model_creation(isAConnect=isAConnect,
+                                                Wstd=Err,Bstd=Err,
+                                                Conv_pool=Conv_pool_aux[i],
+                                                FC_pool=FC_pool_aux[i],
+                                                errDistr=errDistr[k])
+                # NAME
+                Werr = str(int(100*Err))
+                Nm = str(int(FC_pool_aux[i]))
+                name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
+                
+                print("*************************TRAINING NETWORK*********************")
+                print("\n\t\t\t", name)
 
-        # TRAINING
-        model.fit(X_train, Y_train,
-                    batch_size=256,
-                    epochs=2,
-                    validation_data=(X_test, Y_test),
-                    callbacks=callbacks_list,
-                    shuffle=True)
+                #TRAINING PARAMETERS
+                model.compile(loss='sparse_categorical_crossentropy', 
+                        optimizer=optimizer, 
+                        metrics=['accuracy'])
 
-        model.evaluate(X_test,Y_test)    
+                # TRAINING
+                model.fit(X_train, Y_train,
+                            batch_size=batch_size,
+                            epochs=epochs,
+                            validation_data=(X_test, Y_test),
+                            callbacks=callbacks_list,
+                            shuffle=True)
+                model.evaluate(X_test,Y_test)    
 
-        y_predict =model.predict(X_test)
-        elapsed_time = time.time() - start_time
-        print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
-        print("Elapsed time: {}".format(hms_string(elapsed_time)))
-        print('Tiempo de procesamiento (secs): ', time.time()-tic)
+                y_predict =model.predict(X_test)
+                elapsed_time = time.time() - start_time
+                print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
+                print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                print('Tiempo de procesamiento (secs): ', time.time()-tic)
+                #Save the accuracy and the validation accuracy
+                acc = history.history['accuracy'] 
+                val_acc = history.history['val_accuracy']
 
-        # SAVE MODEL:
-        Werr = str(int(100*Err))
-        Nm = str(int(FC_pool[i]))
-        name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_" +errDistr+'Distr'
-        model.save('./Models/AlexNet_CIFAR10/'+name+'.h5',include_optimizer=True)
+                # SAVE MODEL:
+                string = folder_models + name + '.h5'
+                model.save(string,include_optimizer=True)
+                #Save in a txt the accuracy and the validation accuracy for further analysis
+                np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
+                np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
