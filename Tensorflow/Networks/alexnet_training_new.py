@@ -50,17 +50,10 @@ folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 
 # TRAINING PARAMETERS
-def step_decay (epoch): 
-           initial_lrate = 0.01 
-           drop = 0.5 
-           epochs_drop = 20.0 
-           lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
-           return lrate
-
 momentum = 0.9
 batch_size = 256
 epochs = 100
-optimizer = tf.optimizers.SGD(learning_rate=0, 
+optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
 
 for d in range(len(isAConnect)): #Iterate over the networks
@@ -98,8 +91,15 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         metrics=['accuracy'])
 
                 # TRAINING
+                def step_decay (epoch): 
+                    initial_lrate = 0.01 
+                    drop = 0.5 
+                    epochs_drop = 30.0 
+                    lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
+                    return lrate
                 lrate = LearningRateScheduler(step_decay)
                 callbacks_list = [lrate]
+                
                 model.fit(X_train, Y_train,
                             batch_size=batch_size,
                             epochs=epochs,
