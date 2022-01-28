@@ -38,7 +38,7 @@ def get_top_n_score(target, prediction, n):
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()
 
 # INPUT PARAMTERS:
-isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
+isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
 FC_pool = [1,2,4,8,16,32]
 Conv_pool = FC_pool
@@ -78,9 +78,12 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                 FC_pool=FC_pool_aux[i],
                                                 errDistr=errDistr[k])
                 # NAME
-                Werr = str(int(100*Err))
-                Nm = str(int(FC_pool_aux[i]))
-                name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
+                if isAConnect[d]:
+                    Werr = str(int(100*Err))
+                    Nm = str(int(FC_pool_aux[i]))
+                    name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
+                else:
+                    name = 'Base'
                 
                 print("*************************TRAINING NETWORK*********************")
                 print("\n\t\t\t", name)
@@ -100,7 +103,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 lrate = LearningRateScheduler(step_decay)
                 callbacks_list = [lrate]
                 
-                model.fit(X_train, Y_train,
+                history = model.fit(X_train, Y_train,
                             batch_size=batch_size,
                             epochs=epochs,
                             validation_data=(X_test, Y_test),

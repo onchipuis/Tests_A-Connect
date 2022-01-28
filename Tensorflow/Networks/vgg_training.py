@@ -144,12 +144,12 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 print("\n\t\t\t", name)
                     
                 #TRAINING PARAMETERS
-                history = model.compile(loss='sparse_categorical_crossentropy',
+                model.compile(loss='sparse_categorical_crossentropy',
                         optimizer=optimizer, 
                         metrics=['accuracy'])
 
                 # TRAINING
-                model.fit(X_train, Y_train,
+                history = model.fit(X_train, Y_train,
                           batch_size=batch_size,
                           epochs=epochs,
                           validation_data=(X_test, Y_test),
