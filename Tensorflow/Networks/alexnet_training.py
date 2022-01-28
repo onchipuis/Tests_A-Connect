@@ -45,8 +45,8 @@ Conv_pool = FC_pool
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
 errDistr = ["normal"]
-Nlayers_base = [1,4,7,9,11,19]
-Nlayers = [1,5,9,12,15,30]
+Nlayers = [1,5,9,12,15,20,24,27,30]
+Nlayers_base = Nlayers
 
 model_name = 'AlexNet_CIFAR10/'
 folder_models = './Models/'+model_name
@@ -77,7 +77,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 Err = Wstd_aux[j]
                 ### TRAINING STAGE ###
                 # CREATING NN:
-                model = alexnet.model_creation(isAConnect=isAConnect,
+                model = alexnet.model_creation(isAConnect=isAConnect[d],
                                                 Wstd=Err,Bstd=Err,
                                                 Conv_pool=Conv_pool_aux[i],
                                                 FC_pool=FC_pool_aux[i],

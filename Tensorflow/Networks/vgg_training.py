@@ -96,7 +96,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 Err = Wstd_aux[j]
                 # CREATING NN:
                 #model_aux = tf.keras.models.load_model(net,custom_objects = custom_objects)
-                model = vgg.model_creation(isAConnect=isAConnect,
+                model = vgg.model_creation(isAConnect=isAConnect[d],
                                             Wstd=Err,Bstd=Err,
                                             Conv_pool=Conv_pool_aux[i],
                                             FC_pool=FC_pool_aux[i],
