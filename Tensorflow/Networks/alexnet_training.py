@@ -40,7 +40,7 @@ def get_top_n_score(target, prediction, n):
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-FC_pool = [1,2,4,8,16,32,64]
+FC_pool = [1,2,4,8,16,32]
 Conv_pool = FC_pool
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
@@ -52,7 +52,7 @@ folder_results = '../Results/'+model_name+'Training_data/'
 # TRAINING PARAMETERS
 momentum = 0.9
 batch_size = 256
-epochs = 100
+epochs = 30
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
 
