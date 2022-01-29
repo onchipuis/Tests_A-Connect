@@ -53,9 +53,9 @@ validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
 model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,input_shape=(32,32,3))
 
 # INPUT PARAMTERS:
-isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
+isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
 #Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-Wstd_err = [0.3]	    # Define the stddev for training
+Wstd_err = [0.7]	    # Define the stddev for training
 Conv_pool = [16]
 FC_pool = [4]
 isBin = ["no"]		    # Do you want binary weights?
@@ -103,6 +103,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                             errDistr=errDistr[k],
                                             isQuant=['yes','yes'],
                                             bw=[8,8])
+		print(model.summary())
                
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                 if isAConnect[d]:
@@ -119,7 +120,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                     model.layers[35].set_weights(model_aux.layers[15].get_weights())
                     model.layers[38].set_weights(model_aux.layers[16].get_weights())
                     model.layers[41].set_weights(model_aux.layers[17].get_weights())
-                """
+
                 else:
                     model.layers[1].set_weights(model_aux.layers[1].get_weights())
                     model.layers[3].set_weights(model_aux.layers[2].get_weights())
@@ -134,7 +135,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                     model.layers[25].set_weights(model_aux.layers[15].get_weights())
                     model.layers[27].set_weights(model_aux.layers[16].get_weights())
                     model.layers[29].set_weights(model_aux.layers[17].get_weights())
-"""
+
                 # NAME
                 Werr = str(int(100*Err))
                 Nm = str(int(FC_pool_aux[i]))
