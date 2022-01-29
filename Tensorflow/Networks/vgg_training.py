@@ -103,7 +103,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                             errDistr=errDistr[k],
                                             isQuant=['yes','yes'],
                                             bw=[8,8])
-		print(model.summary())
+                print(model.summary())
                
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                 if isAConnect[d]:
