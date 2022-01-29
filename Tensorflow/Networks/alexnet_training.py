@@ -38,7 +38,7 @@ def get_top_n_score(target, prediction, n):
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()
 
 # INPUT PARAMTERS:
-isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
+isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
 FC_pool = [1,2,4]#,8,16]
 Conv_pool = FC_pool
@@ -51,7 +51,7 @@ Nlayers_base = Nlayers
 model_name = 'AlexNet_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
-net_base = folder_models+'Base.h5'
+net_base = folder_models+'Base_32x32.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
@@ -95,7 +95,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                     Nm = str(int(FC_pool_aux[i]))
                     name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
                 else:
-                    name = 'Base'
+                    name = 'Base_32x32'
                 
                 print("*************************TRAINING NETWORK*********************")
                 print("\n\t\t\t", name)
