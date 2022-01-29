@@ -63,6 +63,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                 super(FC_AConnect, self).build(input_shape)
 
         def call(self, X, training=None): #With call we can define all the operations that the layer do in the forward propagation.
+                tf.config.run_functions_eagerly(True)
                 self.X = tf.cast(X, dtype=self.d_type)
                 row = tf.shape(self.X)[-1]
                 self.batch_size = tf.shape(self.X)[0] #Numpy arrays and tensors have the number of array/tensor in the first dimension.
