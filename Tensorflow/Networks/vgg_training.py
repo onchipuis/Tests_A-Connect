@@ -55,7 +55,7 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,inpu
 # INPUT PARAMTERS:
 isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
 #Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-Wstd_err = [0.7]	    # Define the stddev for training
+Wstd_err = [0]	    # Define the stddev for training
 Conv_pool = [16]
 FC_pool = [4]
 isBin = ["no"]		    # Do you want binary weights?
@@ -64,7 +64,7 @@ errDistr = ["normal"]
 model_name = 'VGG16_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
-net = folder_models+'16Werr_Wstd_80_Bstd_80.h5'
+net = folder_models+ 'baseline'#'16Werr_Wstd_80_Bstd_80.h5'
 
 # TRAINING PARAMETERS
 learning_rate = 0.01
@@ -139,7 +139,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 # NAME
                 Werr = str(int(100*Err))
                 Nm = str(int(FC_pool_aux[i]))
-                name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
+                name = 'baseline_32x32'#Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
                 
                 print("*************************TRAINING NETWORK*********************")
                 print("\n\t\t\t", name)
