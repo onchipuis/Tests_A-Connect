@@ -41,7 +41,7 @@ def get_top_n_score(target, prediction, n):
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 #Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
 Wstd_err = [0.3]   # Define the stddev for training
-FC_pool = [1,8,16]
+FC_pool = [1,16]
 Conv_pool = FC_pool
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"

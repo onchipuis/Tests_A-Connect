@@ -26,7 +26,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                 bw=[1,1],
                 pool=None,
                 Slice=1,
-                d_type=tf.dtypes.float32,
+                d_type=tf.dtypes.float16,
                 weights_regularizer=None,
                 bias_regularizer=None,
                 **kwargs): #__init__ method is the first method used for an object in python to initialize the ...
@@ -61,14 +61,18 @@ class FC_AConnect(tf.keras.layers.Layer):
                                                                                 trainable=True)
                 if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
                         if(self.Bstd != 0):
-                                self.infBerr = tf.constant(1,dtype=self.d_type)
+                                self.infBerr = Merr_distr([self.output_size],self.Bstd,self.d_type,self.errDistr)
                                 self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
                                                                                                          #This was necessary to change the error matrix/array when Monte Carlo was running.
+
+
                         else:
                                 self.Berr = tf.constant(1,dtype=self.d_type)
                         if(self.Wstd != 0):
-                                self.infWerr = tf.constant(1,dtype=self.d_type)
+                                self.infWerr = Merr_distr([int(input_shape[-1]),self.output_size],self.Wstd,self.d_type,self.errDistr)
                                 self.infWerr = self.infWerr.numpy()
+
+
                         else:
                                 self.Werr = tf.constant(1,dtype=self.d_type)
                 else:
@@ -470,7 +474,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                             membias = tf.multiply(bias,Berr)
                                             membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])
                                             Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(self.X,1),memW)
-                            ,fn_output_signature=self.d_type),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
+                                                        ,fn_output_signature=self.d_type),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
                                             Z = tf.reshape(Z, [self.batch_size, tf.shape(Z)[1],tf.shape(Z)[2],tf.shape(Z)[3]])
                                             Z = Z+membias
                                 ##################################################################################################################################
@@ -509,11 +513,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                                 membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])
                                                 inp_r, F = reshape(self.X,memW) #Makes the reshape from [batch,H,W,ch] to [1,H,W,Ch*batch] for input. For filters from [batch,fh,fw,Ch,out_ch]  to
                                                                         #[fh,fw,ch*batch,out_ch]
-                                                Z = tf.nn.depthwise_conv2d(
-                                    inp_r,
-                                    filter=F,
-                                    strides=strides,
-                                    padding=self.padding)
+                                                Z = tf.nn.depthwise_conv2d(inp_r,filter=F,strides=strides,padding=self.padding)
                                                 Z = Z_reshape(Z,memW,self.X,self.padding,self.strides) #Output shape from convolution is [1,newH,newW,batch*Ch*out_ch] so it is reshaped to [newH,newW,batch,Ch,out_ch]
                                                                 #Where newH and newW are the new image dimensions. This depends on the value of padding
                                                                 #Padding same: newH = H  and newW = W
@@ -528,7 +528,6 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                         Werr = self.Werr
 
                                     if(self.Bstd != 0):
-
                                         Berr = Merr_distr([self.pool,self.filters],self.Bstd,self.d_type,self.errDistr)
                                     else:
                                         Berr = self.Berr
