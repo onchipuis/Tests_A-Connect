@@ -59,6 +59,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         dtype = self.d_type,
                                         regularizer = self.bias_regularizer,
                                                                                 trainable=True)
+                
                 super(FC_AConnect, self).build(input_shape)
 
         def call(self, X, training=None): #With call we can define all the operations that the layer do in the forward propagation.
@@ -67,25 +68,25 @@ class FC_AConnect(tf.keras.layers.Layer):
                 self.batch_size = tf.shape(self.X)[0] #Numpy arrays and tensors have the number of array/tensor in the first dimension.
                                                                                           #i.e. a tensor with this shape [1000,784,128] are 1000 matrix of [784,128].
                                                                                           #Then the batch_size of the input data also is the first dimension.
-
+                if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
+                    if(self.Bstd != 0):
+                            self.infBerr = Merr_distr([self.output_size],self.Bstd,self.d_type,self.errDistr)
+                            self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
+                                                                                                     #This was necessary to change the error matrix/array when Monte Carlo was running.
+                    else:
+                            self.Berr = tf.constant(1,dtype=self.d_type)
+                    if(self.Wstd != 0):
+                            self.infWerr = Merr_distr([int(input_shape[-1]),self.output_size],self.Wstd,self.d_type,self.errDistr)
+                            self.infWerr = self.infWerr.numpy()
+                    else:
+                            self.Werr = tf.constant(1,dtype=self.d_type)
+                else:
+                        self.Werr = tf.constant(1,dtype=self.d_type) #We need to define the number 1 as a float32.
+                        self.Berr = tf.constant(1,dtype=self.d_type)
+                
                 #This code will train the network. For inference, please go to the else part
                 if(training):
-          
                         if(self.Wstd != 0 or self.Bstd != 0):
-                                if(self.Bstd != 0):
-                                    self.infBerr = Merr_distr([self.output_size],self.Bstd,self.d_type,self.errDistr)
-                                    self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
-                                                                                                         #This was necessary to change the error matrix/array when Monte Carlo was running.
-                                else:
-                                    self.Berr = tf.constant(1,dtype=self.d_type)
-                                if(self.Wstd != 0):
-                                    self.infWerr = Merr_distr([int(input_shape[-1]),self.output_size],self.Wstd,self.d_type,self.errDistr)
-                                    self.infWerr = self.infWerr.numpy()
-
-
-                                else:
-                                    self.Werr = tf.constant(1,dtype=self.d_type)
-                        
                                 if(self.isQuant==["yes","yes"]):
                                         weights = self.LWQuant(self.W)                     #Quantize the weights and multiply them element wise with Werr mask
                                         bias = self.LBQuant(self.bias)                     #Quantize the bias and multiply them element wise with Werr mask
@@ -190,11 +191,11 @@ class FC_AConnect(tf.keras.layers.Layer):
                                 if(self.Wstd !=0):
                                         Werr = self.infWerr
                                 else:
-                                        Werr = tf.constant(1,dtype=self.d_type)
+                                        Werr = self.Werr
                                 if(self.Bstd != 0):
                                         Berr = self.infBerr
                                 else:
-                                        Berr = tf.constant(1,dtype=self.d_type)
+                                        Berr = self.Berr
                         else:
                                 Werr = self.Werr
                                 Berr = self.Berr
@@ -275,7 +276,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                 limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
                 y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))+1),-(2**(self.bw[0]-1)-1), 2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit
                 def grad(dy):
-                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))	+1),-(2**(self.bw[0]-1)-1),2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit,x+1e-5))
+                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))        +1),-(2**(self.bw[0]-1)-1),2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit,x+1e-5))
                         return dydx
             return y, grad
 
@@ -290,7 +291,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                 limit = (2**self.bw[1])/2 #bias quantization limits
                 y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))+1),-(2**(self.bw[1]-1)-1), 2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit
                 def grad(dy):
-                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))	+1),-(2**(self.bw[1]-1)-1),2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit,x+1e-5))
+                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))        +1),-(2**(self.bw[1]-1)-1),2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit,x+1e-5))
                         return dydx
             return y, grad
 
@@ -401,27 +402,29 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                     dtype=self.d_type,
                                     regularizer = self.bias_regularizer,
                                                                         trainable=True)
+                if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
+                        if(self.Bstd != 0):
+                                self.infBerr = Merr_distr([self.filters,],self.Bstd,self.d_type,self.errDistr)
+                                self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
+                                                                                                         #This was necessary to change the error matrix/array when Monte Carlo was running.
 
+                        else:
+                                self.Berr = tf.constant(1,dtype=self.d_type)
+                        if(self.Wstd !=0):
+                                self.infWerr = Merr_distr(self.shape,self.Wstd,self.d_type,self.errDistr)
+                                self.infWerr = self.infWerr.numpy()
+
+                        else:
+                                self.Werr = tf.constant(1,dtype=self.d_type)
+                else:
+                        self.Werr = tf.constant(1,dtype=self.d_type) #We need to define the number 1 as a float32.
+                        self.Berr = tf.constant(1,dtype=self.d_type)
                 super(Conv_AConnect, self).build(input_shape)
         def call(self,X,training):
                 self.X = tf.cast(X, dtype=self.d_type)
                 self.batch_size = tf.shape(self.X)[0]
                 if(training):
                         if(self.Wstd != 0 or self.Bstd != 0):
-                                if(self.Bstd != 0):
-                                    self.infBerr = Merr_distr([self.filters,],self.Bstd,self.d_type,self.errDistr)
-                                    self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
-                                                                                                         #This was necessary to change the error matrix/array when Monte Carlo was running.
-
-                                else:
-                                    self.Berr = tf.constant(1,dtype=self.d_type)
-                                if(self.Wstd !=0):
-                                    self.infWerr = Merr_distr(self.shape,self.Wstd,self.d_type,self.errDistr)
-                                    self.infWerr = self.infWerr.numpy()
-
-                                else:
-                                    self.Werr = tf.constant(1,dtype=self.d_type)
-                        
                                 if(self.isQuant==['yes','yes']):
                                     weights = self.LWQuant(self.W)
                                     bias = self.LBQuant(self.bias)
@@ -557,11 +560,11 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                 if(self.Wstd !=0):
                                         Werr = self.infWerr
                                 else:
-                                        Werr = tf.constant(1,dtype=self.d_type)
+                                        Werr = self.Werr
                                 if(self.Bstd != 0):
                                         Berr = self.infBerr
                                 else:
-                                        Berr = tf.constant(1,dtype=self.d_type)
+                                        Berr = self.Berr
                         else:
                                 Werr = self.Werr
                                 Berr = self.Berr
@@ -658,7 +661,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
                 y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))+1),-(2**(self.bw[0]-1)-1), 2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit
                 def grad(dy):
-                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))	+1),-(2**(self.bw[0]-1)-1),2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit,x+1e-5))
+                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))        +1),-(2**(self.bw[0]-1)-1),2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit,x+1e-5))
                         return dydx
             return y, grad
 
@@ -673,7 +676,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 limit = (2**self.bw[1])/2 #bias quantization limits
                 y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))+1),-(2**(self.bw[1]-1)-1), 2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit
                 def grad(dy):
-                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))	+1),-(2**(self.bw[1]-1)-1),2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit,x+1e-5))
+                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))        +1),-(2**(self.bw[1]-1)-1),2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit,x+1e-5))
                         return dydx
             return y, grad
 ############################AUXILIAR FUNCTIONS##################################################
