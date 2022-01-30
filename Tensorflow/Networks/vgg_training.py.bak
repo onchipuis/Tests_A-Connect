@@ -36,8 +36,8 @@ def get_top_n_score(target, prediction, n):
 
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data() 
-Y_train = to_categorical(y_train, num_classes)
-Y_test = to_categorical(y_test, num_classes)   
+Y_train = to_categorical(Y_train, 10)
+Y_test = to_categorical(Y_test, 10)   
 
 # prepare data augmentation configuration
 
