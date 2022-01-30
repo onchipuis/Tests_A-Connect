@@ -38,13 +38,13 @@ def get_top_n_score(target, prediction, n):
 
 # prepare data augmentation configuration
 train_datagen = ImageDataGenerator(
-    #rescale=1. / 255,
-    rotation_range=15,
-    width_shift_range=0.1,
-    height_shift_range=0.1,
-    shear_range=0.2,
-    zoom_range=0.2,
-    horizontal_flip=True)
+    rescale=1. / 255,
+    #rotation_range=15,
+    #width_shift_range=0.1,
+    #height_shift_range=0.1,
+    #shear_range=0.2,
+    #zoom_range=0.2,
+    #horizontal_flip=True)
 
 train_datagen.fit(X_train)
 #train_generator = train_datagen.flow(X_train, Y_train, batch_size=256)
@@ -56,7 +56,7 @@ mean=np.mean(X_train)
 std=np.std(X_train)
 X_test=(X_test-mean)/std
 X_train=(X_train-mean)/std
-test_datagen = ImageDataGenerator()
+test_datagen = ImageDataGenerator(rescale=1. / 255)
 #validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
 
 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
@@ -86,8 +86,8 @@ lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 decay_steps=196,
                 decay_rate=0.9,
                 staircase=True)
-optimizer = tf.optimizers.Adam(lr=0.001,decay=0, beta_1=0.9, beta_2=0.999, epsilon=1e-08)#SGD(learning_rate=lr_schedule, 
-                          #  momentum=momentum) #Define optimizer
+optimizer = tf.optimizers.SGD(learning_rate=lr_schedule, 
+                            momentum=momentum) #Define optimizer
             
 ### TRAINING
 for d in range(len(isAConnect)): #Iterate over the networks
