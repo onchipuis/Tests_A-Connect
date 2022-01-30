@@ -86,8 +86,8 @@ lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 decay_steps=196,
                 decay_rate=0.9,
                 staircase=True)
-optimizer = tf.optimizers.SGD(learning_rate=lr_schedule, 
-                            momentum=momentum) #Define optimizer
+optimizer = tf.optimizers.Adam(lr=0.001,decay=0, beta_1=0.9, beta_2=0.999, epsilon=1e-08)#SGD(learning_rate=lr_schedule, 
+                          #  momentum=momentum) #Define optimizer
             
 ### TRAINING
 for d in range(len(isAConnect)): #Iterate over the networks
@@ -116,7 +116,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 print(model.summary())
                
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                """"
+                
                 if isAConnect[d]:
                     model.layers[1].set_weights(model_aux.layers[1].get_weights())
                     model.layers[4].set_weights(model_aux.layers[2].get_weights())
@@ -145,7 +145,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                     model.layers[22].set_weights(model_aux.layers[13].get_weights())
                     model.layers[25].set_weights(model_aux.layers[15].get_weights())
                     model.layers[27].set_weights(model_aux.layers[16].get_weights())
-                    model.layers[29].set_weights(model_aux.layers[17].get_weights())"""
+                    model.layers[29].set_weights(model_aux.layers[17].get_weights())
 
                 # NAME
                 Werr = str(int(100*Err))
