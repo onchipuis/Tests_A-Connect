@@ -37,6 +37,7 @@ def get_top_n_score(target, prediction, n):
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()    
 
 # prepare data augmentation configuration
+"""
 train_datagen = ImageDataGenerator(
     #rescale=1. / 255,
     #rotation_range=15,
@@ -57,7 +58,7 @@ std=np.std(X_train)
 X_test=(X_test-mean)/std
 X_train=(X_train-mean)/std
 test_datagen = ImageDataGenerator()
-#validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
+#validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)"""
 
 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
 model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,input_shape=(32,32,3))
@@ -163,12 +164,12 @@ for d in range(len(isAConnect)): #Iterate over the networks
                
                 # TRAINING
                 
-                history = model.fit_generator(train_datagen.flow(X_train, Y_train, batch_size=batch_size),
-                          #batch_size=batch_size,
+                history = model.fit(X_train, Y_train,
+                          batch_size=batch_size,
                           epochs=epochs,
-                          validation_data=test_datagen.flow(X_test, Y_test, batch_size=batch_size),
+                          validation_data=(X_test, Y_test)
                           shuffle=True)
-                model.evaluate(test_datagen.flow(X_test, Y_test, batch_size=batch_size))    
+                model.evaluate((X_test, Y_test))    
 
                 y_predict =model.predict(X_test)
                 elapsed_time = time.time() - start_time
