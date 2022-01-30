@@ -154,7 +154,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
 
                 # TRAINING WITH DATA AUGMENTATION
                 history = model.fit_generator(train_generator,
-                          batch_size=batch_size,
+                          
                           epochs=epochs,
                           validation_data=validation_generator,
                           shuffle=True)                
