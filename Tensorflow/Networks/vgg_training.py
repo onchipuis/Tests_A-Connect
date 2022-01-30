@@ -153,7 +153,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         metrics=['accuracy'])
 
                 # TRAINING WITH DATA AUGMENTATION
-                history = model.fit(train_generator,
+                history = model.fit_generator(train_generator,
                           batch_size=batch_size,
                           epochs=epochs,
                           validation_data=validation_generator,
