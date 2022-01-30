@@ -34,10 +34,11 @@ X_test = np.float32(X_test) #Convert it to float32
 isAConnect = [False,True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 #Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
 Wstd_err = [0.3]	    # Define the stddev for training
-Conv_pool = [1,8]
-FC_pool = [1,8]
+Conv_pool = [1,2,4,8,16,32,64,128]
+FC_pool = Conv_pool
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
+saveModel = False
 errDistr = "normal"
 model_name = 'LeNet5_MNIST/'
 folder_models = './Models/'+model_name
@@ -104,8 +105,9 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 val_acc = history.history['val_accuracy']
                 
                 # SAVE MODEL:
-                string = folder_models + name + '.h5'
-                model.save(string,include_optimizer=False)
-                #Save in a txt the accuracy and the validation accuracy for further analysis
-                np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
-                np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
+                if saveModel:
+                    string = folder_models + name + '.h5'
+                    model.save(string,include_optimizer=False)
+                    #Save in a txt the accuracy and the validation accuracy for further analysis
+                    np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
+                    np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
