@@ -43,11 +43,11 @@ Y_test = to_categorical(Y_test, 10)
 
 datagen = ImageDataGenerator(
     rescale=1. / 255,
-    #rotation_range=15,
+    rotation_range=15,
     width_shift_range=0.1,
     height_shift_range=0.1,
-    #shear_range=0.2,
-    #zoom_range=0.2,
+    shear_range=0.2,
+    zoom_range=0.2,
     horizontal_flip=True)
 
 datagen.fit(X_train)

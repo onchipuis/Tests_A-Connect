@@ -151,7 +151,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 print("\n\t\t\t", name)
                     
                 #TRAINING PARAMETERS
-                model.compile(loss='sparse_categorical_crossentropy',
+                model.compile(loss='categorical_crossentropy',
                         optimizer=optimizer, 
                         metrics=['accuracy'])
 
