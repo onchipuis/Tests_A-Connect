@@ -163,8 +163,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                
                 # TRAINING
                 
-                history = model.fit_generato(train_datagen.flow(X_train, Y_train, batch_size=batch_size),
-                          batch_size=batch_size,
+                history = model.fit_generator(train_datagen.flow(X_train, Y_train, batch_size=batch_size),
+                          #batch_size=batch_size,
                           epochs=epochs,
                           validation_data=test_datagen.flow(X_test, Y_test, batch_size=batch_size),
                           shuffle=True)
