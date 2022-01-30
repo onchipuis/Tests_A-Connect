@@ -38,10 +38,10 @@ def get_top_n_score(target, prediction, n):
 
 # prepare data augmentation configuration
 train_datagen = ImageDataGenerator(
-    rescale=1. / 255,
-    rotation_range=40,
-    width_shift_range=0.2,
-    height_shift_range=0.2,
+    #rescale=1. / 255,
+    rotation_range=15,
+    width_shift_range=0.1,
+    height_shift_range=0.1,
     shear_range=0.2,
     zoom_range=0.2,
     horizontal_flip=True)
@@ -154,7 +154,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
 
                 # TRAINING WITH DATA AUGMENTATION
                 history = model.fit_generator(train_generator,
-                          batch_size=batch_size,
+                          
                           epochs=epochs,
                           validation_data=validation_generator,
                           shuffle=True)                
