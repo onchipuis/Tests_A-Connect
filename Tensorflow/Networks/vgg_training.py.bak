@@ -37,28 +37,19 @@ def get_top_n_score(target, prediction, n):
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()    
 
 # prepare data augmentation configuration
-"""
+
 train_datagen = ImageDataGenerator(
-    #rescale=1. / 255,
+    rescale=1. / 255,
     #rotation_range=15,
-    #width_shift_range=0.1,
-    #height_shift_range=0.1,
+    width_shift_range=0.1,
+    height_shift_range=0.1,
     #shear_range=0.2,
     #zoom_range=0.2,
-    )#horizontal_flip=True)
+    horizontal_flip=True)
 
 train_datagen.fit(X_train)
-#train_generator = train_datagen.flow(X_train, Y_train, batch_size=256)
-X_train = X_train.reshape(X_train.shape[0], 32, 32, 3)
-X_test = X_test.reshape(X_test.shape[0], 32, 32, 3)
-X_train=X_train.astype("float32")  
-X_test=X_test.astype("float32")
-mean=np.mean(X_train)
-std=np.std(X_train)
-X_test=(X_test-mean)/std
-X_train=(X_train-mean)/std
-test_datagen = ImageDataGenerator()
-#validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)"""
+
+
 
 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
 model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,input_shape=(32,32,3))
@@ -134,19 +125,19 @@ for d in range(len(isAConnect)): #Iterate over the networks
                     model.layers[41].set_weights(model_aux.layers[17].get_weights())
 
                 else:
-                    model.layers[5].set_weights(model_aux.layers[1].get_weights())
-                    model.layers[7].set_weights(model_aux.layers[2].get_weights())
-                    model.layers[10].set_weights(model_aux.layers[4].get_weights())
-                    model.layers[12].set_weights(model_aux.layers[5].get_weights())
-                    model.layers[15].set_weights(model_aux.layers[7].get_weights())
-                    model.layers[17].set_weights(model_aux.layers[8].get_weights())
-                    model.layers[19].set_weights(model_aux.layers[9].get_weights())
-                    model.layers[22].set_weights(model_aux.layers[11].get_weights())
-                    model.layers[24].set_weights(model_aux.layers[12].get_weights())
-                    model.layers[26].set_weights(model_aux.layers[13].get_weights())
-                    model.layers[29].set_weights(model_aux.layers[15].get_weights())
-                    model.layers[31].set_weights(model_aux.layers[16].get_weights())
-                    model.layers[33].set_weights(model_aux.layers[17].get_weights())
+                    model.layers[1].set_weights(model_aux.layers[1].get_weights())
+                    model.layers[3].set_weights(model_aux.layers[2].get_weights())
+                    model.layers[6].set_weights(model_aux.layers[4].get_weights())
+                    model.layers[8].set_weights(model_aux.layers[5].get_weights())
+                    model.layers[11].set_weights(model_aux.layers[7].get_weights())
+                    model.layers[13].set_weights(model_aux.layers[8].get_weights())
+                    model.layers[15].set_weights(model_aux.layers[9].get_weights())
+                    model.layers[18].set_weights(model_aux.layers[11].get_weights())
+                    model.layers[20].set_weights(model_aux.layers[12].get_weights())
+                    model.layers[22].set_weights(model_aux.layers[13].get_weights())
+                    model.layers[25].set_weights(model_aux.layers[15].get_weights())
+                    model.layers[27].set_weights(model_aux.layers[16].get_weights())
+                    model.layers[29].set_weights(model_aux.layers[17].get_weights())
 
                 # NAME
                 Werr = str(int(100*Err))
@@ -164,12 +155,12 @@ for d in range(len(isAConnect)): #Iterate over the networks
                
                 # TRAINING
                 
-                history = model.fit(X_train, Y_train,
-                          batch_size=batch_size,
+                history = model.fit(train_datagen.flow(X_train, Y_train, batch_size=batch_size),
+                          #batch_size=batch_size,
                           epochs=epochs,
                           validation_data=(X_test, Y_test),
                           shuffle=True)
-                model.evaluate((X_test, Y_test))    
+                model.evaluate(X_test, Y_test)    
 
                 y_predict =model.predict(X_test)
                 elapsed_time = time.time() - start_time
