@@ -39,11 +39,14 @@ def get_top_n_score(target, prediction, n):
 # prepare data augmentation configuration
 train_datagen = ImageDataGenerator(
     rescale=1. / 255,
+    rotation_range=40,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
     shear_range=0.2,
     zoom_range=0.2,
     horizontal_flip=True)
 
-train_datagen.fit(X_train)
+#train_datagen.fit(X_train)
 train_generator = train_datagen.flow(X_train, Y_train, batch_size=256)
 
 test_datagen = ImageDataGenerator(rescale=1. / 255)
@@ -162,7 +165,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                           epochs=epochs,
                           validation_data=(X_test, Y_test),
                           shuffle=True)"""
-                model.evaluate(X_test,Y_test)    
+                model.evaluate(validation_generator)    
 
                 y_predict =model.predict(X_test)
                 elapsed_time = time.time() - start_time
