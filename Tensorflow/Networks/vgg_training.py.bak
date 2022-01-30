@@ -8,6 +8,7 @@ import tensorflow as tf
 import VGG as vgg
 import time
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.utils import to_categorical
 from aconnect import layers, scripts
 #from keras.callbacks import LearningRateScheduler
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
@@ -38,7 +39,7 @@ def get_top_n_score(target, prediction, n):
 
 # prepare data augmentation configuration
 
-train_datagen = ImageDataGenerator(
+datagen = ImageDataGenerator(
     rescale=1. / 255,
     #rotation_range=15,
     width_shift_range=0.1,
@@ -155,7 +156,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                
                 # TRAINING
                 
-                history = model.fit(train_datagen.flow(X_train, Y_train, batch_size=batch_size),
+                history = model.fit(datagen.flow(X_train, Y_train, batch_size=batch_size),
                           #batch_size=batch_size,
                           epochs=epochs,
                           validation_data=(X_test, Y_test),

@@ -8,6 +8,7 @@ import tensorflow as tf
 import VGG as vgg
 import time
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.utils import to_categorical
 from aconnect import layers, scripts
 #from keras.callbacks import LearningRateScheduler
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
@@ -34,11 +35,13 @@ def get_top_n_score(target, prediction, n):
     return np.mean(precision)
 
 # LOADING DATASET:
-(X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()    
+(X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data() 
+Y_train = to_categorical(y_train, num_classes)
+Y_test = to_categorical(y_test, num_classes)   
 
 # prepare data augmentation configuration
 
-train_datagen = ImageDataGenerator(
+datagen = ImageDataGenerator(
     rescale=1. / 255,
     #rotation_range=15,
     width_shift_range=0.1,
@@ -125,19 +128,19 @@ for d in range(len(isAConnect)): #Iterate over the networks
                     model.layers[41].set_weights(model_aux.layers[17].get_weights())
 
                 else:
-                    model.layers[1-1].set_weights(model_aux.layers[1].get_weights())
-                    model.layers[3-1].set_weights(model_aux.layers[2].get_weights())
-                    model.layers[6-1].set_weights(model_aux.layers[4].get_weights())
-                    model.layers[8-1].set_weights(model_aux.layers[5].get_weights())
-                    model.layers[11-1].set_weights(model_aux.layers[7].get_weights())
-                    model.layers[13-1].set_weights(model_aux.layers[8].get_weights())
-                    model.layers[15-1].set_weights(model_aux.layers[9].get_weights())
-                    model.layers[18-1].set_weights(model_aux.layers[11].get_weights())
-                    model.layers[20-1].set_weights(model_aux.layers[12].get_weights())
-                    model.layers[22-1].set_weights(model_aux.layers[13].get_weights())
-                    model.layers[25-1].set_weights(model_aux.layers[15].get_weights())
-                    model.layers[27-1].set_weights(model_aux.layers[16].get_weights())
-                    model.layers[29-1].set_weights(model_aux.layers[17].get_weights())
+                    model.layers[1].set_weights(model_aux.layers[1].get_weights())
+                    model.layers[3].set_weights(model_aux.layers[2].get_weights())
+                    model.layers[6].set_weights(model_aux.layers[4].get_weights())
+                    model.layers[8].set_weights(model_aux.layers[5].get_weights())
+                    model.layers[11].set_weights(model_aux.layers[7].get_weights())
+                    model.layers[13].set_weights(model_aux.layers[8].get_weights())
+                    model.layers[15].set_weights(model_aux.layers[9].get_weights())
+                    model.layers[18].set_weights(model_aux.layers[11].get_weights())
+                    model.layers[20].set_weights(model_aux.layers[12].get_weights())
+                    model.layers[22].set_weights(model_aux.layers[13].get_weights())
+                    model.layers[25].set_weights(model_aux.layers[15].get_weights())
+                    model.layers[27].set_weights(model_aux.layers[16].get_weights())
+                    model.layers[29].set_weights(model_aux.layers[17].get_weights())
 
                 # NAME
                 Werr = str(int(100*Err))
@@ -155,7 +158,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                
                 # TRAINING
                 
-                history = model.fit(train_datagen.flow(X_train, Y_train, batch_size=batch_size),
+                history = model.fit(datagen.flow(X_train, Y_train, batch_size=batch_size),
                           #batch_size=batch_size,
                           epochs=epochs,
                           validation_data=(X_test, Y_test),
