@@ -116,6 +116,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 print(model.summary())
                
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
+                """"
                 if isAConnect[d]:
                     model.layers[1].set_weights(model_aux.layers[1].get_weights())
                     model.layers[4].set_weights(model_aux.layers[2].get_weights())
@@ -144,7 +145,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                     model.layers[22].set_weights(model_aux.layers[13].get_weights())
                     model.layers[25].set_weights(model_aux.layers[15].get_weights())
                     model.layers[27].set_weights(model_aux.layers[16].get_weights())
-                    model.layers[29].set_weights(model_aux.layers[17].get_weights())
+                    model.layers[29].set_weights(model_aux.layers[17].get_weights())"""
 
                 # NAME
                 Werr = str(int(100*Err))

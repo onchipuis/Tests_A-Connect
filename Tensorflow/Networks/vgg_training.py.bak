@@ -56,7 +56,7 @@ mean=np.mean(X_train)
 std=np.std(X_train)
 X_test=(X_test-mean)/std
 X_train=(X_train-mean)/std
-#test_datagen = ImageDataGenerator(rescale=1. / 255)
+test_datagen = ImageDataGenerator()
 #validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
 
 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
