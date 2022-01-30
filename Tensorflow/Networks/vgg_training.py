@@ -44,7 +44,7 @@ train_datagen = ImageDataGenerator(
     #height_shift_range=0.1,
     #shear_range=0.2,
     #zoom_range=0.2,
-    #horizontal_flip=True)
+    )#horizontal_flip=True)
 
 train_datagen.fit(X_train)
 #train_generator = train_datagen.flow(X_train, Y_train, batch_size=256)
