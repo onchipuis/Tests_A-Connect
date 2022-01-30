@@ -38,7 +38,7 @@ def get_top_n_score(target, prediction, n):
 
 # prepare data augmentation configuration
 train_datagen = ImageDataGenerator(
-    rescale=1. / 255,
+    #rescale=1. / 255,
     #rotation_range=15,
     #width_shift_range=0.1,
     #height_shift_range=0.1,
@@ -56,7 +56,7 @@ mean=np.mean(X_train)
 std=np.std(X_train)
 X_test=(X_test-mean)/std
 X_train=(X_train-mean)/std
-test_datagen = ImageDataGenerator(rescale=1. / 255)
+test_datagen = ImageDataGenerator()
 #validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
 
 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
@@ -168,7 +168,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                           epochs=epochs,
                           validation_data=test_datagen.flow(X_test, Y_test, batch_size=batch_size),
                           shuffle=True)
-                model.evaluate((X_test, Y_test))    
+                model.evaluate(test_datagen.flow(X_test, Y_test, batch_size=batch_size))    
 
                 y_predict =model.predict(X_test)
                 elapsed_time = time.time() - start_time
