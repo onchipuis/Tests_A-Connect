@@ -293,7 +293,7 @@ class FC_AConnect(tf.keras.layers.Layer):
         #@tf.custom_gradient
         def LBQuant(self,x):      # Gradient function for bias quantization
             x = tf.cast(x,tf.dtypes.float32)
-            y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[1])
+            y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[1])
             y = tf.cast(y,self.d_type)
             return y
             """
@@ -686,7 +686,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
         #@tf.custom_gradient
         def LBQuant(self,x):      # Gradient function for bias quantization
             x = tf.cast(x,tf.dtypes.float32)
-            y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[1])
+            y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[1])
             y = tf.cast(y,self.d_type)
             return y
             """
