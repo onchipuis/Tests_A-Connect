@@ -92,7 +92,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
     for i in range(len(FC_pool_aux)):
         for j in range(len(Wstd_aux)):
             if Wstd_aux[j]==0.3:
-                po = 1
+                po = [1]
             else:
                 po = range(len(errDistr))
             
