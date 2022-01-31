@@ -36,10 +36,10 @@ isAConnect = [True]   # Which network you want to train/test True for A-Connect 
 Wstd_err = [0.3]	    # Define the stddev for training
 Conv_pool = [2]
 FC_pool = Conv_pool
-WisQuant = ["no"]		    # Do you want binary weights?
-BisQuant = ["no"]		    # Do you want binary weights?
+WisQuant = ["yes"]		    # Do you want binary weights?
+BisQuant = WisQuant 
 Wbw = [8]
-Bbw = [8]
+Bbw = Wbw
 #errDistr = "lognormal"
 saveModel = False
 errDistr = "normal"
@@ -52,7 +52,7 @@ learning_rate = 0.01
 momentum = 0.9
 optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum) #Define optimizer
 batch_size = 256
-epochs = 2
+epochs = 10
 
 ### TRAINING
 for d in range(len(isAConnect)): #Iterate over the networks
