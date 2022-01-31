@@ -52,7 +52,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                         Conv_AConnect(filters=256,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),      
                         ReLU(),
                         BatchNormalization(),                  
-                        MaxPool2D(pool_size=(3,3),strides=(2,2)),
+                        #MaxPool2D(pool_size=(3,3),strides=(2,2)),
                         Conv_AConnect(filters=384,kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),       
                         ReLU(),
                         BatchNormalization(),                  
