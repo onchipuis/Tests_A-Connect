@@ -270,7 +270,7 @@ class FC_AConnect(tf.keras.layers.Layer):
 
         #@tf.custom_gradient
         def LWQuant(self,x):      # Gradient function for weights quantization
-	    y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[0])
+            y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[0])
             return y
             """
             if (self.bw[0]==1):
@@ -281,16 +281,16 @@ class FC_AConnect(tf.keras.layers.Layer):
             else:
                 limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
                 y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))+1),-(2**(self.bw[0]-1)-1), 2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit
-		y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[0])
+                y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[0])
                 def grad(dy):
-                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))	+1),-(2**(self.bw[0]-1)-1),2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit,x+1e-5))
+                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))        +1),-(2**(self.bw[0]-1)-1),2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit,x+1e-5))
                         return dydx
             return y, grad
             """
 
         #@tf.custom_gradient
         def LBQuant(self,x):      # Gradient function for bias quantization
-	    y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[1])
+            y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[1])
             return y
             """
             if (self.bw[1]==1):
@@ -302,7 +302,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                 limit = (2**self.bw[1])/2 #bias quantization limits
                 y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))+1),-(2**(self.bw[1]-1)-1), 2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit
                 def grad(dy):
-                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))	+1),-(2**(self.bw[1]-1)-1),2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit,x+1e-5))
+                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))        +1),-(2**(self.bw[1]-1)-1),2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit,x+1e-5))
                         return dydx
             return y, grad
             """
@@ -659,7 +659,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 return config
         #@tf.custom_gradient
         def LWQuant(self,x):      # Gradient function for weights quantization
-	    y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[0])
+            y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[0])
             return y
             """
             if (self.bw[0]==1):
@@ -672,14 +672,14 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 limit = (2**self.bw[1])/2-1 #bias quantization limits
                 y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))+1),-(2**(self.bw[0]-1)-1), 2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit
                 def grad(dy):
-                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))	+1),-(2**(self.bw[0]-1)-1),2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit,x+1e-5))
+                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))        +1),-(2**(self.bw[0]-1)-1),2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit,x+1e-5))
                         return dydx
             return y, grad
             """
 
         #@tf.custom_gradient
         def LBQuant(self,x):      # Gradient function for bias quantization
-	    y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[1])
+            y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[1])
             return y
             """
             if (self.bw[1]==1):
@@ -691,7 +691,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 limit = (2**self.bw[1])/2 #bias quantization limits
                 y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))+1),-(2**(self.bw[1]-1)-1), 2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit
                 def grad(dy):
-                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))	+1),-(2**(self.bw[1]-1)-1),2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit,x+1e-5))
+                        dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))        +1),-(2**(self.bw[1]-1)-1),2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit,x+1e-5))
                         return dydx
             return y, grad
             """
