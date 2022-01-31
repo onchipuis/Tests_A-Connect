@@ -69,7 +69,7 @@ net = folder_models+'16Werr_Wstd_80_Bstd_80.h5'
 learning_rate = 0.01
 momentum = 0.9
 batch_size = 256
-epochs =1
+epochs = 1
 lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 initial_learning_rate=0.01,
                 decay_steps=196,
@@ -91,7 +91,12 @@ for d in range(len(isAConnect)): #Iterate over the networks
         
     for i in range(len(FC_pool_aux)):
         for j in range(len(Wstd_aux)):
-            for k in range(len(errDistr)):
+            if Wstd_aux[j]==0.3:
+                po = 1
+            else:
+                po = range(len(errDistr))
+            
+            for k in po:
                 Err = Wstd_aux[j]
                 # CREATING NN:
                 #model_aux = tf.keras.models.load_model(net,custom_objects = custom_objects)
