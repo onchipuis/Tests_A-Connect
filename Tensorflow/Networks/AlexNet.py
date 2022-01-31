@@ -8,7 +8,7 @@ import tensorflow as tf
 from aconnect.layers import Conv_AConnect, FC_AConnect 
 from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatten
 from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax
-Xsz = 256
+Xsz = 32
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr="normal"):
         if(not(isAConnect)):
@@ -17,7 +17,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                         tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),           
                         Conv2D(filters=96,kernel_size=(11,11),strides=(4,4),activation='relu',padding="valid"),
                         BatchNormalization(),
-                        MaxPool2D(pool_size=(3,3),strides=(2,2),padding="valid"),
+                        #MaxPool2D(pool_size=(3,3),strides=(2,2),padding="valid"),
                         Conv2D(filters=256,kernel_size=(5,5),strides=(1,1),activation='relu',padding="same"),
                         BatchNormalization(),
                         #MaxPool2D(pool_size=(3,3),strides=(2,2),padding="valid"),
@@ -27,7 +27,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                         BatchNormalization(),
                         Conv2D(filters=256,kernel_size=(3,3),strides=(1,1),activation='relu',padding="same"),
                         BatchNormalization(),
-                        MaxPool2D(pool_size=(1,1),strides=(1,1),padding="valid"),
+                        #MaxPool2D(pool_size=(1,1),strides=(1,1),padding="valid"),
                         Flatten(),
                         Dense(1024,activation='relu'),
                         BatchNormalization(),                           
