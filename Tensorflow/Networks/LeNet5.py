@@ -11,7 +11,9 @@ from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatte
 from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax, Reshape, Activation
 
 
-def model_creation(isAConnect=False,Wstd=0,Bstd=0,isBin="no",Conv_pool=8,FC_pool=8,errDistr="normal"):
+def model_creation(isAConnect=False,Wstd=0,Bstd=0,
+        isQuant=["no","no"],bw=[8,8],
+        Conv_pool=8,FC_pool=8,errDistr="normal"):
 		
 	if(not(isAConnect)):
 		model = tf.keras.Sequential([
@@ -39,22 +41,22 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,isBin="no",Conv_pool=8,FC_pool
 		model = tf.keras.Sequential([
 			InputLayer(input_shape=[32,32]),
 			Reshape((32,32,1)),
-			Conv_AConnect(6,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,isBin=isBin,Op=2,strides=1,padding="VALID",pool=Conv_pool,d_type=tf.dtypes.float16),
+			Conv_AConnect(6,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,isQuant=isQuant,bw=bw,Op=2,strides=1,padding="VALID",pool=Conv_pool,d_type=tf.dtypes.float16),
                         BatchNormalization(),
 			Activation('tanh'),           
 			AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
-			Conv_AConnect(16,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,isBin=isBin,Op=2 ,strides=1,padding="VALID",pool=Conv_pool,d_type=tf.dtypes.float16),
+			Conv_AConnect(16,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,isQuant=isQuant,bw=bw,Op=2 ,strides=1,padding="VALID",pool=Conv_pool,d_type=tf.dtypes.float16),
                         BatchNormalization(),           
 			Activation('tanh'),                       
 			AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
 			Flatten(),
-			FC_AConnect(120,Wstd,Bstd,errDistr=errDistr,isBin=isBin,pool=FC_pool,d_type=tf.dtypes.float16),
+			FC_AConnect(120,Wstd,Bstd,errDistr=errDistr,isQuant=isQuant,bw=bw,pool=FC_pool,d_type=tf.dtypes.float16),
                         BatchNormalization(),           
 			Activation('tanh'),                       
-			FC_AConnect(84,Wstd,Bstd,errDistr=errDistr,isBin=isBin,pool=FC_pool,d_type=tf.dtypes.float16),
+			FC_AConnect(84,Wstd,Bstd,errDistr=errDistr,isQuant=isQuant,bw=bw,pool=FC_pool,d_type=tf.dtypes.float16),
                         BatchNormalization(),           
 			Activation('tanh'),                       
-			FC_AConnect(10,Wstd,Bstd,errDistr=errDistr,isBin=isBin,pool=FC_pool,d_type=tf.dtypes.float16),
+			FC_AConnect(10,Wstd,Bstd,errDistr=errDistr,isQuant=isQuant,bw=bw,pool=FC_pool,d_type=tf.dtypes.float16),
 			Softmax()							
 		])		
 		

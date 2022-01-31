@@ -36,7 +36,10 @@ isAConnect = [True]   # Which network you want to train/test True for A-Connect 
 Wstd_err = [0.3]	    # Define the stddev for training
 Conv_pool = [2]
 FC_pool = Conv_pool
-isBin = ["no"]		    # Do you want binary weights?
+WisQuant = ["no"]		    # Do you want binary weights?
+BisQuant = ["no"]		    # Do you want binary weights?
+Wbw = [8]
+Bbw = [8]
 #errDistr = "lognormal"
 saveModel = False
 errDistr = "normal"
@@ -63,51 +66,64 @@ for d in range(len(isAConnect)): #Iterate over the networks
         Conv_pool_aux = [0]
     
     for i in range(len(FC_pool_aux)):
-        for p in range (len(isBin)):
-            for j in range(len(Wstd_aux)): #Iterate over the Wstd and Bstd for training
-                Err = Wstd_aux[j]
-                # CREATING NN:
-                model = lenet5.model_creation(isAConnect=isAConnect[d],
-                                                Wstd=Err,Bstd=Err,
-                                                isBin=isBin[p],
-                                                Conv_pool=Conv_pool_aux[i],
-                                                FC_pool=FC_pool_aux[i],
-                                                errDistr=errDistr)
-                Werr = str(int(100*Err))
-                Nm = str(int(FC_pool_aux[i]))
-                name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+"_"+errDistr+'Distr'
-                if isBin[p] == "yes":
-                    name = name+'_BW'
+        for p in range (len(WisQuant)):
+            if WisQuant[p]=="yes":
+                Wbw_aux = Wbw
+                Bbw_aux = Bbw
+            else:
+                Wbw_aux = [8]
+                Bbw_aux = [8]
 
-                print("*************************TRAINING NETWORK*********************")
-                print("\n\t\t\t", name)
-                
-                #TRAINING PARAMETERS
-                model.compile(optimizer=optimizer,
-                            loss=['sparse_categorical_crossentropy'],
-                            metrics=['accuracy'])#Compile the model
-                
-                # TRAINING
-                history = model.fit(X_train,Y_train,
-                                    batch_size=batch_size,
-                                    epochs = epochs,
-                                    validation_data=(X_test, Y_test),
-                                    shuffle=True)
-                model.evaluate(X_test,Y_test)    
+            for q in range (len(Wbw_aux)):
+                for j in range(len(Wstd_aux)): #Iterate over the Wstd and Bstd for training
+                    for k in range(len(errDistr)):
+                        Err = Wstd_aux[j]
+                        # CREATING NN:
+                        model = lenet5.model_creation(isAConnect=isAConnect[d],
+                                                        Wstd=Err,Bstd=Err,
+                                                        isQuant=[WisQuant[p],BisQuant[p]],
+                                                        bw=[Wbw_aux[q],Bbw_aux[q]],
+                                                        Conv_pool=Conv_pool_aux[i],
+                                                        FC_pool=FC_pool_aux[i],
+                                                        errDistr=errDistr[k])
+                        Werr = str(int(100*Err))
+                        Nm = str(int(FC_pool_aux[i]))
+                        if WisQuant[p] == "yes":
+                            bws = str(int(bw[q]))
+                            quant = bws+'bQuant_'
+                        else:
+                            quant = ''
+                        name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'
 
-                Y_predict =model.predict(X_test)
-                elapsed_time = time.time() - start_time
-                print("top-1 score:", get_top_n_score(Y_test, Y_predict, 1))
-                print("Elapsed time: {}".format(hms_string(elapsed_time)))
-                print('Tiempo de procesamiento (secs): ', time.time()-tic)
-                #Save the accuracy and the validation accuracy
-                acc = history.history['accuracy'] 
-                val_acc = history.history['val_accuracy']
-                
-                # SAVE MODEL:
-                if saveModel:
-                    string = folder_models + name + '.h5'
-                    model.save(string,include_optimizer=False)
-                    #Save in a txt the accuracy and the validation accuracy for further analysis
-                    np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
-                    np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
+                        print("*************************TRAINING NETWORK*********************")
+                        print("\n\t\t\t", name)
+                        
+                        #TRAINING PARAMETERS
+                        model.compile(optimizer=optimizer,
+                                    loss=['sparse_categorical_crossentropy'],
+                                    metrics=['accuracy'])#Compile the model
+                        
+                        # TRAINING
+                        history = model.fit(X_train,Y_train,
+                                            batch_size=batch_size,
+                                            epochs = epochs,
+                                            validation_data=(X_test, Y_test),
+                                            shuffle=True)
+                        model.evaluate(X_test,Y_test)    
+
+                        Y_predict =model.predict(X_test)
+                        elapsed_time = time.time() - start_time
+                        print("top-1 score:", get_top_n_score(Y_test, Y_predict, 1))
+                        print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                        print('Tiempo de procesamiento (secs): ', time.time()-tic)
+                        #Save the accuracy and the validation accuracy
+                        acc = history.history['accuracy'] 
+                        val_acc = history.history['val_accuracy']
+                        
+                        # SAVE MODEL:
+                        if saveModel:
+                            string = folder_models + name + '.h5'
+                            model.save(string,include_optimizer=False)
+                            #Save in a txt the accuracy and the validation accuracy for further analysis
+                            np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
+                            np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
