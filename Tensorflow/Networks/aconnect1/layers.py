@@ -268,24 +268,31 @@ class FC_AConnect(tf.keras.layers.Layer):
                 if self.pool is not None and not isinstance(self.pool, int):
                     raise TypeError('pool must be a integer. ' 'Found %s' %(type(self.pool),))
 
-        @tf.custom_gradient
+        #@tf.custom_gradient
         def LWQuant(self,x):      # Gradient function for weights quantization
+	    y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[0])
+            return y
+            """
             if (self.bw[0]==1):
                 y = tf.math.sign(x)
                 def grad(dy):
                         dydx = tf.divide(dy,abs(x)+1e-5)
                         return dydx
             else:
-                #limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
-                limit = (2**self.bw[0])/2-1 #bias quantization limits
+                limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
                 y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))+1),-(2**(self.bw[0]-1)-1), 2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit
+		y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[0])
                 def grad(dy):
                         dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))	+1),-(2**(self.bw[0]-1)-1),2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit,x+1e-5))
                         return dydx
             return y, grad
+            """
 
-        @tf.custom_gradient
+        #@tf.custom_gradient
         def LBQuant(self,x):      # Gradient function for bias quantization
+	    y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[1])
+            return y
+            """
             if (self.bw[1]==1):
                 y = tf.math.sign(x)
                 def grad(dy):
@@ -298,6 +305,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                         dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))	+1),-(2**(self.bw[1]-1)-1),2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit,x+1e-5))
                         return dydx
             return y, grad
+            """
 
 ###HOW TO IMPLEMENT MANUALLY THE BACKPROPAGATION###
 """
@@ -649,8 +657,11 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         'Slice': self.Slice,
                         'd_type': self.d_type})
                 return config
-        @tf.custom_gradient
+        #@tf.custom_gradient
         def LWQuant(self,x):      # Gradient function for weights quantization
+	    y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[0])
+            return y
+            """
             if (self.bw[0]==1):
                 y = tf.math.sign(x)
                 def grad(dy):
@@ -664,9 +675,13 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))	+1),-(2**(self.bw[0]-1)-1),2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit,x+1e-5))
                         return dydx
             return y, grad
+            """
 
-        @tf.custom_gradient
+        #@tf.custom_gradient
         def LBQuant(self,x):      # Gradient function for bias quantization
+	    y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[1])
+            return y
+            """
             if (self.bw[1]==1):
                 y = tf.math.sign(x)
                 def grad(dy):
@@ -679,6 +694,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[1]-1))	+1),-(2**(self.bw[1]-1)-1),2**(self.bw[1]-1)) -0.5)*(2/(2**self.bw[1]-1))*limit,x+1e-5))
                         return dydx
             return y, grad
+            """
 ############################AUXILIAR FUNCTIONS##################################################
 def reshape(X,F): #Used to reshape the input data and the noisy filters
     batch_size=tf.shape(X)[0]
