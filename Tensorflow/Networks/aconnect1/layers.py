@@ -277,7 +277,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                         return dydx
             else:
                 #limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
-                limit = tf.math.argmax(tf.math.abs(x))
+                limit = tf.math.argmax(tf.math.abs(x),output_type=self.d_type)
                 y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))+1),-(2**(self.bw[0]-1)-1), 2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit
                 def grad(dy):
                         dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))	+1),-(2**(self.bw[0]-1)-1),2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit,x+1e-5))
@@ -658,7 +658,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         return dydx
             else:
                 #limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
-                limit = tf.math.argmax(tf.math.abs(x))
+                limit = tf.math.argmax(tf.math.abs(x),output_type=self.d_type)
                 y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))+1),-(2**(self.bw[0]-1)-1), 2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit
                 def grad(dy):
                         dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))	+1),-(2**(self.bw[0]-1)-1),2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit,x+1e-5))
