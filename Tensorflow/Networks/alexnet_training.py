@@ -43,8 +43,6 @@ def normalization(train_images, test_images):
     mean = np.mean(train_images, axis=(0, 1, 2, 3))
     std = np.std(train_images, axis=(0, 1, 2, 3))
     train_images = (train_images - mean) / (std + 1e-7)
-    mean = np.mean(test_images, axis=(0, 1, 2, 3))
-    std = np.std(test_images, axis=(0, 1, 2, 3))    
     test_images = (test_images - mean) / (std + 1e-7)
     return train_images, test_images
 
@@ -58,8 +56,12 @@ Conv_pool = FC_pool
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
 errDistr = ["normal"]
-Nlayers = [1+1,5+1,9+1,12+1,15+1,20+1,24+1,27+1,30+1] 
+sL = 0
+Nlayers = [1,5,9,12,15,20,24,27,30] 
 Nlayers_base = Nlayers
+
+for i in Nlayers:
+    Nlayers[i] = Nlayers[i] + sL
 
 model_name = 'AlexNet_CIFAR10/'
 folder_models = './Models/'+model_name
