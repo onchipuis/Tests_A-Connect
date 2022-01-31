@@ -39,12 +39,16 @@ def get_top_n_score(target, prediction, n):
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-FC_pool = [8,16]
+Wstd_err = [0.3]   # Define the stddev for training
+FC_pool = [2]
 Conv_pool = FC_pool
-isBin = ["no"]		    # Do you want binary weights?
+WisQuant = ["yes"]		    # Do you want binary weights?
+BisQuant = WisQuant 
+Wbw = [8]
+Bbw = Wbw
 #errDistr = "lognormal"
 errDistr = ["normal"]
+saveModel = False
 Nlayers = [1,5,9,12,15,20,24,27,30]
 Nlayers_base = Nlayers
 
@@ -57,7 +61,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 # TRAINING PARAMETERS
 momentum = 0.9
 batch_size = 256
-epochs = 30
+epochs = 3
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
 
@@ -72,69 +76,86 @@ for d in range(len(isAConnect)): #Iterate over the networks
         Conv_pool_aux = [0]
         
     for i in range(len(FC_pool_aux)):
-        for j in range(len(Wstd_aux)):
-            for k in range(len(errDistr)):
-                Err = Wstd_aux[j]
-                ### TRAINING STAGE ###
-                # CREATING NN:
-                model = alexnet.model_creation(isAConnect=isAConnect,
-                                                Wstd=Err,Bstd=Err,
-                                                Conv_pool=Conv_pool_aux[i],
-                                                FC_pool=FC_pool_aux[i],
-                                                errDistr=errDistr[k])
-                ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                if isAConnect[d]:
-                    for m in range(len(Nlayers_base)):
-                        model.layers[Nlayers[m]].set_weights(
-                                model_base.layers[Nlayers_base[m]].get_weights()
-                                )
-                
-                # NAME
-                if isAConnect[d]:
-                    Werr = str(int(100*Err))
-                    Nm = str(int(FC_pool_aux[i]))
-                    name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
-                else:
-                    name = 'Base'
-                
-                print("*************************TRAINING NETWORK*********************")
-                print("\n\t\t\t", name)
+        for p in range (len(WisQuant)):
+            if WisQuant[p]=="yes":
+                Wbw_aux = Wbw
+                Bbw_aux = Bbw
+            else:
+                Wbw_aux = [8]
+                Bbw_aux = [8]
 
-                #TRAINING PARAMETERS
-                model.compile(loss='sparse_categorical_crossentropy', 
-                        optimizer=optimizer, 
-                        metrics=['accuracy'])
+            for q in range (len(Wbw_aux)):
+                for j in range(len(Wstd_aux)):
+                    for k in range(len(errDistr)):
+                        Err = Wstd_aux[j]
+                        ### TRAINING STAGE ###
+                        # CREATING NN:
+                        model = alexnet.model_creation(isAConnect=isAConnect,
+                                                        Wstd=Err,Bstd=Err,
+                                                        isQuant=[WisQuant[p],BisQuant[p]],
+                                                        bw=[Wbw_aux[q],Bbw_aux[q]],
+                                                        Conv_pool=Conv_pool_aux[i],
+                                                        FC_pool=FC_pool_aux[i],
+                                                        errDistr=errDistr[k])
+                        ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
+                        if isAConnect[d]:
+                            for m in range(len(Nlayers_base)):
+                                model.layers[Nlayers[m]].set_weights(
+                                        model_base.layers[Nlayers_base[m]].get_weights()
+                                        )
+                        
+                        # NAME
+                        if isAConnect[d]:
+                            Werr = str(int(100*Err))
+                            Nm = str(int(FC_pool_aux[i]))
+                            if WisQuant[p] == "yes":
+                                bws = str(int(Wbw_aux[q]))
+                                quant = bws+'bQuant_'
+                            else:
+                                quant = ''
+                            name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'
+                        else:
+                            name = 'Base'
+                        
+                        print("*************************TRAINING NETWORK*********************")
+                        print("\n\t\t\t", name)
 
-                # TRAINING
-                def step_decay (epoch): 
-                    initial_lrate = 0.01 
-                    drop = 0.5 
-                    epochs_drop = 30.0 
-                    lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
-                    return lrate
-                lrate = LearningRateScheduler(step_decay)
-                callbacks_list = [lrate]
-                
-                history = model.fit(X_train, Y_train,
-                            batch_size=batch_size,
-                            epochs=epochs,
-                            validation_data=(X_test, Y_test),
-                            callbacks=callbacks_list,
-                            shuffle=True)
-                model.evaluate(X_test,Y_test)    
+                        #TRAINING PARAMETERS
+                        model.compile(loss='sparse_categorical_crossentropy', 
+                                optimizer=optimizer, 
+                                metrics=['accuracy'])
 
-                y_predict =model.predict(X_test)
-                elapsed_time = time.time() - start_time
-                print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
-                print("Elapsed time: {}".format(hms_string(elapsed_time)))
-                print('Tiempo de procesamiento (secs): ', time.time()-tic)
-                #Save the accuracy and the validation accuracy
-                acc = history.history['accuracy'] 
-                val_acc = history.history['val_accuracy']
+                        # TRAINING
+                        def step_decay (epoch): 
+                            initial_lrate = 0.01 
+                            drop = 0.5 
+                            epochs_drop = 30.0 
+                            lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
+                            return lrate
+                        lrate = LearningRateScheduler(step_decay)
+                        callbacks_list = [lrate]
+                        
+                        history = model.fit(X_train, Y_train,
+                                    batch_size=batch_size,
+                                    epochs=epochs,
+                                    validation_data=(X_test, Y_test),
+                                    callbacks=callbacks_list,
+                                    shuffle=True)
+                        model.evaluate(X_test,Y_test)    
 
-                # SAVE MODEL:
-                string = folder_models + name + '.h5'
-                model.save(string,include_optimizer=False)
-                #Save in a txt the accuracy and the validation accuracy for further analysis
-                np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
-                np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
+                        y_predict =model.predict(X_test)
+                        elapsed_time = time.time() - start_time
+                        print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
+                        print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                        print('Tiempo de procesamiento (secs): ', time.time()-tic)
+                        #Save the accuracy and the validation accuracy
+                        acc = history.history['accuracy'] 
+                        val_acc = history.history['val_accuracy']
+
+                        # SAVE MODEL:
+                        if saveModel:
+                            string = folder_models + name + '.h5'
+                            model.save(string,include_optimizer=False)
+                            #Save in a txt the accuracy and the validation accuracy for further analysis
+                            np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
+                            np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
