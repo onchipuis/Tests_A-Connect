@@ -66,7 +66,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
     for i in range(len(Conv_pool_aux)):
         for j in range(len(Wstd_aux)):
             for k in range(len(errDistr)):
-                for m in range(len(SimError)):
+                for m in range(len(Sim_err)):
 
                     Werr = Wstd_aux[j]
                     Err = Sim_err[m]
