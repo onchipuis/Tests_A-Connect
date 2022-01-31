@@ -15,7 +15,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                 model = tf.keras.models.Sequential([
                         InputLayer(input_shape=[32,32,3]),
                         tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),     
-                        Normalization(mean=mean, variance=stddev),
+                        #Normalization(mean=mean, variance=stddev),
                         Conv2D(filters=96,kernel_size=(11,11),strides=(4,4),activation='relu',padding="valid"),
                         BatchNormalization(),
                         MaxPool2D(pool_size=(3,3),strides=(2,2),padding="valid"),
@@ -30,15 +30,15 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                         BatchNormalization(),
                         MaxPool2D(pool_size=(1,1),strides=(1,1),padding="valid"),
                         Flatten(),
-                        Dense(1024,activation='relu'),
+                        Dense(4096,activation='relu'),
                         BatchNormalization(),                           
                         Dropout(0.5),
-                        Dense(1024,activation='relu'),
+                        Dense(4096,activation='relu'),
                         BatchNormalization(),                           
                         Dropout(0.5),
-                        Dense(512,activation='relu'),
-                        BatchNormalization(),                           
-                        Dropout(0.5),
+                        #Dense(512,activation='relu'),
+                        #BatchNormalization(),                           
+                        #Dropout(0.5),
                         Dense(10,activation='softmax')
             ])
         else:
