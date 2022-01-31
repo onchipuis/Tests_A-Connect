@@ -28,8 +28,7 @@ def hms_string(sec_elapsed):
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.7]   # Define the stddev for training
 Sim_err = [0.7]
-FC_pool = [4]
-Conv_pool = [8]
+Conv_pool = [2,8]
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
 errDistr = ["normal"]
