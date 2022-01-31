@@ -40,15 +40,15 @@ def get_top_n_score(target, prediction, n):
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.3]   # Define the stddev for training
-FC_pool = [2]
-Conv_pool = FC_pool
+Conv_pool = [2]
+FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
 Bbw = Wbw
 #errDistr = "lognormal"
 errDistr = ["normal"]
-saveModel = False
+saveModel = True
 Nlayers = [1,5,9,12,15,20,24,27,30]
 Nlayers_base = Nlayers
 
@@ -61,7 +61,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 # TRAINING PARAMETERS
 momentum = 0.9
 batch_size = 256
-epochs = 3
+epochs = 30
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
 
@@ -75,7 +75,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
         FC_pool_aux = [0]
         Conv_pool_aux = [0]
         
-    for i in range(len(FC_pool_aux)):
+    for i in range(len(Conv_pool_aux)):
         for p in range (len(WisQuant)):
             if WisQuant[p]=="yes":
                 Wbw_aux = Wbw
@@ -107,7 +107,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         # NAME
                         if isAConnect[d]:
                             Werr = str(int(100*Err))
-                            Nm = str(int(FC_pool_aux[i]))
+                            Nm = str(int(Conv_pool_aux[i]))
                             if WisQuant[p] == "yes":
                                 bws = str(int(Wbw_aux[q]))
                                 quant = bws+'bQuant_'
