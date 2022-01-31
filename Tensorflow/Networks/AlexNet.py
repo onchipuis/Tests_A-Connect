@@ -29,12 +29,15 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                         BatchNormalization(),
                         MaxPool2D(pool_size=(3,3),strides=(2,2),padding="valid"),
                         Flatten(),
-                        Dense(4096,activation='relu'),
+                        Dense(1024,activation='relu'),
+                        BatchNormalization(),                           
                         Dropout(0.5),
-                        Dense(4096,activation='relu'),
+                        Dense(1024,activation='relu'),
+                        BatchNormalization(),                           
                         Dropout(0.5),
-                        #Dense(512,activation='relu'),
-                        #Dropout(0.5),
+                        Dense(512,activation='relu'),
+                        BatchNormalization(),                           
+                        Dropout(0.5),
                         Dense(10,activation='softmax')
             ])
         else:
