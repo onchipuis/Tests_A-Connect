@@ -27,7 +27,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                         BatchNormalization(),
                         Conv2D(filters=256,kernel_size=(3,3),strides=(1,1),activation='relu',padding="same"),
                         BatchNormalization(),
-                        MaxPool2D(pool_size=(3,3),strides=(2,2),padding="valid"),
+                        MaxPool2D(pool_size=(1,1),strides=(2,2),padding="valid"),
                         Flatten(),
                         Dense(1024,activation='relu'),
                         BatchNormalization(),                           
