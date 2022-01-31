@@ -54,9 +54,9 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,inpu
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-Conv_pool = [2]
-FC_pool = [2]
+Wstd_err = [0.5,0.7]   # Define the stddev for training
+Conv_pool = [4]
+FC_pool = [4]
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
 errDistr = ["normal","lognormal"]
