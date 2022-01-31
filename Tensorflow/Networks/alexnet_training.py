@@ -50,7 +50,7 @@ Conv_pool = FC_pool
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
 errDistr = ["normal"]
-Nlayers = [1,5,9,12,15,20,24,27,30]
+Nlayers = [1,5,9,12,15,20,24,27,30] + 1
 Nlayers_base = Nlayers
 
 model_name = 'AlexNet_CIFAR10/'
@@ -86,7 +86,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                 Wstd=Err,Bstd=Err,
                                                 Conv_pool=Conv_pool_aux[i],
                                                 FC_pool=FC_pool_aux[i],
-                                                errDistr=errDistr[k])
+                                                errDistr=errDistr[k], mean=mean_train, 
+                                                stddev=dev_train)
                 print(model.summary())
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                 
