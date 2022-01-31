@@ -40,6 +40,7 @@ def get_top_n_score(target, prediction, n):
 #### Calculating mean and stddev 
 
 mean_train = np.mean(X_train)
+dev_train = np.var(X_train)
 
 # INPUT PARAMTERS:
 isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
@@ -56,7 +57,7 @@ model_name = 'AlexNet_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 net_base = folder_models+'Base_32x32.h5'
-#model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
+model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
 momentum = 0.9

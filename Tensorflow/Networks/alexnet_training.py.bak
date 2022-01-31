@@ -40,6 +40,7 @@ def get_top_n_score(target, prediction, n):
 #### Calculating mean and stddev 
 
 mean_train = np.mean(X_train)
+dev_train = np.var(X_train)
 
 # INPUT PARAMTERS:
 isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
@@ -88,13 +89,13 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                 errDistr=errDistr[k])
                 print(model.summary())
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                """"
+                
                 if isAConnect[d]:
                     for m in range(len(Nlayers_base)):
                         model.layers[Nlayers[m]].set_weights(
                                 model_base.layers[Nlayers_base[m]].get_weights()
                                 )
-                """
+                
                 # NAME
                 if isAConnect[d]:
                     Werr = str(int(100*Err))
