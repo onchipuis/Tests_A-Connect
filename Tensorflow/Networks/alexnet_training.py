@@ -88,13 +88,13 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                 errDistr=errDistr[k])
                 print(model.summary())
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                """"
+                
                 if isAConnect[d]:
                     for m in range(len(Nlayers_base)):
                         model.layers[Nlayers[m]].set_weights(
                                 model_base.layers[Nlayers_base[m]].get_weights()
                                 )
-                """
+                
                 # NAME
                 if isAConnect[d]:
                     Werr = str(int(100*Err))
@@ -140,7 +140,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
 
                 # SAVE MODEL:
                 string = folder_models + name + '.h5'
-                model.save(string,include_optimizer=True)
+                model.save(string,include_optimizer=False)
                 #Save in a txt the accuracy and the validation accuracy for further analysis
                 np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
                 np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
