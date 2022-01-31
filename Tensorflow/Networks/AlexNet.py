@@ -7,35 +7,34 @@ stage and then load the model to test it using the Monte Carlo simulation.
 import tensorflow as tf
 from aconnect.layers import Conv_AConnect, FC_AConnect 
 from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatten
-from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax, Normalization
+from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax
 Xsz = 32
 
-def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr="normal", mean=0, stddev=1):
+def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr="normal"):
         if(not(isAConnect)):
                 model = tf.keras.models.Sequential([
                         InputLayer(input_shape=[32,32,3]),
                         tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),     
-                        #Normalization(mean=mean, variance=stddev),
                         Conv2D(filters=96,kernel_size=(11,11),strides=(4,4),activation='relu',padding="valid"),
-                        #BatchNormalization(),
+                        BatchNormalization(),
                         MaxPool2D(pool_size=(3,3),strides=(2,2),padding="valid"),
                         Conv2D(filters=256,kernel_size=(5,5),strides=(1,1),activation='relu',padding="same"),
-                        #BatchNormalization(),
+                        BatchNormalization(),
                         #MaxPool2D(pool_size=(3,3),strides=(2,2),padding="valid"),
                         Conv2D(filters=384,kernel_size=(3,3),strides=(1,1),activation='relu',padding="same"),
-                        #BatchNormalization(),
+                        BatchNormalization(),
                         Conv2D(filters=384,kernel_size=(3,3),strides=(1,1),activation='relu',padding="same"),
                         #BatchNormalization(),
                         Conv2D(filters=256,kernel_size=(3,3),strides=(1,1),activation='relu',padding="same"),
-                        #BatchNormalization(),
+                        BatchNormalization(),
                         MaxPool2D(pool_size=(1,1),strides=(1,1),padding="valid"),
                         Flatten(),
-                        Dense(4096,activation='relu'),
-                        #BatchNormalization(),                           
+                        Dense(4096,activation='relu'),                                                
                         Dropout(0.5),
-                        Dense(4096,activation='relu'),
-                        #BatchNormalization(),                           
+                        BatchNormalization(),   
+                        Dense(4096,activation='relu'),                           
                         Dropout(0.5),
+                        BatchNormalization(),
                         #Dense(512,activation='relu'),
                         #BatchNormalization(),                           
                         #Dropout(0.5),

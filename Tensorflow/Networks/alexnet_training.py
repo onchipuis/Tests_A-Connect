@@ -37,10 +37,16 @@ def get_top_n_score(target, prediction, n):
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()
 
-#### Calculating mean and stddev 
+#### DATASET NORMALZATION
 
-mean_train = np.mean(X_train)
-dev_train = np.var(X_train)
+def normalization(train_images, test_images):
+    mean = np.mean(train_images, axis=(0, 1, 2, 3))
+    std = np.std(train_images, axis=(0, 1, 2, 3))
+    train_images = (train_images - mean) / (std + 1e-7)
+    test_images = (test_images - mean) / (std + 1e-7)
+    return train_images, test_images
+
+X_train, X_test = normalization(X_train,X_test)
 
 # INPUT PARAMTERS:
 isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
@@ -86,8 +92,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                 Wstd=Err,Bstd=Err,
                                                 Conv_pool=Conv_pool_aux[i],
                                                 FC_pool=FC_pool_aux[i],
-                                                errDistr=errDistr[k], mean=mean_train, 
-                                                stddev=dev_train)
+                                                errDistr=errDistr[k])
                 print(model.summary())
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                 
