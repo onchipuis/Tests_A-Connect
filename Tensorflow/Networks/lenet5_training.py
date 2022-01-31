@@ -89,7 +89,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         Werr = str(int(100*Err))
                         Nm = str(int(FC_pool_aux[i]))
                         if WisQuant[p] == "yes":
-                            bws = str(int(bw[q]))
+                            bws = str(int(Wbw_aux[q]))
                             quant = bws+'bQuant_'
                         else:
                             quant = ''
