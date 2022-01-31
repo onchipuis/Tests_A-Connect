@@ -26,13 +26,13 @@ def hms_string(sec_elapsed):
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-Sim_err = [0,0.3,0.5,0.7]
-FC_pool = [2]
-Conv_pool = FC_pool
+Wstd_err = [0.7]   # Define the stddev for training
+Sim_err = [0.7]
+FC_pool = [4]
+Conv_pool = [8]
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
-errDistr = ["normal","lognormal"]
+errDistr = ["normal"]
 acc=np.zeros([500,1])
 force = "yes"
 
@@ -73,7 +73,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                     # NAME
                     if isAConnect[d]:
                         Werr = str(int(100*Werr))
-                        Nm = str(int(FC_pool_aux[i]))
+                        Nm = str(int(Conv_pool_aux[i]))
                         name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
                     else:
                         name = 'Base'
