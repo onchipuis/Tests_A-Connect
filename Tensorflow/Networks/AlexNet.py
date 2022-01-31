@@ -8,7 +8,7 @@ import tensorflow as tf
 from aconnect.layers import Conv_AConnect, FC_AConnect 
 from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatten
 from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax
-Xsz = 32
+Xsz = 256
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr="normal"):
         if(not(isAConnect)):
@@ -20,6 +20,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                         MaxPool2D(pool_size=(3,3),strides=(2,2),padding="valid"),
                         Conv2D(filters=256,kernel_size=(5,5),strides=(1,1),activation='relu',padding="same"),
                         BatchNormalization(),
+                        #MaxPool2D(pool_size=(3,3),strides=(2,2),padding="valid"),
                         Conv2D(filters=384,kernel_size=(3,3),strides=(1,1),activation='relu',padding="same"),
                         BatchNormalization(),
                         Conv2D(filters=384,kernel_size=(3,3),strides=(1,1),activation='relu',padding="same"),
