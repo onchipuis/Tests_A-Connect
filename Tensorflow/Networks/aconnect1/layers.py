@@ -270,7 +270,7 @@ class FC_AConnect(tf.keras.layers.Layer):
 
         #@tf.custom_gradient
         def LWQuant(self,x):      # Gradient function for weights quantization
-            y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[0])
+            y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[0])
             return y
             """
             if (self.bw[0]==1):
@@ -659,7 +659,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 return config
         #@tf.custom_gradient
         def LWQuant(self,x):      # Gradient function for weights quantization
-            y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[0])
+            y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[0])
             return y
             """
             if (self.bw[0]==1):
