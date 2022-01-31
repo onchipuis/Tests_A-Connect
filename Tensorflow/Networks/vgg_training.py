@@ -90,7 +90,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
         Conv_pool_aux = [0]
         
     for i in range(len(Conv_pool_aux)):
-                        
+        for j in range(len(Wstd_aux)):
             for k in range(len(errDistr)):
                 Err = Wstd_aux[j]
                 # CREATING NN:
