@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import LeNet5 as lenet5
 import time
-from aconnect import layers, scripts
+from aconnect1 import layers, scripts
 tic=time.time()
 start_time = time.time()
 def hms_string(sec_elapsed):
@@ -34,7 +34,7 @@ X_test = np.float32(X_test) #Convert it to float32
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 #Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
 Wstd_err = [0.3]	    # Define the stddev for training
-Conv_pool = [16,32,64,128]
+Conv_pool = [2]
 FC_pool = Conv_pool
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
