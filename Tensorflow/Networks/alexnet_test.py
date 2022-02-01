@@ -8,7 +8,7 @@ import tensorflow as tf
 import VGG as vgg
 import time
 from datetime import datetime
-from aconnect import layers, scripts
+from aconnect1 import layers, scripts
 #from keras.callbacks import LearningRateScheduler
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
@@ -28,8 +28,7 @@ def hms_string(sec_elapsed):
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
 Sim_err = Wstd_err
-FC_pool = [1,2,4,8,16]
-Conv_pool = FC_pool
+Conv_pool = [1,2,4,8,16]
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
 errDistr = ["normal"]
@@ -56,7 +55,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
         FC_pool_aux = [0]
         Conv_pool_aux = [0]
         
-    for i in range(len(FC_pool_aux)):
+    for i in range(len(Conv_pool_aux)):
         for j in range(len(Wstd_aux)):
             for k in range(len(errDistr)):
 
@@ -66,7 +65,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 # NAME
                 if isAConnect[d]:
                     Werr = str(int(100*Werr))
-                    Nm = str(int(FC_pool_aux[i]))
+                    Nm = str(int(Conv_pool_aux[i]))
                     name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
                 else:
                     name = 'Base'

@@ -55,9 +55,12 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,inpu
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.7]   # Define the stddev for training
-Conv_pool = [16]
+Conv_pool = [8]
 FC_pool = [4]
-isBin = ["no"]		    # Do you want binary weights?
+WisQuant = ["yes"]		    # Do you want binary weights?
+BisQuant = WisQuant 
+Wbw = [8]
+Bbw = Wbw
 #errDistr = "lognormal"
 errDistr = ["normal"]
 model_name = 'VGG16_CIFAR10/'
@@ -90,83 +93,99 @@ for d in range(len(isAConnect)): #Iterate over the networks
         Conv_pool_aux = [0]
         
     for i in range(len(Conv_pool_aux)):
-        for j in range(len(Wstd_aux)):
-            for k in range(len(errDistr)):
-                Err = Wstd_aux[j]
-                # CREATING NN:
-                #model_aux = tf.keras.models.load_model(net,custom_objects = custom_objects)
-                model = vgg.model_creation(isAConnect=isAConnect[d],
-                                            Wstd=Err,Bstd=Err,
-                                            Conv_pool=Conv_pool_aux[i],
-                                            FC_pool=FC_pool_aux[i],
-                                            errDistr=errDistr[k],
-                                            isQuant=['yes','yes'],
-                                            bw=[8,8])
-               
-                ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                if isAConnect[d]:
-                    model.layers[1].set_weights(model_aux.layers[1].get_weights())
-                    model.layers[4].set_weights(model_aux.layers[2].get_weights())
-                    model.layers[8].set_weights(model_aux.layers[4].get_weights())
-                    model.layers[11].set_weights(model_aux.layers[5].get_weights())
-                    model.layers[15].set_weights(model_aux.layers[7].get_weights())
-                    model.layers[18].set_weights(model_aux.layers[8].get_weights())
-                    model.layers[21].set_weights(model_aux.layers[9].get_weights())
-                    model.layers[25].set_weights(model_aux.layers[11].get_weights())
-                    model.layers[28].set_weights(model_aux.layers[12].get_weights())
-                    model.layers[31].set_weights(model_aux.layers[13].get_weights())
-                    model.layers[35].set_weights(model_aux.layers[15].get_weights())
-                    model.layers[38].set_weights(model_aux.layers[16].get_weights())
-                    model.layers[41].set_weights(model_aux.layers[17].get_weights())
-                """
-                else:
-                    model.layers[1].set_weights(model_aux.layers[1].get_weights())
-                    model.layers[3].set_weights(model_aux.layers[2].get_weights())
-                    model.layers[6].set_weights(model_aux.layers[4].get_weights())
-                    model.layers[8].set_weights(model_aux.layers[5].get_weights())
-                    model.layers[11].set_weights(model_aux.layers[7].get_weights())
-                    model.layers[13].set_weights(model_aux.layers[8].get_weights())
-                    model.layers[15].set_weights(model_aux.layers[9].get_weights())
-                    model.layers[18].set_weights(model_aux.layers[11].get_weights())
-                    model.layers[20].set_weights(model_aux.layers[12].get_weights())
-                    model.layers[22].set_weights(model_aux.layers[13].get_weights())
-                    model.layers[25].set_weights(model_aux.layers[15].get_weights())
-                    model.layers[27].set_weights(model_aux.layers[16].get_weights())
-                    model.layers[29].set_weights(model_aux.layers[17].get_weights())
-"""
-                # NAME
-                Werr = str(int(100*Err))
-                Nm = str(int(Conv_pool_aux[i]))
-                name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
-                
-                print("*************************TRAINING NETWORK*********************")
-                print("\n\t\t\t", name)
-                    
-                #TRAINING PARAMETERS
-                model.compile(loss='sparse_categorical_crossentropy',
-                        optimizer=optimizer, 
-                        metrics=['accuracy'])
+        for p in range (len(WisQuant)):
+            if WisQuant[p]=="yes":
+                Wbw_aux = Wbw
+                Bbw_aux = Bbw
+            else:
+                Wbw_aux = [8]
+                Bbw_aux = [8]
 
-                # TRAINING
-                history = model.fit(X_train, Y_train,
-                          batch_size=batch_size,
-                          epochs=epochs,
-                          validation_data=(X_test, Y_test),
-                          shuffle=True)
-                model.evaluate(X_test,Y_test)    
+            for q in range (len(Wbw_aux)):
+                for j in range(len(Wstd_aux)):
+                    for k in range(len(errDistr)):
+                        Err = Wstd_aux[j]
+                        # CREATING NN:
+                        #model_aux = tf.keras.models.load_model(net,custom_objects = custom_objects)
+                        model = vgg.model_creation(isAConnect=isAConnect[d],
+                                                    Wstd=Err,Bstd=Err,
+                                                    isQuant=[WisQuant[p],BisQuant[p]],
+                                                    Conv_pool=Conv_pool_aux[i],
+                                                    FC_pool=FC_pool_aux[i],
+                                                    errDistr=errDistr[k])
+                       
+                        ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
+                        if isAConnect[d]:
+                            model.layers[1].set_weights(model_aux.layers[1].get_weights())
+                            model.layers[4].set_weights(model_aux.layers[2].get_weights())
+                            model.layers[8].set_weights(model_aux.layers[4].get_weights())
+                            model.layers[11].set_weights(model_aux.layers[5].get_weights())
+                            model.layers[15].set_weights(model_aux.layers[7].get_weights())
+                            model.layers[18].set_weights(model_aux.layers[8].get_weights())
+                            model.layers[21].set_weights(model_aux.layers[9].get_weights())
+                            model.layers[25].set_weights(model_aux.layers[11].get_weights())
+                            model.layers[28].set_weights(model_aux.layers[12].get_weights())
+                            model.layers[31].set_weights(model_aux.layers[13].get_weights())
+                            model.layers[35].set_weights(model_aux.layers[15].get_weights())
+                            model.layers[38].set_weights(model_aux.layers[16].get_weights())
+                            model.layers[41].set_weights(model_aux.layers[17].get_weights())
+                        """
+                        else:
+                            model.layers[1].set_weights(model_aux.layers[1].get_weights())
+                            model.layers[3].set_weights(model_aux.layers[2].get_weights())
+                            model.layers[6].set_weights(model_aux.layers[4].get_weights())
+                            model.layers[8].set_weights(model_aux.layers[5].get_weights())
+                            model.layers[11].set_weights(model_aux.layers[7].get_weights())
+                            model.layers[13].set_weights(model_aux.layers[8].get_weights())
+                            model.layers[15].set_weights(model_aux.layers[9].get_weights())
+                            model.layers[18].set_weights(model_aux.layers[11].get_weights())
+                            model.layers[20].set_weights(model_aux.layers[12].get_weights())
+                            model.layers[22].set_weights(model_aux.layers[13].get_weights())
+                            model.layers[25].set_weights(model_aux.layers[15].get_weights())
+                            model.layers[27].set_weights(model_aux.layers[16].get_weights())
+                            model.layers[29].set_weights(model_aux.layers[17].get_weights())
+        """
+                        # NAME
+                        if isAConnect[d]:
+                            Werr = str(int(100*Err))
+                            Nm = str(int(Conv_pool_aux[i]))
+                            if WisQuant[p] == "yes":
+                                bws = str(int(Wbw_aux[q]))
+                                quant = bws+'bQuant_'
+                            else:
+                                quant = ''
+                            name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'
+                        else:
+                            name = 'Base'
+                        
+                        print("*************************TRAINING NETWORK*********************")
+                        print("\n\t\t\t", name)
+                            
+                        #TRAINING PARAMETERS
+                        model.compile(loss='sparse_categorical_crossentropy',
+                                optimizer=optimizer, 
+                                metrics=['accuracy'])
 
-                y_predict =model.predict(X_test)
-                elapsed_time = time.time() - start_time
-                print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
-                print("Elapsed time: {}".format(hms_string(elapsed_time)))
-                print('Tiempo de procesamiento (secs): ', time.time()-tic)
-                #Save the accuracy and the validation accuracy
-                acc = history.history['accuracy'] 
-                val_acc = history.history['val_accuracy']
+                        # TRAINING
+                        history = model.fit(X_train, Y_train,
+                                  batch_size=batch_size,
+                                  epochs=epochs,
+                                  validation_data=(X_test, Y_test),
+                                  shuffle=True)
+                        model.evaluate(X_test,Y_test)    
 
-                # SAVE MODEL:
-                string = folder_models + name + '.h5'
-                model.save(string,include_optimizer=False)
-                #Save in a txt the accuracy and the validation accuracy for further analysis
-                np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
-                np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
+                        y_predict =model.predict(X_test)
+                        elapsed_time = time.time() - start_time
+                        print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
+                        print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                        print('Tiempo de procesamiento (secs): ', time.time()-tic)
+                        #Save the accuracy and the validation accuracy
+                        acc = history.history['accuracy'] 
+                        val_acc = history.history['val_accuracy']
+
+                        # SAVE MODEL:
+                        string = folder_models + name + '.h5'
+                        model.save(string,include_optimizer=False)
+                        #Save in a txt the accuracy and the validation accuracy for further analysis
+                        np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
+                        np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
