@@ -62,7 +62,7 @@ datagen = ImageDataGenerator(
         width_shift_range=0.1,  # randomly shift images horizontally (fraction of total width)
         height_shift_range=0.1,  # randomly shift images vertically (fraction of total height)
         horizontal_flip=True,  # randomly flip images
-        zoom_range=0.1
+        zoom_range=0.1,
         vertical_flip=False)  # randomly flip images
     # (std, mean, and principal components if ZCA whitening is applied).
 datagen.fit(X_train)
