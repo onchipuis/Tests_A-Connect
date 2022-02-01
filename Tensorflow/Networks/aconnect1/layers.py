@@ -266,18 +266,12 @@ class FC_AConnect(tf.keras.layers.Layer):
                 if self.pool is not None and not isinstance(self.pool, int):
                     raise TypeError('pool must be a integer. ' 'Found %s' %(type(self.pool),))
 
-        @tf.custom_gradient
+        #@tf.custom_gradient
         def LWQuant(self,x):      # Gradient function for weights quantization
             x = tf.cast(x,tf.dtypes.float32)
             y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[0])
             y = tf.cast(y,self.d_type)
-            def grad(dy):
-                xq = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[0])
-                xe = tf.divide(xq,x+1e-5)
-                xe = tf.cast(xe,self.d_type)
-                dydx = tf.multiply(dy,xe)
-                return dydx
-            return y,grad
+            return y
             """
             if (self.bw[0]==1):
                 y = tf.math.sign(x)
@@ -293,19 +287,12 @@ class FC_AConnect(tf.keras.layers.Layer):
             return y, grad
             """
 
-        @tf.custom_gradient
+        #@tf.custom_gradient
         def LBQuant(self,x):      # Gradient function for bias quantization
             x = tf.cast(x,tf.dtypes.float32)
             y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[1])
             y = tf.cast(y,self.d_type)
-            def grad(dy):
-                xq = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[1])
-                xe = tf.divide(xq,x+1e-5)
-                xe = tf.cast(xe,self.d_type)
-                dydx = tf.multiply(dy,xe)
-                return dydx
-            return y,grad
-         #   return y
+            return y
             """
             if (self.bw[1]==1):
                 y = tf.math.sign(x)
@@ -671,19 +658,12 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         'Slice': self.Slice,
                         'd_type': self.d_type})
                 return config
-        @tf.custom_gradient
+        #@tf.custom_gradient
         def LWQuant(self,x):      # Gradient function for weights quantization
             x = tf.cast(x,tf.dtypes.float32)
             y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[0])
             y = tf.cast(y,self.d_type)
-            def grad(dy):
-                xq = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[0])
-                xe = tf.divide(xq,x+1e-5)
-                xe = tf.cast(xe,self.d_type)
-                dydx = tf.multiply(dy,xe)
-                return dydx
-            return y,grad
-            #return y
+            return y
             """
             if (self.bw[0]==1):
                 y = tf.math.sign(x)
@@ -700,19 +680,12 @@ class Conv_AConnect(tf.keras.layers.Layer):
             return y, grad
             """
 
-        @tf.custom_gradient
+        #@tf.custom_gradient
         def LBQuant(self,x):      # Gradient function for bias quantization
             x = tf.cast(x,tf.dtypes.float32)
             y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[1])
             y = tf.cast(y,self.d_type)
-            def grad(dy):
-                xq = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[1])
-                xe = tf.divide(xq,x+1e-5)
-                xe = tf.cast(xe,self.d_type)
-                dydx = tf.multiply(dy,xe)
-                return dydx
-            return y,grad
-            #return y
+            return y
             """
             if (self.bw[1]==1):
                 y = tf.math.sign(x)
