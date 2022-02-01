@@ -38,6 +38,9 @@ def get_top_n_score(target, prediction, n):
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()
 
+Y_train = to_categorical(Y_train, 10)
+Y_test = to_categorical(Y_test, 10)
+
 #### DATASET NORMALZATION
 
 def normalization(train_images, test_images):
@@ -135,7 +138,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 print("\n\t\t\t", name)
 
                 #TRAINING PARAMETERS
-                model.compile(loss='sparse_categorical_crossentropy', 
+                model.compile(loss='categorical_crossentropy', 
                         optimizer=optimizer, 
                         metrics=['accuracy'])
 
@@ -149,9 +152,10 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 lrate = LearningRateScheduler(step_decay)
                 callbacks_list = [lrate]
                 
-                history = model.fit(X_train, Y_train,
-                            batch_size=batch_size,
+                history = model.fit(datagen.flow(X_train, Y_train,
+                            batch_size=batch_size),
                             epochs=epochs,
+                            steps_per_epoch=X_train.shape[0] // batch_size
                             validation_data=(X_test, Y_test),
                             callbacks=callbacks_list,
                             shuffle=True)

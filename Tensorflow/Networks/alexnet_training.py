@@ -155,7 +155,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 history = model.fit(datagen.flow(X_train, Y_train,
                             batch_size=batch_size),
                             epochs=epochs,
-                            steps_per_epoch=X_train.shape[0] // batch_size
+                            steps_per_epoch=X_train.shape[0] // batch_size,
                             validation_data=(X_test, Y_test),
                             callbacks=callbacks_list,
                             shuffle=True)
