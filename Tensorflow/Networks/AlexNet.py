@@ -7,7 +7,7 @@ stage and then load the model to test it using the Monte Carlo simulation.
 import tensorflow as tf
 from aconnect.layers import Conv_AConnect, FC_AConnect 
 from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatten
-from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax, RandomFlip, RandomZoom, RandomRotation
+from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax, RandomFlip, RandomZoom, RandomRotation, Rescaling
 Xsz = 32
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr="normal"):
@@ -15,9 +15,10 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                 model = tf.keras.models.Sequential([
                         InputLayer(input_shape=[32,32,3]),
                         tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),  
+                        Rescaling(1./255),
                         RandomFlip("horizontal"),
                         RandomZoom(0.2),
-                        RandomRotation(0.7),
+                        #RandomRotation(0.7),
                         Conv2D(filters=96,kernel_size=(11,11),strides=(4,4),activation='relu',padding="valid"),
                         BatchNormalization(),
                         MaxPool2D(pool_size=(3,3),strides=(2,2),padding="valid"),
