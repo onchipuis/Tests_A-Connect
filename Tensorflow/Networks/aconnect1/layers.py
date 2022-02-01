@@ -268,7 +268,7 @@ class FC_AConnect(tf.keras.layers.Layer):
         
         @tf.custom_gradient
         def LQuant(self,x,bwidth):      # Gradient function for weights quantization
-            if (bwidth==1):
+            if (self.bw[0]==1):
                 y = tf.math.sign(x)
                 def grad(dy):
                     dydx = tf.divide(dy,abs(x)+1e-5)
@@ -641,7 +641,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
         
         @tf.custom_gradient
         def LQuant(self,x,bwidth):      # Gradient function for weights quantization
-            if (bwidth==1):
+            if (self.bw[0]==1):
                 y = tf.math.sign(x)
                 def grad(dy):
                     dydx = tf.divide(dy,abs(x)+1e-5)
