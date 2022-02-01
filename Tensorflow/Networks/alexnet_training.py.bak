@@ -60,7 +60,7 @@ sL = 0
 Nlayers = [1,5,9,12,15,20,24,27,30] 
 Nlayers_base = Nlayers
 
-for i in Nlayers:
+for i in range(len(Nlayers)):
     Nlayers[i] = Nlayers[i] + sL
 
 model_name = 'AlexNet_CIFAR10/'
