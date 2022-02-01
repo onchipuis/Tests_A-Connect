@@ -40,7 +40,7 @@ def get_top_n_score(target, prediction, n):
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.7]   # Define the stddev for training
-Conv_pool = [4,8]
+Conv_pool = [2]
 FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
@@ -48,7 +48,7 @@ Wbw = [8]
 Bbw = Wbw
 #errDistr = "lognormal"
 errDistr = ["normal"]
-saveModel = True
+saveModel = False
 Nlayers = [1,5,9,12,15,20,24,27,30]
 Nlayers_base = Nlayers
 
@@ -61,7 +61,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 # TRAINING PARAMETERS
 momentum = 0.9
 batch_size = 256
-epochs = 30
+epochs = 3
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
 
