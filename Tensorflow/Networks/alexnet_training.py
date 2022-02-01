@@ -51,7 +51,7 @@ def normalization(train_images, test_images):
     return train_images, test_images
 
 #### DATA AUGMENTATION
-
+"""
 datagen = ImageDataGenerator(
         featurewise_center=False,  # set input mean to 0 over the dataset
         samplewise_center=False,  # set each sample mean to 0
@@ -65,7 +65,7 @@ datagen = ImageDataGenerator(
         #zoom_range=0.1, #se puede incluir en el modelo
         vertical_flip=False)  # randomly flip images
     # (std, mean, and principal components if ZCA whitening is applied).
-datagen.fit(X_train)
+datagen.fit(X_train)"""
 
 X_train, X_test = normalization(X_train,X_test)
 
@@ -153,10 +153,10 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 lrate = LearningRateScheduler(step_decay)
                 callbacks_list = [lrate]
                 
-                history = model.fit(datagen.flow(X_train, Y_train,
-                            batch_size=batch_size),
+                history = model.fit(X_train, Y_train,
+                            batch_size=batch_size,
                             epochs=epochs,
-                            steps_per_epoch=X_train.shape[0] // batch_size,
+                            #steps_per_epoch=X_train.shape[0] // batch_size,
                             validation_data=(X_test, Y_test),
                             callbacks=callbacks_list,
                             shuffle=True)
