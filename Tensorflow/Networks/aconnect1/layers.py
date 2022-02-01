@@ -44,35 +44,33 @@ class FC_AConnect(tf.keras.layers.Layer):
                 self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)                  #Weights regularizer. Default is None
                 self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
                 self.validate_init()
+        
         def build(self,input_shape):                                                             #This method is used for initialize the layer variables that depend on input_shape
                                                                                                     #input_shape is automatically computed by tensorflow
                 self.W = self.add_weight("W",
-                                                                                shape = [int(input_shape[-1]),self.output_size], #Weights matrix
-                                                                                initializer = "glorot_uniform",
+                                        shape = [int(input_shape[-1]),self.output_size], #Weights matrix
+                                        initializer = "glorot_uniform",
                                         dtype = self.d_type,
                                         regularizer = self.weights_regularizer,
-                                                                                trainable=True)
+                                        trainable=True)
 
                 self.bias = self.add_weight("bias",
-                                                                                shape = [self.output_size,],                                    #Bias vector
-                                                                                initializer = "zeros",
+                                        shape = [self.output_size,],                                    #Bias vector
+                                        initializer = "zeros",
                                         dtype = self.d_type,
                                         regularizer = self.bias_regularizer,
-                                                                                trainable=True)
+                                        trainable=True)
+
                 if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
                         if(self.Bstd != 0):
                                 self.infBerr = Merr_distr([self.output_size],self.Bstd,self.d_type,self.errDistr)
                                 self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
                                                                                                          #This was necessary to change the error matrix/array when Monte Carlo was running.
-
-
                         else:
                                 self.Berr = tf.constant(1,dtype=self.d_type)
                         if(self.Wstd != 0):
                                 self.infWerr = Merr_distr([int(input_shape[-1]),self.output_size],self.Wstd,self.d_type,self.errDistr)
                                 self.infWerr = self.infWerr.numpy()
-
-
                         else:
                                 self.Werr = tf.constant(1,dtype=self.d_type)
                 else:
