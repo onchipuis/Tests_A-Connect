@@ -89,14 +89,14 @@ class FC_AConnect(tf.keras.layers.Layer):
                 if(training):
                         if(self.Wstd != 0 or self.Bstd != 0):
                                 if(self.isQuant==["yes","yes"]):
-                                        weights = self.LQuant(self.W,self.bw[0],self.d_type)    #Quantize the weights and multiply them element wise with Werr mask
-                                        bias = self.LQuant(self.bias,self.bw[1],self.d_type)    #Quantize the bias and multiply them element wise with Werr mask
+                                        weights = LQuant(self.W,self.bw[0],self.d_type)    #Quantize the weights and multiply them element wise with Werr mask
+                                        bias = LQuant(self.bias,self.bw[1],self.d_type)    #Quantize the bias and multiply them element wise with Werr mask
                                 elif(self.isQuant==["yes","no"]):
-                                        weights = self.LQuant(self.W,self.bw[0],self.d_type)
+                                        weights = LQuant(self.W,self.bw[0],self.d_type)
                                         bias = self.bias
                                 elif(self.isQuant==["no","yes"]):
                                         weights = self.W
-                                        bias = self.LQuant(self.bias,self.bw[1],self.d_type)
+                                        bias = LQuant(self.bias,self.bw[1],self.d_type)
                                 else:
                                     weights = self.W
                                     bias = self.bias
@@ -173,14 +173,14 @@ class FC_AConnect(tf.keras.layers.Layer):
 
                         else:
                                 if(self.isQuant==['yes','yes']):
-                                        self.memW = self.LQuant(self.W,self.bw[0],self.d_type)*self.Werr
-                                        self.membias = self.LQuant(self.bias,self.bw[1],self.d_type)*self.Berr
+                                        self.memW = LQuant(self.W,self.bw[0],self.d_type)*self.Werr
+                                        self.membias = LQuant(self.bias,self.bw[1],self.d_type)*self.Berr
                                 elif(self.isQuant==['yes','no']):
-                                        self.memW = self.LQuant(self.W,self.bw[0],self.d_type)*self.Werr
+                                        self.memW = LQuant(self.W,self.bw[0],self.d_type)*self.Werr
                                         self.membias = self.bias*self.Berr
                                 elif(self.isQuant==['no','yes']):
                                         self.memW = self.W*self.Werr
-                                        self.membias = self.LQuant(self.bias,self.bw[1],self.d_type)*self.Berr
+                                        self.membias = LQuant(self.bias,self.bw[1],self.d_type)*self.Berr
                                 else:
                                         self.memW = self.W*self.Werr
                                         self.membias = self.bias*self.Berr
@@ -201,14 +201,14 @@ class FC_AConnect(tf.keras.layers.Layer):
                                 Werr = self.Werr
                                 Berr = self.Berr
                         if(self.isQuant==['yes','yes']):
-                                weights =self.LQuant(self.W,self.bw[0],self.d_type)*Werr
-                                bias =self.LQuant(self.bias,self.bw[1],self.d_type)*Berr
+                                weights =LQuant(self.W,self.bw[0],self.d_type)*Werr
+                                bias =LQuant(self.bias,self.bw[1],self.d_type)*Berr
                         elif(self.isQuant==['yes','no']):
-                                weights =self.LQuant(self.W,self.bw[0],self.d_type)*Werr
+                                weights =LQuant(self.W,self.bw[0],self.d_type)*Werr
                                 bias =self.bias*Berr
                         elif(self.isQuant==['no','yes']):
                                 weights =self.W*Werr
-                                bias =self.LQuant(self.bias,self.bw[1],self.d_type)*Berr
+                                bias =LQuant(self.bias,self.bw[1],self.d_type)*Berr
                         else:
                                 weights = self.W*Werr
                                 bias = self.bias*Berr
@@ -398,14 +398,14 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 if(training):
                         if(self.Wstd != 0 or self.Bstd != 0):
                                 if(self.isQuant==['yes','yes']):
-                                    weights = self.LQuant(self.W,self.bw[0],self.d_type)
-                                    bias = self.LQuant(self.bias,self.bw[1],self.d_type)
+                                    weights = LQuant(self.W,self.bw[0],self.d_type)
+                                    bias = LQuant(self.bias,self.bw[1],self.d_type)
                                 elif(self.isQuant==['yes','no']):
-                                    weights = self.LQuant(self.W,self.bw[0],self.d_type)
+                                    weights = LQuant(self.W,self.bw[0],self.d_type)
                                     bias = self.bias
                                 elif(self.isQuant==['no','yes']):
                                     weights = self.W
-                                    bias = self.LQuant(self.bias,self.bw[1],self.d_type)
+                                    bias = LQuant(self.bias,self.bw[1],self.d_type)
                                 else:
                                     weights=self.W
                                     bias=self.bias
@@ -510,14 +510,14 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                         Z = tf.concat([Z,Z1],axis=0)
                         else:
                                 if(self.isQuant==['yes','yes']):
-                                        weights = self.LQuant(self.W,self.bw[0],self.d_type)*self.Werr
-                                        self.membias = self.LQuant(self.bias,self.bw[1],self.d_type)*self.Berr
+                                        weights = LQuant(self.W,self.bw[0],self.d_type)*self.Werr
+                                        self.membias = LQuant(self.bias,self.bw[1],self.d_type)*self.Berr
                                 elif(self.isQuant==['yes','no']):
-                                        weights = self.LQuant(self.W,self.bw[0],self.d_type)*self.Werr
+                                        weights = LQuant(self.W,self.bw[0],self.d_type)*self.Werr
                                         self.membias = self.bias*self.Berr
                                 elif(self.isQuant==['no','yes']):
                                         weights = self.W*self.Werr
-                                        self.membias = self.LQuant(self.bias,self.bw[1],self.d_type)*self.Berr
+                                        self.membias = LQuant(self.bias,self.bw[1],self.d_type)*self.Berr
                                 else:
                                         weights=self.W*self.Werr
                                         self.membias = self.bias*self.Berr
@@ -536,14 +536,14 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                 Werr = self.Werr
                                 Berr = self.Berr
                         if(self.isQuant==['yes','yes']):
-                                weights=self.LQuant(self.W,self.bw[0],self.d_type)*Werr
-                                bias=self.LQuant(self.bias,self.bw[1],self.d_type)*Berr
+                                weights=LQuant(self.W,self.bw[0],self.d_type)*Werr
+                                bias=LQuant(self.bias,self.bw[1],self.d_type)*Berr
                         elif(self.isQuant==['yes','no']):
-                                weights=self.LQuant(self.W,self.bw[0],self.d_type)*Werr
+                                weights=LQuant(self.W,self.bw[0],self.d_type)*Werr
                                 bias =self.bias*Berr
                         elif(self.isQuant==['no','yes']):
                                 weights=self.W*Werr
-                                bias=self.LQuant(self.bias,self.bw[1],self.d_type)*Berr
+                                bias=LQuant(self.bias,self.bw[1],self.d_type)*Berr
                         else:
                                 weights=self.W*Werr
                                 bias = self.bias*Berr
