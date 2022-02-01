@@ -77,8 +77,8 @@ Conv_pool = FC_pool
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
 errDistr = ["normal"]
-sL = 3
-Nlayers = [1,3,4,5,6,8,10,12] 
+sL = 0
+Nlayers = [1,4,6,8,10,13,16,19] 
 Nlayers_base = Nlayers
 
 for i in range(len(Nlayers)):
