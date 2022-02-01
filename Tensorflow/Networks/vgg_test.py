@@ -55,11 +55,9 @@ optimizer = tf.optimizers.SGD(learning_rate=lr_schedule,
 for d in range(len(isAConnect)): #Iterate over the networks
     if isAConnect[d]: #is a network with A-Connect?
         Wstd_aux = Wstd_err
-        FC_pool_aux = FC_pool
         Conv_pool_aux = Conv_pool
     else:
         Wstd_aux = [0]
-        FC_pool_aux = [0]
         Conv_pool_aux = [0]
         
     for i in range(len(Conv_pool_aux)):
