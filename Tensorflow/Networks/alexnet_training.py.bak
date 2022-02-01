@@ -93,7 +93,7 @@ net_base = folder_models+'Base_32x32.h5'
 # TRAINING PARAMETERS
 momentum = 0.9
 batch_size = 256
-epochs = 60
+epochs = 50
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
 
