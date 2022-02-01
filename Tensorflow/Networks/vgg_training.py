@@ -55,14 +55,15 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,inpu
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.7]   # Define the stddev for training
-Conv_pool = [1]
-FC_pool = [1]
+Conv_pool = [1,2,4,8,16]
+FC_pool = [1,2,4,4,4]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
 Bbw = Wbw
 #errDistr = "lognormal"
 errDistr = ["normal"]
+saveModel = False
 model_name = 'VGG16_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
@@ -72,7 +73,7 @@ net = folder_models+'16Werr_Wstd_80_Bstd_80.h5'
 learning_rate = 0.01
 momentum = 0.9
 batch_size = 256
-epochs = 30
+epochs = 2
 lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 initial_learning_rate=0.01,
                 decay_steps=196,
@@ -184,8 +185,9 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         val_acc = history.history['val_accuracy']
 
                         # SAVE MODEL:
-                        string = folder_models + name + '.h5'
-                        model.save(string,include_optimizer=False)
-                        #Save in a txt the accuracy and the validation accuracy for further analysis
-                        np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
-                        np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
+                        if saveModel:
+                            string = folder_models + name + '.h5'
+                            model.save(string,include_optimizer=False)
+                            #Save in a txt the accuracy and the validation accuracy for further analysis
+                            np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
+                            np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
