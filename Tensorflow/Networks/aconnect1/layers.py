@@ -275,11 +275,11 @@ class FC_AConnect(tf.keras.layers.Layer):
                     return dydx
             else:
                 xi = tf.cast(x,tf.dtypes.float32)
-                y = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-1,max=1,num_bits=bwidth)
+                y = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-1,max=1,num_bits=self.bw[0])
                 y = tf.cast(y,self.d_type)
                 def grad(dy):
                     xi = tf.cast(x,tf.dtypes.float32)
-                    xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-1,max=1,num_bits=bwidth)
+                    xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-1,max=1,num_bits=self.bw[0])
                     xe = tf.divide(xq,xi+1e-5)
                     xe = tf.cast(xe,self.d_type)
                     dydx = tf.multiply(dy,xe)
