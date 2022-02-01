@@ -38,8 +38,8 @@ def get_top_n_score(target, prediction, n):
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()
 
-Y_train = to_categorical(Y_train, 10)
-Y_test = to_categorical(Y_test, 10)
+#Y_train = to_categorical(Y_train, 10)
+#Y_test = to_categorical(Y_test, 10)
 
 #### DATASET NORMALZATION
 
@@ -139,7 +139,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 print("\n\t\t\t", name)
 
                 #TRAINING PARAMETERS
-                model.compile(loss='categorical_crossentropy', 
+                model.compile(loss='sparse_categorical_crossentropy', 
                         optimizer=optimizer, 
                         metrics=['accuracy'])
 
