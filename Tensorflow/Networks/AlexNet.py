@@ -20,20 +20,20 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                         #RandomZoom(0.2),
                         Conv2D(filters=96,kernel_size=(11,11),strides=(4,4),padding="valid"),
                         BatchNormalization(),
-                        ReLU()
+                        ReLU(),
                         MaxPool2D(pool_size=(3,3),strides=(2,2),padding="valid"),
                         Conv2D(filters=256,kernel_size=(5,5),strides=(1,1),padding="same"),
-                        ReLU()                        
+                        ReLU(),                     
                         BatchNormalization(),
                         #MaxPool2D(pool_size=(3,3),strides=(2,2),padding="same"),
                         Conv2D(filters=384,kernel_size=(3,3),strides=(1,1),padding="same"),
-                        ReLU()                        
+                        ReLU(),                        
                         BatchNormalization(),
                         Conv2D(filters=384,kernel_size=(3,3),strides=(1,1),padding="same"),
-                        ReLU()                        
+                        ReLU(),                        
                         BatchNormalization(),
                         Conv2D(filters=384,kernel_size=(3,3),strides=(1,1),padding="same"),
-                        ReLU()                        
+                        ReLU(),                        
                         BatchNormalization(),
                         #MaxPool2D(pool_size=(3,3),strides=(2,2),padding="same"),
                         Flatten(),
