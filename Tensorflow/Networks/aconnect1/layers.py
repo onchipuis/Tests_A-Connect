@@ -266,12 +266,18 @@ class FC_AConnect(tf.keras.layers.Layer):
                 if self.pool is not None and not isinstance(self.pool, int):
                     raise TypeError('pool must be a integer. ' 'Found %s' %(type(self.pool),))
 
-        #@tf.custom_gradient
+        @tf.custom_gradient
         def LWQuant(self,x):      # Gradient function for weights quantization
             x = tf.cast(x,tf.dtypes.float32)
             y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[0])
             y = tf.cast(y,self.d_type)
-            return y
+            def grad(dy):
+                x = tf.cast(x,tf.dtypes.float32)
+                xq = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=self.bw[0])
+                xq = tf.cast(y,self.d_type)
+                dydx = tf.multiply(dy,tf.divide(xq,x+1e-5))
+                return dydx
+            return y,grad
             """
             if (self.bw[0]==1):
                 y = tf.math.sign(x)
@@ -281,7 +287,6 @@ class FC_AConnect(tf.keras.layers.Layer):
             else:
                 limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
                 y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))+1),-(2**(self.bw[0]-1)-1), 2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit
-                y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,num_bits=self.bw[0])
                 def grad(dy):
                         dydx = tf.multiply(dy,tf.divide((tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))        +1),-(2**(self.bw[0]-1)-1),2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit,x+1e-5))
                         return dydx
