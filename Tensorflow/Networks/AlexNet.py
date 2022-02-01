@@ -15,9 +15,9 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                 model = tf.keras.models.Sequential([
                         InputLayer(input_shape=[32,32,3]),
                         tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),  
-                        RandomFlip("horizontal_and_vertical"),
+                        RandomFlip("horizontal"),
                         #RandomZoom(0.1),
-                        #RandomRotation(0.2),
+                        RandomRotation(0.2),
                         Conv2D(filters=96,kernel_size=(11,11),strides=(4,4),activation='relu',padding="valid"),
                         BatchNormalization(),
                         MaxPool2D(pool_size=(3,3),strides=(2,2),padding="valid"),
