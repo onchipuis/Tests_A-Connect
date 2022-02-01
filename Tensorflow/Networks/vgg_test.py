@@ -8,7 +8,7 @@ import tensorflow as tf
 import VGG as vgg
 import time
 from datetime import datetime
-from aconnect import layers, scripts
+from aconnect1 import layers, scripts
 #from keras.callbacks import LearningRateScheduler
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
