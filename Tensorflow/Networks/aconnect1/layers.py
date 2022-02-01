@@ -662,7 +662,7 @@ def Merr_distr(shape,stddev,dtype,errDistr): #Used to reshape the output of the 
     return Merr
 
 @tf.custom_gradient
-def LQuant(x,bwidth,dtype):      # Gradient function for weights quantization
+def LQuant(x,bwidth,d_type):      # Gradient function for weights quantization
     if (self.bw[0]==1):
         y = tf.math.sign(x)
         def grad(dy):
@@ -671,10 +671,11 @@ def LQuant(x,bwidth,dtype):      # Gradient function for weights quantization
     else:
         x = tf.cast(x,tf.dtypes.float32)
         y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=bwidth)
-        y = tf.cast(y,dtype)
+        y = tf.cast(y,d_type)
         def grad(dy):
             xq = tf.cast(y,tf.dtypes.float32)
             xe = tf.divide(xq,x+1e-5)
+            xe = tf.cast(xe,d_type)
             dydx = tf.multiply(dy,xe)
             return dydx
     return y,grad
