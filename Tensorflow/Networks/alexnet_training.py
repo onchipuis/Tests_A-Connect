@@ -11,6 +11,7 @@ import time
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import LearningRateScheduler
 from aconnect import layers, scripts
+from tensorflow.keras.utils import to_categorical
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
 tic=time.time()
@@ -37,6 +38,9 @@ def get_top_n_score(target, prediction, n):
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()
 
+Y_train = to_categorical(Y_train, 10)
+Y_test = to_categorical(Y_test, 10)
+
 #### DATASET NORMALZATION
 
 def normalization(train_images, test_images):
@@ -45,6 +49,22 @@ def normalization(train_images, test_images):
     train_images = (train_images - mean) / (std + 1e-7)
     test_images = (test_images - mean) / (std + 1e-7)
     return train_images, test_images
+
+#### DATA AUGMENTATION
+
+datagen = ImageDataGenerator(
+        featurewise_center=False,  # set input mean to 0 over the dataset
+        samplewise_center=False,  # set each sample mean to 0
+        featurewise_std_normalization=False,  # divide inputs by std of the dataset
+        samplewise_std_normalization=False,  # divide each input by its std
+        zca_whitening=False,  # apply ZCA whitening
+        rotation_range=15,  # randomly rotate images in the range (degrees, 0 to 180)
+        width_shift_range=0.1,  # randomly shift images horizontally (fraction of total width)
+        height_shift_range=0.1,  # randomly shift images vertically (fraction of total height)
+        horizontal_flip=True,  # randomly flip images
+        vertical_flip=False)  # randomly flip images
+    # (std, mean, and principal components if ZCA whitening is applied).
+datagen.fit(X_train)
 
 X_train, X_test = normalization(X_train,X_test)
 
@@ -118,7 +138,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 print("\n\t\t\t", name)
 
                 #TRAINING PARAMETERS
-                model.compile(loss='sparse_categorical_crossentropy', 
+                model.compile(loss='categorical_crossentropy', 
                         optimizer=optimizer, 
                         metrics=['accuracy'])
 
@@ -132,9 +152,10 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 lrate = LearningRateScheduler(step_decay)
                 callbacks_list = [lrate]
                 
-                history = model.fit(X_train, Y_train,
-                            batch_size=batch_size,
+                history = model.fit(datagen.flow(X_train, Y_train,
+                            batch_size=batch_size),
                             epochs=epochs,
+                            steps_per_epoch=X_train.shape[0] // batch_size
                             validation_data=(X_test, Y_test),
                             callbacks=callbacks_list,
                             shuffle=True)
