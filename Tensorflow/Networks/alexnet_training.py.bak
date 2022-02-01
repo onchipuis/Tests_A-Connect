@@ -88,12 +88,12 @@ model_name = 'AlexNet_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 net_base = folder_models+'Base_32x32.h5'
-model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
+#model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
 momentum = 0.9
 batch_size = 256
-epochs = 30
+epochs = 50
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
 
@@ -120,12 +120,12 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                 errDistr=errDistr[k])
                 print(model.summary())
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                
+                """"
                 if isAConnect[d]:
                     for m in range(len(Nlayers_base)):
                         model.layers[Nlayers[m]].set_weights(
                                 model_base.layers[Nlayers_base[m]].get_weights()
-                                )
+                                )"""
                 
                 # NAME
                 if isAConnect[d]:
