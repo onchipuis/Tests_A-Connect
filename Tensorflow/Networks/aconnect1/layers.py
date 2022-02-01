@@ -663,10 +663,21 @@ def Merr_distr(shape,stddev,dtype,errDistr): #Used to reshape the output of the 
 
 #@tf.custom_gradient
 def LQuant(x,bwidth,dtype):      # Gradient function for weights quantization
-    x = tf.cast(x,tf.dtypes.float32)
-    y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=bwidth)
-    y = tf.cast(y,dtype)
-    return y
+    if (self.bw[0]==1):
+        y = tf.math.sign(x)
+        def grad(dy):
+            dydx = tf.divide(dy,abs(x)+1e-5)
+            return dydx
+    else:
+        x = tf.cast(x,tf.dtypes.float32)
+        y = tf.quantization.fake_quant_with_min_max_vars(inputs=x,min=-1,max=1,num_bits=bwidth)
+        y = tf.cast(y,dtype)
+        def grad(dy):
+            xq = tf.cast(y,tf.dtypes.float32)
+            xe = tf.divide(xq,x+1e-5)
+            dydx = tf.multiply(dy,xe)
+            return dydx
+    return y,grad
     """
     if (self.bw[0]==1):
         y = tf.math.sign(x)
@@ -674,7 +685,7 @@ def LQuant(x,bwidth,dtype):      # Gradient function for weights quantization
                 dydx = tf.divide(dy,abs(x)+1e-5)
                 return dydx
     else:
-        limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
+        #limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
         #limit = (2**self.bw[1])/2 #bias quantization limits
         y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))+1),-(2**(self.bw[0]-1)-1), 2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit
         def grad(dy):
