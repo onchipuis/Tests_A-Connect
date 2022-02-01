@@ -661,7 +661,7 @@ def Merr_distr(shape,stddev,dtype,errDistr): #Used to reshape the output of the 
       Merr = tf.math.exp(-N)
     return Merr
 
-#@tf.custom_gradient
+@tf.custom_gradient
 def LQuant(x,bwidth,dtype):      # Gradient function for weights quantization
     if (self.bw[0]==1):
         y = tf.math.sign(x)
