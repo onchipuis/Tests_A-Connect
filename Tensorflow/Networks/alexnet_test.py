@@ -37,7 +37,7 @@ force = "yes"
 
 model_name = 'AlexNet_CIFAR10/'
 folder_models = './Models/'+model_name
-folder_results = '../Results/'+model_name+'Training_data/'
+folder_results = '../Results/'+model_name
 
 # TRAINING PARAMETERS
 momentum = 0.9
