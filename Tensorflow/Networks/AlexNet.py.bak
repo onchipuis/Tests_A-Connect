@@ -16,7 +16,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                         InputLayer(input_shape=[32,32,3]),
                         tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),  
                         RandomCrop(Xsz,Xsz),
-                        Rescaling(1./255),
+                        #Rescaling(1./255),
                         RandomFlip("horizontal"),
                         #RandomZoom(0.3),
                         #RandomTranslation(0.1,0.1),

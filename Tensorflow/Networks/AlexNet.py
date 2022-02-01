@@ -18,7 +18,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                         RandomCrop(Xsz,Xsz),
                         #Rescaling(1./255),
                         RandomFlip("horizontal"),
-                        #RandomZoom(0.3),
+                        RandomZoom(0.3),
                         #RandomTranslation(0.1,0.1),
                         Conv2D(filters=96,kernel_size=(11,11),strides=(4,4),padding="valid"),
                         BatchNormalization(),
