@@ -77,13 +77,14 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                         FC_AConnect(1024,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=FC_pool,d_type=tf.dtypes.float16, isBin=isBin),  
                         BatchNormalization(),                             
                         ReLU(),                
-                        #Dropout(0.5),
+                        Dropout(0.5),
                         FC_AConnect(1024,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=FC_pool,d_type=tf.dtypes.float16, isBin=isBin),     
                         BatchNormalization(),                             
                         ReLU(),
                         FC_AConnect(512,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=FC_pool,d_type=tf.dtypes.float16, isBin=isBin),       
                         BatchNormalization(),                             
                         ReLU(),
+                        Dropout(0.5),                        
                         FC_AConnect(10,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=FC_pool,d_type=tf.dtypes.float16, isBin=isBin),
                         Softmax()
             ])
