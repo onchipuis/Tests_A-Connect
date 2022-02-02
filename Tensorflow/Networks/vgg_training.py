@@ -54,7 +54,7 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,inpu
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.7]   # Define the stddev for training
+Wstd_err = [0.0]   # Define the stddev for training
 Conv_pool = [1,2,4,8,16]
 FC_pool = [1,2,4,4,4]
 WisQuant = ["yes"]		    # Do you want binary weights?
@@ -73,7 +73,7 @@ net = folder_models+'16Werr_Wstd_80_Bstd_80.h5'
 learning_rate = 0.01
 momentum = 0.9
 batch_size = 256
-epochs = 2
+epochs = 30
 lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 initial_learning_rate=0.01,
                 decay_steps=196,
