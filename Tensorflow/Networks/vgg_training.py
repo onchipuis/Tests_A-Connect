@@ -91,7 +91,7 @@ net = folder_models+ 'baseline'#'32x32_16Werr_Wstd_80_Bstd_80.h5'
 learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
-epochs = 30
+epochs = 100
 lr_decay = 1e-6
 lr_drop = 20
 """
