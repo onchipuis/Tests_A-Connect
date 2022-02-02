@@ -53,8 +53,8 @@ Wstd_err = [0.3]   # Define the stddev for training
 Conv_pool = [2]
 FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
-BisQuant = ["no"] 
-Wbw = [8]
+BisQuant = ["yes"] 
+Wbw = [1]
 Bbw = [8]
 #errDistr = "lognormal"
 errDistr = ["normal"]
@@ -116,13 +116,11 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                         FC_pool=FC_pool_aux[i],
                                                         errDistr=errDistr[k])
                         ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                        """
                         if isAConnect[d]:
                             for m in range(len(Nlayers_base)):
                                 model.layers[Nlayers[m]].set_weights(
                                         model_base.layers[Nlayers_base[m]].get_weights()
                                         )
-                        """
                         # NAME
                         if isAConnect[d]:
                             Werr = str(int(100*Err))
