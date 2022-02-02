@@ -70,7 +70,7 @@ validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
 model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,input_shape=(32,32,3))
 
 # INPUT PARAMTERS:
-isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
+isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.3]   # Define the stddev for training
 Conv_pool = [2]
 FC_pool = [2]
@@ -85,8 +85,8 @@ model_name = 'VGG16_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 #net = folder_models+'16Werr_Wstd_80_Bstd_80.h5'
-#net_base = folder_models+'Base.h5'
-#model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
+net_base = folder_models+'Base.h5'
+model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
 learning_rate = 0.1
@@ -147,11 +147,15 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                         if isAConnect[d]:
                             Nlayers = Nlayers_AC
+                            Nlayers0 = Nlayers_noAC
+                            model0 = model_base
                         else:
                             Nlayers = Nlayers_noAC
+                            Nlayers0 = NlayersBase
+                            model0 = model_aux
                         
                         for m in range(len(Nlayers)):
-                            model.layers[Nlayers[m]].set_weights(model_aux.layers[NlayersBase[m]].get_weights())
+                            model.layers[Nlayers[m]].set_weights(model0.layers[Nlayers0[m]].get_weights())
 
                         # NAME
                         if isAConnect[d]:
