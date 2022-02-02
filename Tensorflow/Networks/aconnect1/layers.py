@@ -275,8 +275,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                     return dydx
             else:
                 xi = tf.cast(x,tf.dtypes.float32)
-                #limit = 2*tf.math.reduce_std(xi)
-                limit = 10
+                limit = 2*np.std(xi)
                 xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=self.bw[0])
                 y = tf.cast(xq,self.d_type)
                 def grad(dy):
@@ -647,8 +646,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                     return dydx
             else:
                 xi = tf.cast(x,tf.dtypes.float32)
-                #limit = 2*tf.math.reduce_std(xi)
-                limit = 10
+                limit = 2*np.std(xi)
                 xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=self.bw[0])
                 y = tf.cast(xq,self.d_type)
                 def grad(dy):
