@@ -10,7 +10,7 @@ import AlexNet as alexnet
 import time
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import LearningRateScheduler
-from aconnect import layers, scripts
+from aconnect1 import layers, scripts
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
 tic=time.time()
@@ -40,7 +40,7 @@ def get_top_n_score(target, prediction, n):
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.3]   # Define the stddev for training
-Conv_pool = [2]
+Conv_pool = [8]
 FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = ["no"] 
@@ -99,9 +99,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         # CREATING NN:
                         model = alexnet.model_creation(isAConnect=isAConnect,
                                                         Wstd=Err,Bstd=Err,
-                                                        isBin=WisQuant[p],
-                                                        #isQuant=[WisQuant[p],BisQuant[p]],
-                                                        #bw=[Wbw_aux[q],Bbw_aux[q]],
+                                                        isQuant=[WisQuant[p],BisQuant[p]],
+                                                        bw=[Wbw_aux[q],Bbw_aux[q]],
                                                         Conv_pool=Conv_pool_aux[i],
                                                         FC_pool=FC_pool_aux[i],
                                                         errDistr=errDistr[k])
