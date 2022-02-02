@@ -19,7 +19,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,
                         InputLayer(input_shape=(32,32,3)),
                         tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),  
                         ## Data augmentation layers
-                        Rescaling(1./255),
+                        #Rescaling(1./255),
                         RandomFlip("horizontal"),
                         #RandomTranslation(0.1,0.1),
                         RandomRotation(0.1),

@@ -60,7 +60,7 @@ def normalization(train_images, test_images):
     return train_images, test_images
     
 X_train, X_test = normalization(X_train,X_test)    
-sL = 5
+sL = 3
 Nlayers = [1,3,6,8,11,13,15,18,20,22,25,27,29] #Baseline layer numbers
 NlayersBase = [1,2,4,5,7,8,9,11,12,13,15,16,17]
 
