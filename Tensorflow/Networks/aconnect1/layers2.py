@@ -287,9 +287,11 @@ class FC_AConnect(tf.keras.layers.Layer):
                                 num_bits=self.bw[0])
                     #xe = tf.divide(y,x+1e-5)
                     #dydx = tf.multiply(dy,xe)
+                    """
                     dydx = tf.cast(dydx,self.d_type)
                     dlimPdx = tf.cast(dlimPdx,self.d_type)
                     dlimNdx = tf.cast(dlimNdx,self.d_type)
+                    """
                     return dydx,dlimPdx,dlimNdx
             return y,grad
             
@@ -668,9 +670,11 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                 num_bits=self.bw[0])
                     #xe = tf.divide(y,x+1e-5)
                     #dydx = tf.multiply(dy,xe)
+                    """
                     dydx = tf.cast(dydx,self.d_type)
                     dlimPdx = tf.cast(dlimPdx,self.d_type)
                     dlimNdx = tf.cast(dlimNdx,self.d_type)
+                    """
                     return dydx,dlimPdx,dlimNdx
             return y,grad
             
