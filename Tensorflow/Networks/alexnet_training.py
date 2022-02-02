@@ -67,7 +67,7 @@ datagen = ImageDataGenerator(
     # (std, mean, and principal components if ZCA whitening is applied).
 datagen.fit(X_train)"""
 
-X_train, X_test = normalization(X_train,X_test)
+#X_train, X_test = normalization(X_train,X_test)
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
@@ -77,7 +77,7 @@ Conv_pool = FC_pool
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
 errDistr = ["normal"]
-sL = 1
+sL = 0
 Nlayers = [1,4,6,8,10,13,16,19] 
 Nlayers_base = Nlayers
 

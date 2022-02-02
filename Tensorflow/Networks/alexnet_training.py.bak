@@ -70,14 +70,14 @@ datagen.fit(X_train)"""
 X_train, X_test = normalization(X_train,X_test)
 
 # INPUT PARAMTERS:
-isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
+isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
 FC_pool = [1,2,4]#,8,16]
 Conv_pool = FC_pool
 isBin = ["no"]		    # Do you want binary weights?
 #errDistr = "lognormal"
 errDistr = ["normal"]
-sL = 1
+sL = 0
 Nlayers = [1,4,6,8,10,13,16,19] 
 Nlayers_base = Nlayers
 
@@ -117,7 +117,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                 Wstd=Err,Bstd=Err,
                                                 Conv_pool=Conv_pool_aux[i],
                                                 FC_pool=FC_pool_aux[i],
-                                                errDistr=errDistr[k])
+                                                errDistr=errDistr[k],
+                                                isBin = "yes")
                 print(model.summary())
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                 """"
