@@ -5,7 +5,7 @@ Due to the memory usage we recommend to uncomment the first train the model and 
 """
 import numpy as np
 import tensorflow as tf
-import VGG as vgg
+import VGG1 as vgg
 import time
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from aconnect1 import layers, scripts
@@ -19,6 +19,13 @@ def hms_string(sec_elapsed):
     m = int((sec_elapsed % (60 * 60)) / 60)
     s = sec_elapsed % 60
     return f"{h}:{m:>02}:{s:>05.2f}"
+#Extra code to improve model accuracy
+def normalization(train_images, test_images):
+    mean = np.mean(train_images, axis=(0, 1, 2, 3))
+    std = np.std(train_images, axis=(0, 1, 2, 3))
+    train_images =(train_images - mean) / (std + 1e-7)
+    test_images = (test_images - mean) / (std + 1e-7)
+    return train_images, test_images
 
 #### TRAINING STAGE #########3
 def get_top_n_score(target, prediction, n):
@@ -35,6 +42,16 @@ def get_top_n_score(target, prediction, n):
 
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()    
+X_train, X_test = normalization(X_train,X_test)    
+sL = 3 
+Nlayers_noAC = [1,3,6,8,11,13,15,18,20,22,25,27,29] #wo AC layer numbers
+NlayersBase = [1,2,4,5,7,8,9,11,12,13,15,16,17]
+Nlayers_AC = [1,4,8,11,15,18,21,25,28,31,35,38,41] #AConnect layer numbers
+
+#Shift the layer index due to the preprocessing layers
+for j in range(len(Nlayers)):
+    Nlayers_AC[j] = Nlayers_AC[j] + sL 
+    Nlayers_noAC[j] = Nlayers_noAC[j] + sL
 """
 # prepare data augmentation configuration
 train_datagen = ImageDataGenerator(
@@ -54,10 +71,10 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,inpu
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.0]   # Define the stddev for training
-Conv_pool = [1,2,4,8,16]
-FC_pool = [1,2,4,4,4]
-WisQuant = ["yes"]		    # Do you want binary weights?
+Wstd_err = [0.3]   # Define the stddev for training
+Conv_pool = [2]
+FC_pool = [2]
+WisQuant = ["no"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
 Bbw = Wbw
@@ -67,13 +84,16 @@ saveModel = False
 model_name = 'VGG16_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
-net = folder_models+'16Werr_Wstd_80_Bstd_80.h5'
+#net = folder_models+'16Werr_Wstd_80_Bstd_80.h5'
 
 # TRAINING PARAMETERS
-learning_rate = 0.01
+learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
 epochs = 30
+lr_decay = 1e-6
+lr_drop = 20
+"""
 lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 initial_learning_rate=0.01,
                 decay_steps=196,
@@ -81,6 +101,13 @@ lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 staircase=True)
 optimizer = tf.optimizers.SGD(learning_rate=lr_schedule, 
                             momentum=momentum) #Define optimizer
+"""
+def lr_scheduler(epoch):
+    return learning_rate * (0.5 ** (epoch // lr_drop))    
+
+reduce_lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)    
+optimizer = tf.optimizers.SGD(learning_rate=learning_rate, 
+                            momentum=momentum, decay = lr_decay, nesterov= True) #Define optimizer
             
 ### TRAINING
 for d in range(len(isAConnect)): #Iterate over the networks
@@ -117,35 +144,13 @@ for d in range(len(isAConnect)): #Iterate over the networks
                        
                         ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                         if isAConnect[d]:
-                            model.layers[1].set_weights(model_aux.layers[1].get_weights())
-                            model.layers[4].set_weights(model_aux.layers[2].get_weights())
-                            model.layers[8].set_weights(model_aux.layers[4].get_weights())
-                            model.layers[11].set_weights(model_aux.layers[5].get_weights())
-                            model.layers[15].set_weights(model_aux.layers[7].get_weights())
-                            model.layers[18].set_weights(model_aux.layers[8].get_weights())
-                            model.layers[21].set_weights(model_aux.layers[9].get_weights())
-                            model.layers[25].set_weights(model_aux.layers[11].get_weights())
-                            model.layers[28].set_weights(model_aux.layers[12].get_weights())
-                            model.layers[31].set_weights(model_aux.layers[13].get_weights())
-                            model.layers[35].set_weights(model_aux.layers[15].get_weights())
-                            model.layers[38].set_weights(model_aux.layers[16].get_weights())
-                            model.layers[41].set_weights(model_aux.layers[17].get_weights())
-                        """
+                            Nlayers = Nlayers_AC
                         else:
-                            model.layers[1].set_weights(model_aux.layers[1].get_weights())
-                            model.layers[3].set_weights(model_aux.layers[2].get_weights())
-                            model.layers[6].set_weights(model_aux.layers[4].get_weights())
-                            model.layers[8].set_weights(model_aux.layers[5].get_weights())
-                            model.layers[11].set_weights(model_aux.layers[7].get_weights())
-                            model.layers[13].set_weights(model_aux.layers[8].get_weights())
-                            model.layers[15].set_weights(model_aux.layers[9].get_weights())
-                            model.layers[18].set_weights(model_aux.layers[11].get_weights())
-                            model.layers[20].set_weights(model_aux.layers[12].get_weights())
-                            model.layers[22].set_weights(model_aux.layers[13].get_weights())
-                            model.layers[25].set_weights(model_aux.layers[15].get_weights())
-                            model.layers[27].set_weights(model_aux.layers[16].get_weights())
-                            model.layers[29].set_weights(model_aux.layers[17].get_weights())
-        """
+                            Nlayers = Nlayers_noAC
+                        
+                        for m in range(len(Nlayers)):
+                            model.layers[Nlayers[m]].set_weights(model_aux.layers[NlayersBase[m]].get_weights())
+
                         # NAME
                         if isAConnect[d]:
                             Werr = str(int(100*Err))
