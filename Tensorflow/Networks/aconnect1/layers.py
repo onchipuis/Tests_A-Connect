@@ -270,7 +270,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                     raise TypeError('pool must be a integer. ' 'Found %s' %(type(self.pool),))
         
         @tf.custom_gradient
-        def LQuant(self,x,self.limP,self.limN):      # Gradient function for weights quantization
+        def LQuant(self,x,limP,limN):      # Gradient function for weights quantization
             if (self.bw[0]==1):
                 y = tf.math.sign(x)
                 def grad(dy):
