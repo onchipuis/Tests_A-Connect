@@ -46,7 +46,7 @@ Conv_pool = [8]
 FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = ["no"] 
-Wbw = [4]
+Wbw = [1]
 Bbw = [8]
 #errDistr = "lognormal"
 errDistr = ["normal"]
@@ -61,7 +61,7 @@ net_base = folder_models+'Base.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
-lr_init = 0.04
+lr_init = 0.01
 momentum = 0.9
 batch_size = 256
 epochs = 30
