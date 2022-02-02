@@ -43,8 +43,8 @@ Wstd_err = [0.3]   # Define the stddev for training
 Conv_pool = [8]
 FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
-BisQuant = ["yes"] 
-Wbw = [8]
+BisQuant = ["no"] 
+Wbw = [1]
 Bbw = Wbw
 #errDistr = "lognormal"
 errDistr = ["normal"]
@@ -59,6 +59,7 @@ net_base = folder_models+'Base.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
+lr_init = 0.04
 momentum = 0.9
 batch_size = 256
 epochs = 30
@@ -133,7 +134,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
 
                         # TRAINING
                         def step_decay (epoch): 
-                            initial_lrate = 0.01 
+                            initial_lrate = lr_init 
                             drop = 0.5 
                             epochs_drop = 30.0 
                             lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
