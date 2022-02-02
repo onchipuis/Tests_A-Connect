@@ -36,6 +36,8 @@ def get_top_n_score(target, prediction, n):
 
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()
+X_train = X_train/255
+X_test = X_test/255
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
