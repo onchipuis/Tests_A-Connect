@@ -21,7 +21,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,
                         ## Data augmentation layers
                         Rescaling(1./255),
                         RandomFlip("horizontal"),
-                        RandomTranslation(0.1,0.1),
+                        #RandomTranslation(0.1,0.1),
                         RandomRotation(0.1),
                         RandomZoom(0.2),
                         #tf.keras.layers.UpSampling2D(),          
