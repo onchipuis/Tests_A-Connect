@@ -49,7 +49,7 @@ NlayersBase = [1,2,4,5,7,8,9,11,12,13,15,16,17]
 Nlayers_AC = [1,4,8,11,15,18,21,25,28,31,35,38,41] #AConnect layer numbers
 
 #Shift the layer index due to the preprocessing layers
-for j in range(len(Nlayers)):
+for j in range(len(NlayersBase)):
     Nlayers_AC[j] = Nlayers_AC[j] + sL 
     Nlayers_noAC[j] = Nlayers_noAC[j] + sL
 """
