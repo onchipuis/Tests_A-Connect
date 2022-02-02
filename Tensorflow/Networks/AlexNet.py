@@ -55,7 +55,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                 model = tf.keras.models.Sequential([
                         InputLayer(input_shape=[32,32,3]),
                         tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),   
-                        Rescaling(1./255),
+                        #Rescaling(1./255),
                         Conv_AConnect(filters=96,kernel_size=(11,11),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,strides=4,padding="VALID",Op=1,Slice=1,d_type=tf.dtypes.float16, isBin=isBin),      
                         BatchNormalization(),                             
                         ReLU(),                             
