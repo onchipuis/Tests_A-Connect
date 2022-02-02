@@ -66,7 +66,7 @@ NlayersBase = [1,2,4,5,7,8,9,11,12,13,15,16,17]
 
 for j in range(len(Nlayers)):
     Nlayers[j] = Nlayers[j] + sL #Shift the layer index due to the preprocessing layers
-
+print(Nlayers)
 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
 model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,input_shape=(32,32,3))
 
