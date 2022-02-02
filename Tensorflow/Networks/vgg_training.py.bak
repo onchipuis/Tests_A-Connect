@@ -138,19 +138,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         model.layers[Nlayers[i]].set_weights(model_aux.layers[NlayersBase[i]].get_weights())
 
                 else:
-                    model.layers[1].set_weights(model_aux.layers[1].get_weights())
-                    model.layers[3].set_weights(model_aux.layers[2].get_weights())
-                    model.layers[6].set_weights(model_aux.layers[4].get_weights())
-                    model.layers[8].set_weights(model_aux.layers[5].get_weights())
-                    model.layers[11].set_weights(model_aux.layers[7].get_weights())
-                    model.layers[13].set_weights(model_aux.layers[8].get_weights())
-                    model.layers[15].set_weights(model_aux.layers[9].get_weights())
-                    model.layers[18].set_weights(model_aux.layers[11].get_weights())
-                    model.layers[20].set_weights(model_aux.layers[12].get_weights())
-                    model.layers[22].set_weights(model_aux.layers[13].get_weights())
-                    model.layers[25].set_weights(model_aux.layers[15].get_weights())
-                    model.layers[27].set_weights(model_aux.layers[16].get_weights())
-                    model.layers[29].set_weights(model_aux.layers[17].get_weights())
+                    for i in range(len(Nlayers)):
+                        model.layers[Nlayers[i]].set_weights(model_aux.layers[NlayersBase[i]].get_weights())
 
                 # NAME
                 Werr = str(int(100*Err))
