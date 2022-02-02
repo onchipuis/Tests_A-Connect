@@ -399,6 +399,10 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                     dtype=self.d_type,
                                     regularizer = self.bias_regularizer,
                                                                         trainable=True)
+
+                self.limP = tf.Variable(initial_value=1,trainable=True,dtype=tf.dtypes.float32)
+                self.limN = tf.Variable(initial_value=-1,trainable=True,dtype=tf.dtypes.float32)
+
                 if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
                         if(self.Bstd != 0):
                                 self.infBerr = Merr_distr([self.filters,],self.Bstd,self.d_type,self.errDistr)
