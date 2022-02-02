@@ -10,7 +10,7 @@ import AlexNet as alexnet
 import time
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import LearningRateScheduler
-from aconnect1 import layers, scripts
+from aconnect import layers, scripts
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
 tic=time.time()
@@ -99,8 +99,9 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         # CREATING NN:
                         model = alexnet.model_creation(isAConnect=isAConnect,
                                                         Wstd=Err,Bstd=Err,
-                                                        isQuant=[WisQuant[p],BisQuant[p]],
-                                                        bw=[Wbw_aux[q],Bbw_aux[q]],
+                                                        isBin=WisQuant[p],
+                                                        #isQuant=[WisQuant[p],BisQuant[p]],
+                                                        #bw=[Wbw_aux[q],Bbw_aux[q]],
                                                         Conv_pool=Conv_pool_aux[i],
                                                         FC_pool=FC_pool_aux[i],
                                                         errDistr=errDistr[k])
