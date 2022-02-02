@@ -92,7 +92,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
-epochs = 250
+epochs = 100
 lr_decay = 1e-6
 lr_drop = 20
 """
