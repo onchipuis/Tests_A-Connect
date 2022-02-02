@@ -39,7 +39,7 @@ def get_top_n_score(target, prediction, n):
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.0]   # Define the stddev for training
+Wstd_err = [0.3]   # Define the stddev for training
 Conv_pool = [2]
 FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
