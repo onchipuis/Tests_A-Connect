@@ -134,12 +134,12 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                 
                 if isAConnect[d]:
-                    for i in range(len(Nlayers)):
-                        model.layers[Nlayers[i]].set_weights(model_aux.layers[NlayersBase[i]].get_weights())
+                    for p in range(len(Nlayers)):
+                        model.layers[Nlayers[p]].set_weights(model_aux.layers[NlayersBase[p]].get_weights())
 
                 else:
-                    for i in range(len(Nlayers)):
-                        model.layers[Nlayers[i]].set_weights(model_aux.layers[NlayersBase[i]].get_weights())
+                    for p in range(len(Nlayers)):
+                        model.layers[Nlayers[p]].set_weights(model_aux.layers[NlayersBase[p]].get_weights())
 
                 # NAME
                 Werr = str(int(100*Err))
