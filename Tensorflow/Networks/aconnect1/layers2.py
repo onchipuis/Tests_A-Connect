@@ -281,11 +281,15 @@ class FC_AConnect(tf.keras.layers.Layer):
                 xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=limN,max=limP,num_bits=self.bw[0])
                 y = tf.cast(xq,self.d_type)
                 def grad(dy):
+                    dyi = tf.cast(dy,tf.dtypes.float32)
                     (dydx,dlimPdx,dlimNdx) = tf.quantization.fake_quant_with_min_max_vars_gradient(
-                                gradients=dy, inputs=xi, min=limN, max=limP,
+                                gradients=dyi, inputs=xi, min=limN, max=limP,
                                 num_bits=self.bw[0])
                     #xe = tf.divide(y,x+1e-5)
                     #dydx = tf.multiply(dy,xe)
+                    dydx = tf.cast(dydx,self.d_type)
+                    dlimPdx = tf.cast(dlimPdx,self.d_type)
+                    dlimNdx = tf.cast(dlimNdx,self.d_type)
                     return dydx,dlimPdx,dlimNdx
             return y,grad
             
@@ -658,11 +662,15 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=limN,max=limP,num_bits=self.bw[0])
                 y = tf.cast(xq,self.d_type)
                 def grad(dy):
+                    dyi = tf.cast(dy,tf.dtypes.float32)
                     (dydx,dlimPdx,dlimNdx) = tf.quantization.fake_quant_with_min_max_vars_gradient(
-                                gradients=dy, inputs=xi, min=limN, max=limP,
+                                gradients=dyi, inputs=xi, min=limN, max=limP,
                                 num_bits=self.bw[0])
                     #xe = tf.divide(y,x+1e-5)
                     #dydx = tf.multiply(dy,xe)
+                    dydx = tf.cast(dydx,self.d_type)
+                    dlimPdx = tf.cast(dlimPdx,self.d_type)
+                    dlimNdx = tf.cast(dlimNdx,self.d_type)
                     return dydx,dlimPdx,dlimNdx
             return y,grad
             
