@@ -40,19 +40,32 @@ Y_train = to_categorical(Y_train, 10)
 Y_test = to_categorical(Y_test, 10)   
 
 # prepare data augmentation configuration
-
+""""
 datagen = ImageDataGenerator(
     rescale=1. / 255,
-    #rotation_range=15,
+    rotation_range=15,
     width_shift_range=0.1,
     height_shift_range=0.1,
-    #shear_range=0.2,
-    #zoom_range=0.2,
+    shear_range=0.2,
+    zoom_range=0.2,
     horizontal_flip=True)
 
 datagen.fit(X_train)
+"""
+def normalization(train_images, test_images):
+    mean = np.mean(train_images, axis=(0, 1, 2, 3))
+    std = np.std(train_images, axis=(0, 1, 2, 3))
+    train_images =(train_images - mean) / (std + 1e-7)
+    test_images = (test_images - mean) / (std + 1e-7)
+    return train_images, test_images
+    
+X_train, X_test = normalization(X_train,X_test)    
+sL = 3
+Nlayers = [1,3,6,8,11,13,15,18,20,22,25,27,29] #Baseline layer numbers
+NlayersBase = [1,2,4,5,7,8,9,11,12,13,15,16,17]
 
-
+for j in range(len(Nlayers)):
+    Nlayers[j] = Nlayers[j] + sL #Shift the layer index due to the preprocessing layers
 
 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
 model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,input_shape=(32,32,3))
@@ -72,16 +85,24 @@ folder_results = '../Results/'+model_name+'Training_data/'
 net = folder_models+ 'baseline'#'32x32_16Werr_Wstd_80_Bstd_80.h5'
 
 # TRAINING PARAMETERS
-learning_rate = 0.01
+learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
 epochs = 30
+lr_decay = 1e-6
+lr_drop = 20
+"""
 lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 initial_learning_rate=0.01,
                 decay_steps=196,
                 decay_rate=0.9,
-                staircase=True)
-optimizer = tf.optimizers.SGD(learning_rate=lr_schedule, 
+                staircase=True)"""
+                
+def lr_scheduler(epoch):
+    return learning_rate * (0.5 ** (epoch // lr_drop))    
+
+lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)    
+optimizer = tf.optimizers.SGD(learning_rate=learning_rate 
                             momentum=momentum) #Define optimizer
             
 ### TRAINING
@@ -113,19 +134,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                 
                 if isAConnect[d]:
-                    model.layers[1].set_weights(model_aux.layers[1].get_weights())
-                    model.layers[4].set_weights(model_aux.layers[2].get_weights())
-                    model.layers[8].set_weights(model_aux.layers[4].get_weights())
-                    model.layers[11].set_weights(model_aux.layers[5].get_weights())
-                    model.layers[15].set_weights(model_aux.layers[7].get_weights())
-                    model.layers[18].set_weights(model_aux.layers[8].get_weights())
-                    model.layers[21].set_weights(model_aux.layers[9].get_weights())
-                    model.layers[25].set_weights(model_aux.layers[11].get_weights())
-                    model.layers[28].set_weights(model_aux.layers[12].get_weights())
-                    model.layers[31].set_weights(model_aux.layers[13].get_weights())
-                    model.layers[35].set_weights(model_aux.layers[15].get_weights())
-                    model.layers[38].set_weights(model_aux.layers[16].get_weights())
-                    model.layers[41].set_weights(model_aux.layers[17].get_weights())
+                    for i in range(len(Nlayers)):
+                        model.layers[Nlayers[i]].set_weights(model_aux.layers[NlayersBase[i]].get_weights())
 
                 else:
                     model.layers[1].set_weights(model_aux.layers[1].get_weights())
@@ -158,10 +168,11 @@ for d in range(len(isAConnect)): #Iterate over the networks
                
                 # TRAINING
                 
-                history = model.fit(datagen.flow(X_train, Y_train, batch_size=batch_size),
-                          #batch_size=batch_size,
+                history = model.fit(X_train, Y_train,
+                          batch_size=batch_size,
                           epochs=epochs,
                           validation_data=(X_test, Y_test),
+                          callbacks=[reduce_lr],
                           shuffle=True)
                 model.evaluate(X_test, Y_test)    
 

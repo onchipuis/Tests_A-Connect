@@ -8,7 +8,7 @@ import tensorflow as tf
 from aconnect.layers import Conv_AConnect, FC_AConnect 
 from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatten, RandomFlip, RandomRotation, RandomZoom
 from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax, Rescaling
-Xsz = 32
+Xsz = 100
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,
         Conv_pool=16,FC_pool=16,errDistr="normal",
