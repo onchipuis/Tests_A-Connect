@@ -268,7 +268,12 @@ class FC_AConnect(tf.keras.layers.Layer):
         
         @tf.custom_gradient
         def LQuant(self,x):      # Gradient function for weights quantization
-            if (self.bw[0]==1):
+            if x.name == "bias":
+                bwidth = self.bw[1]
+            else:
+                bwidth = self.bw[0]
+
+            if (bwidth==1):
                 y = tf.math.sign(x)
                 def grad(dy):
                     dydx = tf.divide(dy,abs(x)+1e-5)
@@ -276,7 +281,8 @@ class FC_AConnect(tf.keras.layers.Layer):
             else:
                 xi = tf.cast(x,tf.dtypes.float32)
                 limit = 1
-                xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=self.bw[0])
+                xq
+                = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=bwidth)
                 y = tf.cast(xq,self.d_type)
                 def grad(dy):
                     xe = tf.divide(y,x+1e-5)
@@ -639,7 +645,12 @@ class Conv_AConnect(tf.keras.layers.Layer):
         
         @tf.custom_gradient
         def LQuant(self,x):      # Gradient function for weights quantization
-            if (self.bw[0]==1):
+            if x.name == "bias":
+                bwidth = self.bw[1]
+            else:
+                bwidth = self.bw[0]
+            
+            if (bwidth==1):
                 y = tf.math.sign(x)
                 def grad(dy):
                     dydx = tf.divide(dy,abs(x)+1e-5)
@@ -647,7 +658,8 @@ class Conv_AConnect(tf.keras.layers.Layer):
             else:
                 xi = tf.cast(x,tf.dtypes.float32)
                 limit = 1
-                xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=self.bw[0])
+                xq
+                = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=bwidth)
                 y = tf.cast(xq,self.d_type)
                 def grad(dy):
                     xe = tf.divide(y,x+1e-5)
