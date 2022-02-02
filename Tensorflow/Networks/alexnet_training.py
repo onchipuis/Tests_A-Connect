@@ -105,13 +105,11 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                         FC_pool=FC_pool_aux[i],
                                                         errDistr=errDistr[k])
                         ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                        """
                         if isAConnect[d]:
                             for m in range(len(Nlayers_base)):
                                 model.layers[Nlayers[m]].set_weights(
                                         model_base.layers[Nlayers_base[m]].get_weights()
                                         )
-                        """
                         # NAME
                         if isAConnect[d]:
                             Werr = str(int(100*Err))
