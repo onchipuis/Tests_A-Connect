@@ -46,8 +46,8 @@ def get_top_n_score(target, prediction, n):
 def normalization(train_images, test_images):
     mean = np.mean(train_images, axis=(0, 1, 2, 3))
     std = np.std(train_images, axis=(0, 1, 2, 3))
-    train_images = (train_images - mean) / (std + 1e-7)
-    test_images = (test_images - mean) / (std + 1e-7)
+    train_images = train_images./255#(train_images - mean) / (std + 1e-7)
+    test_images = test_images./255#(test_images - mean) / (std + 1e-7)
     return train_images, test_images
 
 #### DATA AUGMENTATION
@@ -67,7 +67,7 @@ datagen = ImageDataGenerator(
     # (std, mean, and principal components if ZCA whitening is applied).
 datagen.fit(X_train)"""
 
-#X_train, X_test = normalization(X_train,X_test)
+X_train, X_test = normalization(X_train,X_test)
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
