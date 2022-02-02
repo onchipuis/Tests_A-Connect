@@ -103,7 +103,7 @@ def lr_scheduler(epoch):
 
 reduce_lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)    
 optimizer = tf.optimizers.SGD(learning_rate=learning_rate 
-                            momentum=momentum, decay = decay, nesteorv= True) #Define optimizer
+                            momentum=momentum, decay = decay, nesterov= True) #Define optimizer
             
 ### TRAINING
 for d in range(len(isAConnect)): #Iterate over the networks
