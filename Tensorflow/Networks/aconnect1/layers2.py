@@ -61,8 +61,8 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         regularizer = self.bias_regularizer,
                                         trainable=True)
 
-                self.limP = tf.Variable(initial_value=1,trainable=True,dtype=tf.dtypes.float32)
-                self.limN = tf.Variable(initial_value=-1,trainable=True,dtype=tf.dtypes.float32)
+                self.limP = tf.Variable(initial_value=1,trainable=True,dtype=self.d_type)
+                self.limN = tf.Variable(initial_value=-1,trainable=True,dtype=self.d_type)
 
                 if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
                         if(self.Bstd != 0):
@@ -287,11 +287,9 @@ class FC_AConnect(tf.keras.layers.Layer):
                                 num_bits=self.bw[0])
                     #xe = tf.divide(y,x+1e-5)
                     #dydx = tf.multiply(dy,xe)
-                    """
                     dydx = tf.cast(dydx,self.d_type)
                     dlimPdx = tf.cast(dlimPdx,self.d_type)
                     dlimNdx = tf.cast(dlimNdx,self.d_type)
-                    """
                     return dydx,dlimPdx,dlimNdx
             return y,grad
             
@@ -405,8 +403,8 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                     regularizer = self.bias_regularizer,
                                                                         trainable=True)
 
-                self.limP = tf.Variable(initial_value=1,trainable=True,dtype=tf.dtypes.float32)
-                self.limN = tf.Variable(initial_value=-1,trainable=True,dtype=tf.dtypes.float32)
+                self.limP = tf.Variable(initial_value=1,trainable=True,dtype=self.d_type)
+                self.limN = tf.Variable(initial_value=-1,trainable=True,dtype=self.d_type)
 
                 if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
                         if(self.Bstd != 0):
@@ -670,11 +668,9 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                 num_bits=self.bw[0])
                     #xe = tf.divide(y,x+1e-5)
                     #dydx = tf.multiply(dy,xe)
-                    """
                     dydx = tf.cast(dydx,self.d_type)
                     dlimPdx = tf.cast(dlimPdx,self.d_type)
                     dlimNdx = tf.cast(dlimNdx,self.d_type)
-                    """
                     return dydx,dlimPdx,dlimNdx
             return y,grad
             
