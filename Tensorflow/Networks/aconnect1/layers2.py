@@ -61,6 +61,9 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         regularizer = self.bias_regularizer,
                                         trainable=True)
 
+                self.limP = tf.Variable(initial_value=1,trainable=True,dtype=tf.dtypes.float32)
+                self.limN = tf.Variable(initial_value=-1,trainable=True,dtype=tf.dtypes.float32)
+
                 if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
                         if(self.Bstd != 0):
                                 self.infBerr = Merr_distr([self.output_size],self.Bstd,self.d_type,self.errDistr)
@@ -89,14 +92,14 @@ class FC_AConnect(tf.keras.layers.Layer):
                 if(training):
                         if(self.Wstd != 0 or self.Bstd != 0):
                                 if(self.isQuant==["yes","yes"]):
-                                        weights = self.LQuant(self.W)    #Quantize the weights and multiply them element wise with Werr mask
-                                        bias = self.LQuant(self.bias)    #Quantize the bias and multiply them element wise with Werr mask
+                                        weights = self.LQuant(self.W,self.limP,self.limN)    #Quantize the weights and multiply them element wise with Werr mask
+                                        bias = self.LQuant(self.bias,self.limP,self.limN)    #Quantize the bias and multiply them element wise with Werr mask
                                 elif(self.isQuant==["yes","no"]):
-                                        weights = self.LQuant(self.W)
+                                        weights = self.LQuant(self.W,self.limP,self.limN)
                                         bias = self.bias
                                 elif(self.isQuant==["no","yes"]):
                                         weights = self.W
-                                        bias = self.LQuant(self.bias)
+                                        bias = self.LQuant(self.bias,self.limP,self.limN)
                                 else:
                                     weights = self.W
                                     bias = self.bias
@@ -173,14 +176,14 @@ class FC_AConnect(tf.keras.layers.Layer):
 
                         else:
                                 if(self.isQuant==['yes','yes']):
-                                        self.memW = self.LQuant(self.W)*self.Werr
-                                        self.membias = self.LQuant(self.bias)*self.Berr
+                                        self.memW = self.LQuant(self.W,self.limP,self.limN)*self.Werr
+                                        self.membias = self.LQuant(self.bias,self.limP,self.limN)*self.Berr
                                 elif(self.isQuant==['yes','no']):
-                                        self.memW = self.LQuant(self.W)*self.Werr
+                                        self.memW = self.LQuant(self.W,self.limP,self.limN)*self.Werr
                                         self.membias = self.bias*self.Berr
                                 elif(self.isQuant==['no','yes']):
                                         self.memW = self.W*self.Werr
-                                        self.membias = self.LQuant(self.bias)*self.Berr
+                                        self.membias = self.LQuant(self.bias,self.limP,self.limN)*self.Berr
                                 else:
                                         self.memW = self.W*self.Werr
                                         self.membias = self.bias*self.Berr
@@ -201,14 +204,14 @@ class FC_AConnect(tf.keras.layers.Layer):
                                 Werr = self.Werr
                                 Berr = self.Berr
                         if(self.isQuant==['yes','yes']):
-                                weights = self.LQuant(self.W)*Werr
-                                bias = self.LQuant(self.bias)*Berr
+                                weights = self.LQuant(self.W,self.limP,self.limN)*Werr
+                                bias = self.LQuant(self.bias,self.limP,self.limN)*Berr
                         elif(self.isQuant==['yes','no']):
-                                weights = self.LQuant(self.W)*Werr
+                                weights = self.LQuant(self.W,self.limP,self.limN)*Werr
                                 bias =self.bias*Berr
                         elif(self.isQuant==['no','yes']):
                                 weights =self.W*Werr
-                                bias = self.LQuant(self.bias)*Berr
+                                bias = self.LQuant(self.bias,self.limP,self.limN)*Berr
                         else:
                                 weights = self.W*Werr
                                 bias = self.bias*Berr
@@ -267,7 +270,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                     raise TypeError('pool must be a integer. ' 'Found %s' %(type(self.pool),))
         
         @tf.custom_gradient
-        def LQuant(self,x):      # Gradient function for weights quantization
+        def LQuant(self,x,limP,limN):      # Gradient function for weights quantization
             if (self.bw[0]==1):
                 y = tf.math.sign(x)
                 def grad(dy):
@@ -276,12 +279,15 @@ class FC_AConnect(tf.keras.layers.Layer):
             else:
                 xi = tf.cast(x,tf.dtypes.float32)
                 limit = 2*np.std(xi)
-                xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=self.bw[0])
+                xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=limN,max=limP,num_bits=self.bw[0])
                 y = tf.cast(xq,self.d_type)
                 def grad(dy):
-                    xe = tf.divide(y,x+1e-5)
-                    dydx = tf.multiply(dy,xe)
-                    return dydx
+                    (dydx,dlimPdx,dlimNdx) = tf.quantization.fake_quant_with_min_max_vars_gradient(
+                                gradients=dy, inputs=xi, min=limN, max=limP,
+                                num_bits=self.bw[0])
+                    #xe = tf.divide(y,x+1e-5)
+                    #dydx = tf.multiply(dy,xe)
+                    return dydx,dlimPdx,dlimNdx
             return y,grad
             
 
@@ -417,14 +423,14 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 if(training):
                         if(self.Wstd != 0 or self.Bstd != 0):
                                 if(self.isQuant==['yes','yes']):
-                                    weights = self.LQuant(self.W)
-                                    bias = self.LQuant(self.bias)
+                                    weights = self.LQuant(self.W,self.limP,self.limN)
+                                    bias = self.LQuant(self.bias,self.limP,self.limN)
                                 elif(self.isQuant==['yes','no']):
-                                    weights = self.LQuant(self.W)
+                                    weights = self.LQuant(self.W,self.limP,self.limN)
                                     bias = self.bias
                                 elif(self.isQuant==['no','yes']):
                                     weights = self.W
-                                    bias = self.LQuant(self.bias)
+                                    bias = self.LQuant(self.bias,self.limP,self.limN)
                                 else:
                                     weights=self.W
                                     bias=self.bias
@@ -529,14 +535,14 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                         Z = tf.concat([Z,Z1],axis=0)
                         else:
                                 if(self.isQuant==['yes','yes']):
-                                        weights = self.LQuant(self.W)*self.Werr
-                                        self.membias = self.LQuant(self.bias)*self.Berr
+                                        weights = self.LQuant(self.W,self.limP,self.limN)*self.Werr
+                                        self.membias = self.LQuant(self.bias,self.limP,self.limN)*self.Berr
                                 elif(self.isQuant==['yes','no']):
-                                        weights = self.LQuant(self.W)*self.Werr
+                                        weights = self.LQuant(self.W,self.limP,self.limN)*self.Werr
                                         self.membias = self.bias*self.Berr
                                 elif(self.isQuant==['no','yes']):
                                         weights = self.W*self.Werr
-                                        self.membias = self.LQuant(self.bias)*self.Berr
+                                        self.membias = self.LQuant(self.bias,self.limP,self.limN)*self.Berr
                                 else:
                                         weights=self.W*self.Werr
                                         self.membias = self.bias*self.Berr
@@ -555,14 +561,14 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                 Werr = self.Werr
                                 Berr = self.Berr
                         if(self.isQuant==['yes','yes']):
-                                weights= self.LQuant(self.W)*Werr
-                                bias= self.LQuant(self.bias)*Berr
+                                weights= self.LQuant(self.W,self.limP,self.limN)*Werr
+                                bias= self.LQuant(self.bias,self.limP,self.limN)*Berr
                         elif(self.isQuant==['yes','no']):
-                                weights= self.LQuant(self.W)*Werr
+                                weights= self.LQuant(self.W,self.limP,self.limN)*Werr
                                 bias =self.bias*Berr
                         elif(self.isQuant==['no','yes']):
                                 weights=self.W*Werr
-                                bias= self.LQuant(self.bias)*Berr
+                                bias= self.LQuant(self.bias,self.limP,self.limN)*Berr
                         else:
                                 weights=self.W*Werr
                                 bias = self.bias*Berr
@@ -638,7 +644,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 return config
         
         @tf.custom_gradient
-        def LQuant(self,x):      # Gradient function for weights quantization
+        def LQuant(self,x,limP,limN):      # Gradient function for weights quantization
             if (self.bw[0]==1):
                 y = tf.math.sign(x)
                 def grad(dy):
@@ -647,12 +653,15 @@ class Conv_AConnect(tf.keras.layers.Layer):
             else:
                 xi = tf.cast(x,tf.dtypes.float32)
                 limit = 2*np.std(xi)
-                xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=self.bw[0])
+                xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=limN,max=limP,num_bits=self.bw[0])
                 y = tf.cast(xq,self.d_type)
                 def grad(dy):
-                    xe = tf.divide(y,x+1e-5)
-                    dydx = tf.multiply(dy,xe)
-                    return dydx
+                    (dydx,dlimPdx,dlimNdx) = tf.quantization.fake_quant_with_min_max_vars_gradient(
+                                gradients=dy, inputs=xi, min=limN, max=limP,
+                                num_bits=self.bw[0])
+                    #xe = tf.divide(y,x+1e-5)
+                    #dydx = tf.multiply(dy,xe)
+                    return dydx,dlimPdx,dlimNdx
             return y,grad
             
             """
