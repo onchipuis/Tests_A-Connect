@@ -46,7 +46,7 @@ X_train, X_test = normalization(X_train,X_test)
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.3]   # Define the stddev for training
-Sim_err = [0,0.3]
+Sim_err = [0]
 #Conv_pool = [1,2,4,8,16]
 Conv_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
@@ -130,10 +130,11 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             
                             model = tf.keras.models.load_model(string,custom_objects=custom_objects)
                             model.compile(loss='sparse_categorical_crossentropy',
-                                    optimizer=optimizer, 
                                     metrics=['accuracy'])
+                                    #optimizer=optimizer, 
                             y_predict =model.predict(X_test)
                             print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
+                            """
                             elapsed_time = time.time() - start_time
                             print("Elapsed time: {}".format(hms_string(elapsed_time)))
                             now = datetime.now()
