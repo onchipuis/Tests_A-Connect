@@ -158,4 +158,3 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             print('\n\n*********************************************************************')
                             print('\n Simulation started at: ',starttime)
                             print('Simulation finished at: ', endtime)    
-                            """
