@@ -36,7 +36,7 @@ X_train, X_test = normalization(X_train,X_test)
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.3]   # Define the stddev for training
-Sim_err = [0.3]
+Sim_err = [0,0.3]
 #Conv_pool = [1,2,4,8,16]
 Conv_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
@@ -118,8 +118,6 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                 N = 1
                                     #####
                             
-                            model = tf.keras.models.load_model(string,custom_objects=custom_objects)
-                            model.evaluate(X_test,Y_test)    
                             elapsed_time = time.time() - start_time
                             print("Elapsed time: {}".format(hms_string(elapsed_time)))
                             now = datetime.now()
