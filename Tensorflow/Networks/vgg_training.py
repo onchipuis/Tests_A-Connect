@@ -205,7 +205,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         # SAVE MODEL:
                         if saveModel:
                             string = folder_models + name + '.h5'
-                            model.save(string,include_optimizer=False)
+                            model.save(string,include_optimizer=True)
                             #Save in a txt the accuracy and the validation accuracy for further analysis
                             np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
                             np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
