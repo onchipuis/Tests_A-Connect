@@ -98,7 +98,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
-epochs = 50
+epochs = 5
 lr_decay = 1e-6
 lr_drop = 30
 """
@@ -148,7 +148,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                     isQuant=[WisQuant[p],BisQuant[p]],
                                                     Conv_pool=Conv_pool_aux[i],
                                                     FC_pool=FC_pool_aux[i],
-                                                    errDistr=errDistr[k],isBin="yes")
+                                                    errDistr=errDistr[k],isBin="no")
                        
                         ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                         if isAConnect[d]:
