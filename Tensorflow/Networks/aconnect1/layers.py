@@ -242,13 +242,14 @@ class FC_AConnect(tf.keras.layers.Layer):
                         'output_size': self.output_size,
                         'Wstd': self.Wstd,
                         'Bstd': self.Bstd,
-                        'isBin': self.isQuant,
+                        'isQuant': self.isQuant,
                         'bw': self.bw,
-            'pool' : self.pool,
-            'Slice': self.Slice,
-            'd_type': self.d_type,
-            'weights_regularizer': self.weights_regularizer,
-            'bias_regularizer' : self.bias_regularizer})
+                        'pool' : self.pool,
+                        'Slice': self.Slice,
+                        'd_type': self.d_type,
+                        'errDistr ': self.errDistr,
+                        'weights_regularizer': self.weights_regularizer,
+                        'bias_regularizer' : self.bias_regularizer})
                 return config
 
         def validate_init(self):
