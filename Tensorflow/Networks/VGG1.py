@@ -5,7 +5,7 @@ Due to the memory usage we recommend to uncomment the first train the model and 
 stage and then load the model to test it using the Monte Carlo simulation.
 """
 import tensorflow as tf
-from aconnect1.layers import Conv_AConnect, FC_AConnect 
+from aconnect.layers import Conv_AConnect, FC_AConnect 
 from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatten, RandomFlip, RandomRotation, RandomZoom
 from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax, Rescaling, RandomTranslation
 Xsz = 32
