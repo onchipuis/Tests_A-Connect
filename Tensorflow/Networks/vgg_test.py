@@ -128,7 +128,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                 N = 1
                                     #####
                             
-                            name = '2Werr_Wstd_30_Bstd_30_8bQuant_normalDistr'
+                            name = 'Base'
                             string = folder_models + name + '.h5'
                             model = tf.keras.models.load_model(string,custom_objects=custom_objects)
                             model.compile(loss='sparse_categorical_crossentropy',
