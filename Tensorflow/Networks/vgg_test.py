@@ -125,18 +125,9 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             if Err == 0:
                                 N = 1
                             else:
-                                N = 1
+                                N = 100
                                     #####
                             
-                            name = 'Base'
-                            string = folder_models + name + '.h5'
-                            model = tf.keras.models.load_model(string,custom_objects=custom_objects)
-                            model.compile(loss='sparse_categorical_crossentropy',
-                                    metrics=['accuracy'])
-                                    #optimizer=optimizer, 
-                            y_predict =model.predict(X_test)
-                            print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
-                            """
                             elapsed_time = time.time() - start_time
                             print("Elapsed time: {}".format(hms_string(elapsed_time)))
                             now = datetime.now()
