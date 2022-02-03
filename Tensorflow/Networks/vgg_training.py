@@ -83,7 +83,7 @@ folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 net = folder_models+'32x32_16Werr_Wstd_80_Bstd_80.h5'
 
-sL = 3 
+sL = 0 
 NlayersBase = [1,2,4,5,7,8,9,11,12,13,15,16,17]
 if isAConnect:
     Nlayers = [1,3,6,8,11,13,15,18,20,22,25,27,29] #Baseline layer number

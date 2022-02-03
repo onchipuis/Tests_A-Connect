@@ -136,7 +136,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                             Conv_pool=Conv_pool_aux[i],
                                             FC_pool=FC_pool_aux[i],
                                             errDistr=errDistr[k],
-                                            isQuant=['yes','yes'],
+                                            isQuant=['no','no'],
                                             bw=[8,8])
                 print(model.summary())
                
