@@ -191,7 +191,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                   validation_data=(X_test, Y_test),
                                   callbacks = [reduce_lr],
                                   shuffle=True)
-                        model.evaluate(X_test,Y_test)    
+                        model.evaluate(X_test,Y_test) 
+                        string = folder_models + name + '.h5'                                
                         model.save(string,include_optimizer=False)
                         y_predict =model.predict(X_test)
                         elapsed_time = time.time() - start_time

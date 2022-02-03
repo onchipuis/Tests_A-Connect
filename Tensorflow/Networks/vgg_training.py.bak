@@ -192,7 +192,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                   callbacks = [reduce_lr],
                                   shuffle=True)
                         model.evaluate(X_test,Y_test)    
-
+                        model.save(string,include_optimizer=False)
                         y_predict =model.predict(X_test)
                         elapsed_time = time.time() - start_time
                         print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
@@ -205,7 +205,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         # SAVE MODEL:
                         if saveModel:
                             string = folder_models + name + '.h5'
-                            model.save(string,include_optimizer=False)
+                            #model.save(string,include_optimizer=False)
                             #Save in a txt the accuracy and the validation accuracy for further analysis
                             np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
                             np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
