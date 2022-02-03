@@ -63,9 +63,9 @@ for j in range(len(Sim_err)):
                     Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
                     custom_objects=custom_objects,
                     optimizer=tf.optimizers.SGD(learning_rate=0.1,momentum=0.9),
-                    loss='sparse_categorical_crossentropy',
+                    loss='categorical_crossentropy',
                     metrics=['accuracy'],top5=False,dtype='float16',
-                    errDistr="normal"
+                    errDistr="normal", force = "yes"
                     )
             name_sim = name+'_simErr_'+str(int(100*Err))                      
             name_stats = name+'_stats_simErr_'+str(int(100*Err))                      
