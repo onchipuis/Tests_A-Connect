@@ -30,7 +30,7 @@ def normalization(train_images, test_images):
 
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()	
-X_train, X_test = normalization(X_train,X_test)    
+#X_train, X_test = normalization(X_train,X_test)    
 
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
