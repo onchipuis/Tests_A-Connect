@@ -100,7 +100,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             Err = Sim_err[m]
                             # NAME
                             if isAConnect[d]:
-                                Werr = str(int(100*Err))
+                                Werr = str(int(100*Werr))
                                 Nm = str(int(Conv_pool_aux[i]))
                                 if WisQuant[p] == "yes":
                                     bws = str(int(Wbw_aux[q]))
