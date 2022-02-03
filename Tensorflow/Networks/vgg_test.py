@@ -118,6 +118,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                 N = 1
                                     #####
                             
+                            model = tf.keras.models.load_model(string,custom_objects=custom_objects)
+                            model.evaluate(X_test,Y_test)    
                             elapsed_time = time.time() - start_time
                             print("Elapsed time: {}".format(hms_string(elapsed_time)))
                             now = datetime.now()
