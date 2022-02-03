@@ -63,20 +63,16 @@ def normalization(train_images, test_images):
     return train_images, test_images
     
 X_train, X_test = normalization(X_train,X_test)    
-sL = 3 
-Nlayers = [1,3,6,8,11,13,15,18,20,22,25,27,29] #Baseline layer numbers
-NlayersBase = [1,2,4,5,7,8,9,11,12,13,15,16,17]
 
-for j in range(len(Nlayers)):
-    Nlayers[j] = Nlayers[j] + sL #Shift the layer index due to the preprocessing layers
+
 ###########################################################################################
 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
 model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,input_shape=(32,32,3))
 
 # INPUT PARAMTERS:
-isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
+isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 #Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-Wstd_err = [0.7]	    # Define the stddev for training
+Wstd_err = [0.3]	    # Define the stddev for training
 Conv_pool = [16]
 FC_pool = [4]
 isBin = ["no"]		    # Do you want binary weights?
@@ -85,13 +81,23 @@ errDistr = ["normal"]
 model_name = 'VGG16_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
-net = folder_models+ 'baseline'#'32x32_16Werr_Wstd_80_Bstd_80.h5'
+net = folder_models+'32x32_16Werr_Wstd_80_Bstd_80.h5'
+
+sL = 3 
+NlayersBase = [1,2,4,5,7,8,9,11,12,13,15,16,17]
+if isAConnect:
+    Nlayers = [1,3,6,8,11,13,15,18,20,22,25,27,29] #Baseline layer number
+else:
+    Nlayers = [1,4,8,11,15,18,21,25,28,31,35,38,41] #Baseline layer numbers     
+
+for j in range(len(Nlayers)):
+    Nlayers[j] = Nlayers[j] + sL #Shift the layer index due to the preprocessing layers    
 
 # TRAINING PARAMETERS
 learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
-epochs = 100
+epochs = 5
 lr_decay = 1e-6
 lr_drop = 20
 """
@@ -147,7 +153,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 # NAME
                 Werr = str(int(100*Err))
                 Nm = str(int(FC_pool_aux[i]))
-                name = 'baseline_32x32' #+Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
+                name = "32x32_"+Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
                 
                 print("*************************TRAINING NETWORK*********************")
                 print("\n\t\t\t", name)
