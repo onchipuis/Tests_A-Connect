@@ -26,11 +26,21 @@ def normalization(train_images, test_images):
     train_images =(train_images - mean) / (std + 1e-7)
     test_images = (test_images - mean) / (std + 1e-7)
     return train_images, test_images
-
+def get_top_n_score(target, prediction, n):
+    #ordeno los indices de menor a mayor probabilidad
+    pre_sort_index = np.argsort(prediction)
+    #ordeno de mayor probabilidad a menor
+    pre_sort_index = pre_sort_index[:,::-1]
+    #cojo las n-top predicciones
+    pre_top_n = pre_sort_index[:,:n]
+    #obtengo el conteo de acierto
+    precision = [1 if target[i] in pre_top_n[i] else 0 for i in range(target.shape[0])]
+    #se retorna la precision
+    return np.mean(precision)
 
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()	
-#X_train, X_test = normalization(X_train,X_test)    
+X_train, X_test = normalization(X_train,X_test)    
 
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
@@ -122,7 +132,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             model.compile(loss='sparse_categorical_crossentropy',
                                     optimizer=optimizer, 
                                     metrics=['accuracy'])
-                            model.evaluate(X_test,Y_test)    
+                            y_predict =model.predict(X_test)
+                            print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
                             elapsed_time = time.time() - start_time
                             print("Elapsed time: {}".format(hms_string(elapsed_time)))
                             now = datetime.now()
