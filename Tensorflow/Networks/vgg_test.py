@@ -21,6 +21,15 @@ def hms_string(sec_elapsed):
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()	
 
+def normalization(train_images, test_images):
+    mean = np.mean(train_images, axis=(0, 1, 2, 3))
+    std = np.std(train_images, axis=(0, 1, 2, 3))
+    train_images =(train_images - mean) / (std + 1e-7)
+    test_images = (test_images - mean) / (std + 1e-7)
+    return train_images, test_images
+    
+X_train, X_test = normalization(X_train, X_test)
+    
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 #Sim_err = [0, 0.3, 0.5, 0.7 0.8]
 #Wstd_err = [0.3, 0.5, 0.7]

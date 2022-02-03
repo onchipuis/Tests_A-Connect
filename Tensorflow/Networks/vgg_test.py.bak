@@ -26,7 +26,7 @@ def hms_string(sec_elapsed):
 #Wstd_err = [0.3, 0.5, 0.7]
 pool = [4]
 Sim_err = [0,0.3,0.5,0.7]
-Wstd_err = [0.8]
+Wstd_err = [0.3]
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 acc=np.zeros([500,1])
 force = "yes"
@@ -40,7 +40,7 @@ for j in range(len(Sim_err)):
             # Model NAME:
             Werr = int(100*Wstd_err[i])
             Nm = str(int(pool[l]))
-            name = "32x32_"+Nm+'Werr_'+'Wstd_'+str(Werr)+'_Bstd_'+str(Werr) 
+            name = "32x32_"+Nm+'Werr_'+'Wstd_'+str(Werr)+'_Bstd_'+str(Werr)+"_normalDistr" 
             string = './Models/VGG16_CIFAR10/'+name+'.h5'
             
             Err = Sim_err[j]
