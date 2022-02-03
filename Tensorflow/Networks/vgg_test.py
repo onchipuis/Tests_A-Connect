@@ -128,7 +128,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                 N = 1
                                     #####
                             
-                            model = tf.keras.models.load_model(string,custom_objects=custom_objects)
+                            model = tf.keras.models.load_model('Base.h5',custom_objects=custom_objects)
                             model.compile(loss='sparse_categorical_crossentropy',
                                     metrics=['accuracy'])
                                     #optimizer=optimizer, 
