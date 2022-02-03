@@ -9,7 +9,7 @@ import VGG1 as vgg
 import time
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.utils import to_categorical
-from aconnect import layers, scripts
+from aconnect1 import layers, scripts
 #from keras.callbacks import LearningRateScheduler
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
@@ -44,8 +44,8 @@ def get_top_n_score(target, prediction, n):
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()    
 X_train, X_test = normalization(X_train,X_test)    
-Y_train = to_categorical(Y_train, 10)
-Y_test = to_categorical(Y_test, 10)   
+#Y_train = to_categorical(Y_train, 10)
+#Y_test = to_categorical(Y_test, 10)   
 sL = 3 
 Nlayers_noAC = [1,3,6,8,11,13,15,18,20,22,25,27,29] #wo AC layer numbers
 NlayersBase = [1,2,4,5,7,8,9,11,12,13,15,16,17]
@@ -73,11 +73,11 @@ validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
 model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,input_shape=(32,32,3))
 
 # INPUT PARAMTERS:
-isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
+isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.3]   # Define the stddev for training
-Conv_pool = [2]
-FC_pool = [2]
-WisQuant = ["no"]		    # Do you want binary weights?
+Conv_pool = [4]
+FC_pool = [4]
+WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
 Bbw = Wbw
@@ -177,8 +177,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         print("\n\t\t\t", name)
                             
                         #TRAINING PARAMETERS
-                        #model.compile(loss='sparse_categorical_crossentropy',
-                        model.compile(loss='categorical_crossentropy',
+                        #model.compile(loss='categorical_crossentropy',
+                        model.compile(loss='sparse_categorical_crossentropy',
                                 optimizer=optimizer, 
                                 metrics=['accuracy'])
 
