@@ -19,17 +19,29 @@ def hms_string(sec_elapsed):
     m = int((sec_elapsed % (60 * 60)) / 60)
     s = sec_elapsed % 60
     return f"{h}:{m:>02}:{s:>05.2f}"
+#Extra code to improve model accuracy
+def normalization(train_images, test_images):
+    mean = np.mean(train_images, axis=(0, 1, 2, 3))
+    std = np.std(train_images, axis=(0, 1, 2, 3))
+    train_images =(train_images - mean) / (std + 1e-7)
+    test_images = (test_images - mean) / (std + 1e-7)
+    return train_images, test_images
+
 
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()	
+X_train, X_test = normalization(X_train,X_test)    
 
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.7]   # Define the stddev for training
-Sim_err = [0.7]
+Wstd_err = [0.3]   # Define the stddev for training
+Sim_err = [0.3]
 Conv_pool = [1,2,4,8,16]
-isBin = ["no"]		    # Do you want binary weights?
+WisQuant = ["yes"]		    # Do you want binary weights?
+BisQuant = WisQuant 
+Wbw = [8]
+Bbw = Wbw
 #errDistr = "lognormal"
 errDistr = ["normal"]
 acc=np.zeros([500,1])
@@ -40,10 +52,13 @@ folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name
 
 # TRAINING PARAMETERS
-learning_rate = 0.01
+learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
-epochs = 30
+epochs = 50
+lr_decay = 1e-6
+lr_drop = 30
+"""
 lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 initial_learning_rate=0.01,
                 decay_steps=196,
@@ -51,6 +66,12 @@ lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 staircase=True)
 optimizer = tf.optimizers.SGD(learning_rate=lr_schedule, 
                             momentum=momentum) #Define optimizer
+"""
+def lr_scheduler(epoch):
+    return learning_rate * (0.5 ** (epoch // lr_drop))    
+reduce_lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)    
+optimizer = tf.optimizers.SGD(learning_rate=learning_rate, 
+                            momentum=momentum, decay = lr_decay, nesterov= True) #Define optimizer
 
 for d in range(len(isAConnect)): #Iterate over the networks
     if isAConnect[d]: #is a network with A-Connect?
@@ -61,55 +82,69 @@ for d in range(len(isAConnect)): #Iterate over the networks
         Conv_pool_aux = [0]
         
     for i in range(len(Conv_pool_aux)):
-        for j in range(len(Wstd_aux)):
-            for k in range(len(errDistr)):
-                for m in range(len(Sim_err)):
+        for p in range (len(WisQuant)):
+            if WisQuant[p]=="yes":
+                Wbw_aux = Wbw
+                Bbw_aux = Bbw
+            else:
+                Wbw_aux = [8]
+                Bbw_aux = [8]
 
-                    Werr = Wstd_aux[j]
-                    Err = Sim_err[m]
-                    # NAME
-                    if isAConnect[d]:
-                        Werr = str(int(100*Werr))
-                        Nm = str(int(Conv_pool_aux[i]))
-                        name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
-                    else:
-                        name = 'Base'
-                    string = folder_models + name + '.h5'
-                
-                    if Err == 0:
-                        N = 1
-                    else:
-                        N = 100
-                            #####
-                    
-                    elapsed_time = time.time() - start_time
-                    print("Elapsed time: {}".format(hms_string(elapsed_time)))
-                    now = datetime.now()
-                    starttime = now.time()
-                    print('\n\n*****************************************************************************\n\n')
-                    print('TESTING NETWORK: ', name)
-                    print('With simulation error: ', Err)
-                    print('\n\n*********************************************************************************')
-                    
-                    acc, stats = scripts.MonteCarlo(net=string,Xtest=X_test,Ytest=Y_test,M=N,
-                            Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
-                            custom_objects=custom_objects,
-                            optimizer=optimizer,
-                            loss='sparse_categorical_crossentropy',
-                            metrics=['accuracy'],top5=False,dtype='float16',
-                            errDistr=errDistr[k]
-                            )
-                    name_sim = name+'_simErr_'+str(int(100*Err))                      
-                    name_stats = name+'_stats_simErr_'+str(int(100*Err))                      
-                    np.savetxt(folder_results+name_sim+'.txt',acc,fmt="%.2f")
-                    np.savetxt(folder_results+name_stats+'.txt',stats,fmt="%.2f")
+            for q in range (len(Wbw_aux)):
+                for j in range(len(Wstd_aux)):
+                    for k in range(len(errDistr)):
+                        for m in range(len(Sim_err)):
 
-                    now = datetime.now()
-                    endtime = now.time()
-                    elapsed_time = time.time() - start_time
-                    print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                            Werr = Wstd_aux[j]
+                            Err = Sim_err[m]
+                            # NAME
+                            if isAConnect[d]:
+                                Werr = str(int(100*Err))
+                                Nm = str(int(Conv_pool_aux[i]))
+                                if WisQuant[p] == "yes":
+                                    bws = str(int(Wbw_aux[q]))
+                                    quant = bws+'bQuant_'
+                                else:
+                                    quant = ''
+                                name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'
+                            else:
+                                name = 'Base'
+                            string = folder_models + name + '.h5'
+                        
+                            if Err == 0:
+                                N = 1
+                            else:
+                                N = 100
+                                    #####
+                            
+                            elapsed_time = time.time() - start_time
+                            print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                            now = datetime.now()
+                            starttime = now.time()
+                            print('\n\n******************************************************************\n\n')
+                            print('TESTING NETWORK: ', name)
+                            print('With simulation error: ', Err)
+                            print('\n\n**********************************************************************')
+                            
+                            acc, stats = scripts.MonteCarlo(net=string,Xtest=X_test,Ytest=Y_test,M=N,
+                                    Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
+                                    custom_objects=custom_objects,
+                                    optimizer=optimizer,
+                                    loss='sparse_categorical_crossentropy',
+                                    metrics=['accuracy'],top5=False,dtype='float16',
+                                    errDistr=errDistr[k]
+                                    )
+                            name_sim = name+'_simErr_'+str(int(100*Err))                      
+                            name_stats = name+'_stats_simErr_'+str(int(100*Err))                      
+                            np.savetxt(folder_results+name_sim+'.txt',acc,fmt="%.2f")
+                            np.savetxt(folder_results+name_stats+'.txt',stats,fmt="%.2f")
 
-                    print('\n\n*********************************************************************************')
-                    print('\n Simulation started at: ',starttime)
-                    print('Simulation finished at: ', endtime)    
+                            now = datetime.now()
+                            endtime = now.time()
+                            elapsed_time = time.time() - start_time
+                            print("Elapsed time: {}".format(hms_string(elapsed_time)))
+
+                            print('\n\n*********************************************************************')
+                            print('\n Simulation started at: ',starttime)
+                            print('Simulation finished at: ', endtime)    
 
