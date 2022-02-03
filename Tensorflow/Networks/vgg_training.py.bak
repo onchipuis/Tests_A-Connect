@@ -153,7 +153,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                 # NAME
                 Werr = str(int(100*Err))
                 Nm = str(int(FC_pool_aux[i]))
-                name = Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
+                name = "32x32_"+Nm+'Werr_'+'Wstd_'+ Werr +'_Bstd_'+ Werr + "_"+errDistr[k]+'Distr'
                 
                 print("*************************TRAINING NETWORK*********************")
                 print("\n\t\t\t", name)
