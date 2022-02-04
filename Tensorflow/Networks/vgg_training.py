@@ -76,15 +76,15 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,inpu
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.7]   # Define the stddev for training
-Conv_pool = [1,2,4,8,16]
-FC_pool = [1,2,4,4,4]
+Conv_pool = [4]
+FC_pool = [4]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
 Bbw = Wbw
 #errDistr = "lognormal"
 errDistr = ["normal"]
-saveModel = False
+saveModel = True
 model_name = 'VGG16_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
@@ -96,7 +96,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
-epochs = 2
+epochs = 50
 lr_decay = 1e-6
 lr_drop = 30
 """
