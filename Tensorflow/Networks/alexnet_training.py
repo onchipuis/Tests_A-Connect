@@ -102,7 +102,7 @@ optimizer = tf.optimizers.SGD(learning_rate=0.0,
                             momentum=momentum) #Define optimizer
                             
 def lr_scheduler(epoch):
-    initial_lrate = 0.1 
+    initial_lrate = 0.005 
     drop = 0.5 
     epochs_drop = 30.0 
     lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
