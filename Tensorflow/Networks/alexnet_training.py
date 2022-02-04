@@ -95,7 +95,7 @@ net_base = folder_models+'Base_32x32.h5'
 learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
-epochs = 30
+epochs = 50
 lr_decay = 1e-6
 lr_drop = 20
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
@@ -129,7 +129,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                 Conv_pool=Conv_pool_aux[i],
                                                 FC_pool=FC_pool_aux[i],
                                                 errDistr=errDistr[k],
-                                                isBin = "yes")
+                                                isBin = "no")
                 print(model.summary())
                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                 """"
