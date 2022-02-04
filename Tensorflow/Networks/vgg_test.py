@@ -3,6 +3,8 @@ Script for testing VGG with A-Connect, DVA, or none (Baseline)
 INSTRUCTIONS:
 Due to the memory usage we recommend to uncomment the first train the model and save it. Then just comment the training stage and then load the model to test it using the Monte Carlo simulation.
 """
+import os
+os.environ[‘TF_GPU_ALLOCATOR’] = ‘cuda_malloc_async’
 import numpy as np
 import tensorflow as tf
 import VGG as vgg
@@ -47,7 +49,7 @@ X_train, X_test = normalization(X_train,X_test)
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.7]   # Define the stddev for training
 Sim_err = [0.7]
-Conv_pool = [1,2,4,8,16]
+Conv_pool = [2,4,8,16]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
