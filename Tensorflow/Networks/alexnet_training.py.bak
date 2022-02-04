@@ -156,14 +156,15 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         metrics=['accuracy'])
 
                 # TRAINING
+                """
                 def step_decay (epoch): 
                     initial_lrate = 0.01 
                     drop = 0.5 
                     epochs_drop = 30.0 
                     lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
                     return lrate
-                lrate = LearningRateScheduler(step_decay)
-                callbacks_list = [lrate]
+                lrate = LearningRateScheduler(step_decay)"""
+                callbacks_list = [reduce_lr]
                 
                 history = model.fit(X_train, Y_train,
                             batch_size=batch_size,
