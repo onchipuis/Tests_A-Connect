@@ -139,7 +139,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         _, accuracy, top5acc = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         return accuracy, top5acc
                 else:
-                        Xtest_tensor = tf.convert_to_tensor(Xtest)
+                        Xtest_tensor = tf.convert_to_tensor(Xtest,dtype=tf.float16)
                         y_predict_tensor =net(Xtest_tensor)
                         y_predict = y_predict_tensor.numpy()
                         accuracy = get_top_n_score(Ytest, y_predict, 1)
@@ -178,12 +178,14 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         [NetNoisy,Wstdn,Bstdn] = add_Wnoise(local_net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) #Function that adds the new noisy matrices to the layers
                         NetNoisy.compile(optimizer,loss,metrics,run_eagerly=run_model_eagerly) #Compile the model. It is necessary to use the model.evaluate
                         if top5:
-                                acc_noisy[i],top5acc_noisy[i] = classify(NetNoisy, Xtest, Ytest,top5,ev_batch_size=evaluate_batch_size) #Get the accuracy of the network
+                                acc_noisy[i],top5acc_noisy[i] = classify(NetNoisy, Xtest,Ytest,top5,
+                                                                    ev_batch_size=evaluate_batch_size) #Get the accuracy of the network
                                 top5acc_noisy[i] = 100*top5acc_noisy[i]
                                 acc_noisy[i] = 100*acc_noisy[i]
                                 print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i],top5acc_noisy[i]))
                         else:
-                                acc_noisy[i] = classify(NetNoisy, Xtest, Ytest,top5,ev_batch_size=evaluate_batch_size) #Get the accuracy of the network
+                                acc_noisy[i] = classify(NetNoisy, Xtest, Ytest,top5,
+                                                    ev_batch_size=evaluate_batch_size) #Get the accuracy of the network
                                 acc_noisy[i] = 100*acc_noisy[i]
                                 print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i]))
                         local_net.load_weights(filepath=(net_name+'_weights.h5')) #Takes the original weights value.
