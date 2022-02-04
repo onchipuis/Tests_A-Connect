@@ -13,6 +13,16 @@ from aconnect1 import layers, scripts
 #from keras.callbacks import LearningRateScheduler
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
+import sys
+def sizeof_fmt(num, suffix='B'):
+    ''' by Fred Cirera,  https://stackoverflow.com/a/1094933/1870254,modified'''
+    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f %s%s" % (num, unit,suffix)
+        num /= 1024.0
+    return "%.1f %s%s" % (num,'Yi', suffix)
+
+
 gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
@@ -59,7 +69,7 @@ Wbw = [8]
 Bbw = Wbw
 #errDistr = "lognormal"
 errDistr = ["normal"]
-MCsims = 10
+MCsims = 3
 acc=np.zeros([MCsims,1])
 force = "yes"
 
@@ -165,4 +175,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             print('Simulation finished at: ', endtime)
                             tf.keras.backend.clear_session()
                             gc.collect()
-                            time.sleep(10)
+
+                            for name, size in sorted(((name,sys.getsizeof(value)) 
+                                for name, value in locals().items()),key= lambda x:-x[1])[:10]:
+                                    print("{:>30}: {:>8}".format(name,sizeof_fmt(size)))
