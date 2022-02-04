@@ -144,7 +144,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                     optimizer=optimizer,
                                     loss='sparse_categorical_crossentropy',
                                     metrics=['accuracy'],top5=False,dtype='float16',
-                                    errDistr=errDistr[k]
+                                    errDistr=errDistr[k],evaluate_batch_size=32
                                     )
                             name_sim = name+'_simErr_'+str(int(100*Err))                      
                             name_stats = name+'_stats_simErr_'+str(int(100*Err))                      
