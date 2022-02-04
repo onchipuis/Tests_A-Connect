@@ -91,11 +91,22 @@ net_base = folder_models+'Base_32x32.h5'
 #model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
+
+learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
-epochs = 60
+epochs = 5
+lr_decay = 1e-6
+lr_drop = 20
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
+                            
+def lr_scheduler(epoch):
+    return learning_rate * (0.5 ** (epoch // lr_drop))    
+
+reduce_lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)    
+optimizer = tf.optimizers.SGD(learning_rate=learning_rate, 
+                            momentum=momentum, decay = lr_decay, nesterov= True) #Define optimizer                            
 
 for d in range(len(isAConnect)): #Iterate over the networks
     if isAConnect[d]: #is a network with A-Connect?
@@ -145,14 +156,15 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         metrics=['accuracy'])
 
                 # TRAINING
+                """
                 def step_decay (epoch): 
                     initial_lrate = 0.01 
                     drop = 0.5 
                     epochs_drop = 30.0 
                     lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
                     return lrate
-                lrate = LearningRateScheduler(step_decay)
-                callbacks_list = [lrate]
+                lrate = LearningRateScheduler(step_decay)"""
+                callbacks_list = [reduce_lr]
                 
                 history = model.fit(X_train, Y_train,
                             batch_size=batch_size,

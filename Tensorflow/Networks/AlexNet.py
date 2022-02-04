@@ -8,7 +8,7 @@ import tensorflow as tf
 from aconnect.layers import Conv_AConnect, FC_AConnect 
 from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatten
 from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax, RandomFlip, RandomZoom, RandomRotation, Rescaling, RandomTranslation, RandomCrop
-Xsz = 224
+Xsz = 32
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr="normal", isBin = "no"):
         if(not(isAConnect)):
@@ -16,10 +16,9 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,Conv_pool=8,FC_pool=8,errDistr
                         InputLayer(input_shape=[32,32,3]),
                         tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),  
                         RandomCrop(Xsz,Xsz),
-                        #Rescaling(1./255),
                         RandomFlip("horizontal"),
-                        RandomZoom(0.3),
-                        RandomTranslation(0.1,0.1),
+                        RandomTranslation(0.1,0.1),                        
+                        RandomZoom(0.2),
                         Conv2D(filters=96,kernel_size=(11,11),strides=(4,4),padding="valid"),
                         BatchNormalization(),
                         ReLU(),
