@@ -4,7 +4,7 @@ INSTRUCTIONS:
 Due to the memory usage we recommend to uncomment the first train the model and save it. Then just comment the training stage and then load the model to test it using the Monte Carlo simulation.
 """
 import os
-os.environ[‘TF_GPU_ALLOCATOR’] = ‘cuda_malloc_async’
+os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc_async'
 import numpy as np
 import tensorflow as tf
 import VGG as vgg
