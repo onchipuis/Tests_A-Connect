@@ -208,6 +208,7 @@ def classify(net,Xtest,Ytest,top5,ev_batch_size=None):
                 else:
                         y_predict =model.predict(Xtest)
                         accuracy = get_top_n_score(Ytest, y_predict, 1)
+                        tf.keras.backend.clear_session()
                         gc.collect()
                         #_,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         return accuracy
