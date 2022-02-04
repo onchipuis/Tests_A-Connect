@@ -176,6 +176,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
 
                 for i in range(M): #Iterate over M samples
                         [NetNoisy,Wstdn,Bstdn] = add_Wnoise(local_net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) #Function that adds the new noisy matrices to the layers
+                        del local_net
                         NetNoisy.compile(optimizer,loss,metrics,run_eagerly=run_model_eagerly) #Compile the model. It is necessary to use the model.evaluate
                         if top5:
                             #Get the accuracy of the network    
@@ -190,6 +191,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                     top5,ev_batch_size=evaluate_batch_size) 
                             acc_noisy[i] = 100*acc_noisy[i]
                             print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i]))
+                        del NetNoisy
                         local_net.load_weights(filepath=(net_name+'_weights.h5')) #Takes the original weights value.
         #               return acc_noisy
 
