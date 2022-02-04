@@ -7,7 +7,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
         force="no",Derr=0,net_name="Network",custom_objects=None,dtype='float32',
         optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),
         loss=['sparse_categorical_crossentropy'],
-        metrics=['accuracy'],top5=False,run_model_eagerly=False,evaluate_batch_size=None):
+        metrics=['accuracy'],top5=False,run_model_eagerly=True,evaluate_batch_size=None):
         """
         Input Parameters:
         net: Name of the network model you want to test (it must be saved in the folder Models)
@@ -139,13 +139,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         _, accuracy, top5acc = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         return accuracy, top5acc
                 else:
-                        #Xtest_tensor = tf.convert_to_tensor(Xtest,dtype=tf.float16)
-                        #y_predict_tensor =net(Xtest_tensor)
-                        #y_predict = y_predict_tensor.numpy()
-                        #accuracy = get_top_n_score(Ytest, y_predict, 1)
                         _,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
-                        tf.keras.backend.clear_session()
-                        gc.collect()
                         return accuracy
         """
         def classify(net,Xtest,Ytest,top5,ev_batch_size=None):
@@ -164,7 +158,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy
                 top5acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy   top5
                 local_net = tf.keras.models.load_model(net,custom_objects = custom_objects) #Load the trained model
-                #local_net.save_weights(filepath=(net_name+'_weights.h5')) #Save the weights. It is used to optimize the script RAM consumption
+                local_net.save_weights(filepath=(net_name+'_weights.h5')) #Save the weights. It is used to optimize the script RAM consumption
                 #print(local_net.summary()) #Print the network summary
                 if top5:
                     print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy | \tTop-5 Accuracy\n')
@@ -172,11 +166,9 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 else:
                     print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy\n')
                     print('---------------------------------------------------------------------------------------')
-        #       global parallel
 
                 for i in range(M): #Iterate over M samples
                         [NetNoisy,Wstdn,Bstdn] = add_Wnoise(local_net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) #Function that adds the new noisy matrices to the layers
-                        del local_net
                         NetNoisy.compile(optimizer,loss,metrics,run_eagerly=run_model_eagerly) #Compile the model. It is necessary to use the model.evaluate
                         if top5:
                             #Get the accuracy of the network    
@@ -191,10 +183,10 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                     top5,ev_batch_size=evaluate_batch_size) 
                             acc_noisy[i] = 100*acc_noisy[i]
                             print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i]))
+                        tf.keras.backend.clear_session()
+                        gc.collect()
                         del NetNoisy
-                        local_net = tf.keras.models.load_model(net,custom_objects = custom_objects) #Load the trained model
-                        #local_net.load_weights(filepath=(net_name+'_weights.h5')) #Takes the original weights value.
-        #               return acc_noisy
+                        local_net.load_weights(filepath=(net_name+'_weights.h5')) #Takes the original weights value.
 
                 #pool = Pool(mp.cpu_count())
                 #acc_noisy = pool.map(parallel, range(M))
