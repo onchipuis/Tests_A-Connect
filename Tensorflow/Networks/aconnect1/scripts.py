@@ -185,7 +185,6 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                     top5,ev_batch_size=evaluate_batch_size) 
                             acc_noisy[i] = 100*acc_noisy[i]
                             print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i]))
-                        del NetNoisy
                         local_net.load_weights(filepath=(net_name+'_weights.h5')) #Takes the original weights value.
 
                 #pool = Pool(mp.cpu_count())
