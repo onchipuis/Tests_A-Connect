@@ -140,7 +140,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         return accuracy, top5acc
                 else:
                         Xtest_tensor = tf.convert_to_tensor(Xtest)
-                        y_predict_tensor =model(Xtest_tensor)
+                        y_predict_tensor =net(Xtest_tensor)
                         y_predict = y_predict_tensor.numpy()
                         accuracy = get_top_n_score(Ytest, y_predict, 1)
                         #tf.keras.backend.clear_session()
