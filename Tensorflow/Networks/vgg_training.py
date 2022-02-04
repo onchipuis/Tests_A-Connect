@@ -84,7 +84,7 @@ Wbw = [8]
 Bbw = Wbw
 #errDistr = "lognormal"
 errDistr = ["normal"]
-saveModel = True
+saveModel = False
 model_name = 'VGG16_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
@@ -96,7 +96,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
-epochs = 50
+epochs = 2
 lr_decay = 1e-6
 lr_drop = 30
 """
@@ -205,7 +205,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         # SAVE MODEL:
                         if saveModel:
                             string = folder_models + name + '.h5'
-                            #model.save(string,include_optimizer=False)
+                            model.save(string,include_optimizer=False)
                             #Save in a txt the accuracy and the validation accuracy for further analysis
                             np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
                             np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
