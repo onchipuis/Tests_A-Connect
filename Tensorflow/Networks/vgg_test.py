@@ -13,20 +13,6 @@ from aconnect1 import layers, scripts
 #from keras.callbacks import LearningRateScheduler
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
-import sys
-def sizeof_fmt(num, suffix='B'):
-    ''' by Fred Cirera,  https://stackoverflow.com/a/1094933/1870254,modified'''
-    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
-        if abs(num) < 1024.0:
-            return "%3.1f %s%s" % (num, unit,suffix)
-        num /= 1024.0
-    return "%.1f %s%s" % (num,'Yi', suffix)
-
-
-gpus = tf.config.experimental.list_physical_devices('GPU')
-for gpu in gpus:
-    tf.config.experimental.set_memory_growth(gpu, True)
-
 tic=time.time()
 start_time = time.time()
 def hms_string(sec_elapsed):
@@ -62,7 +48,7 @@ X_train, X_test = normalization(X_train,X_test)
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.7]   # Define the stddev for training
 Sim_err = [0.7]
-Conv_pool = [8,16]
+Conv_pool = [16]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
@@ -175,7 +161,3 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             print('Simulation finished at: ', endtime)
                             tf.keras.backend.clear_session()
                             gc.collect()
-
-                            for name, size in sorted(((name,sys.getsizeof(value)) 
-                                for name, value in locals().items()),key= lambda x:-x[1])[:10]:
-                                    print("{:>30}: {:>8}".format(name,sizeof_fmt(size)))
