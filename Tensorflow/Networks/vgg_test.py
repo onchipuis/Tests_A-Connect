@@ -46,8 +46,8 @@ X_train, X_test = normalization(X_train,X_test)
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.7]   # Define the stddev for training
-Sim_err = [0,0.3,0.5,0.7]
+Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
+Sim_err = [0.5,0.7]
 Conv_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
@@ -56,7 +56,7 @@ Bbw = Wbw
 #errDistr = "lognormal"
 errDistr = ["normal"]
 MCsims = 100
-acc=np.zeros([MCsims,1])
+acc=np.zeros([500,1])
 force = "yes"
 
 model_name = 'VGG16_CIFAR10/'
@@ -161,3 +161,4 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             print('Simulation finished at: ', endtime)
                             tf.keras.backend.clear_session()
                             gc.collect()
+                            tf.compat.v1.reset_default_graph()
