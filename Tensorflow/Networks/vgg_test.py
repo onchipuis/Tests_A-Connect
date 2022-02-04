@@ -7,6 +7,7 @@ import numpy as np
 import tensorflow as tf
 import VGG as vgg
 import time
+import gc
 from datetime import datetime
 from aconnect1 import layers, scripts
 #from keras.callbacks import LearningRateScheduler
@@ -58,7 +59,8 @@ Wbw = [8]
 Bbw = Wbw
 #errDistr = "lognormal"
 errDistr = ["normal"]
-acc=np.zeros([500,1])
+MCsims = 10
+acc=np.zeros([MCsims,1])
 force = "yes"
 
 model_name = 'VGG16_CIFAR10/'
@@ -128,7 +130,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             if Err == 0:
                                 N = 1
                             else:
-                                N = 100
+                                N = MCsims
                                     #####
                             
                             elapsed_time = time.time() - start_time
