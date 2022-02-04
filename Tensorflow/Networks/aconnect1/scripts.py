@@ -189,12 +189,25 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
 
 #Function to do inference. You also could have the top-5 accuracy if you passed to the model metrics and then setting top5=True
 def classify(net,Xtest,Ytest,top5,ev_batch_size=None):
+        def get_top_n_score(target, prediction, n):
+            #ordeno los indices de menor a mayor probabilidad
+            pre_sort_index = np.argsort(prediction)
+            #ordeno de mayor probabilidad a menor
+            pre_sort_index = pre_sort_index[:,::-1]
+            #cojo las n-top predicciones
+            pre_top_n = pre_sort_index[:,:n]
+            #obtengo el conteo de acierto
+            precision = [1 if target[i] in pre_top_n[i] else 0 for i in range(target.shape[0])]
+            #se retorna la precision
+            return np.mean(precision)
         def classify(net,Xtest,Ytest,top5):
                 if top5:
                         _, accuracy, top5acc = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         return accuracy, top5acc
                 else:
-                        _,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
+                        y_predict =model.predict(Xtest)
+                        accuracy = get_top_n_score(Ytest, y_predict, 1)
+                        #_,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         return accuracy
         return classify(net,Xtest,Ytest,top5)
 
