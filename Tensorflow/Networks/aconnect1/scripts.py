@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 import os
+import gc
 #Function to make the monte carlo simulation. To see more please go to the original file in Scripts
 def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="normal",
         force="no",Derr=0,net_name="Network",custom_objects=None,dtype='float32',
@@ -205,8 +206,9 @@ def classify(net,Xtest,Ytest,top5,ev_batch_size=None):
                         _, accuracy, top5acc = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         return accuracy, top5acc
                 else:
-                        y_predict =model.predict_on_batch(Xtest)
+                        y_predict =model.predict(Xtest)
                         accuracy = get_top_n_score(Ytest, y_predict, 1)
+                        gc.collect()
                         #_,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         return accuracy
         return classify(net,Xtest,Ytest,top5)
