@@ -165,4 +165,4 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             print('Simulation finished at: ', endtime)
                             tf.keras.backend.clear_session()
                             gc.collect()
-                            time.sleep(5)
+                            time.sleep(10)
