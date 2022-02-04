@@ -205,7 +205,7 @@ def classify(net,Xtest,Ytest,top5,ev_batch_size=None):
                         _, accuracy, top5acc = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         return accuracy, top5acc
                 else:
-                        y_predict =model.predict(Xtest)
+                        y_predict =model.predict_on_batch(Xtest)
                         accuracy = get_top_n_score(Ytest, y_predict, 1)
                         #_,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         return accuracy
