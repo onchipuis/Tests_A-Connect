@@ -164,7 +164,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy
                 top5acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy   top5
                 local_net = tf.keras.models.load_model(net,custom_objects = custom_objects) #Load the trained model
-                local_net.save_weights(filepath=(net_name+'_weights.h5')) #Save the weights. It is used to optimize the script RAM consumption
+                #local_net.save_weights(filepath=(net_name+'_weights.h5')) #Save the weights. It is used to optimize the script RAM consumption
                 #print(local_net.summary()) #Print the network summary
                 if top5:
                     print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy | \tTop-5 Accuracy\n')
@@ -192,7 +192,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                             acc_noisy[i] = 100*acc_noisy[i]
                             print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i]))
                         del NetNoisy
-                        local_net.load_weights(filepath=(net_name+'_weights.h5')) #Takes the original weights value.
+                        local_net = tf.keras.models.load_model(net,custom_objects = custom_objects) #Load the trained model
+                        #local_net.load_weights(filepath=(net_name+'_weights.h5')) #Takes the original weights value.
         #               return acc_noisy
 
                 #pool = Pool(mp.cpu_count())
@@ -209,7 +210,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 print('Min. Accuracy: %.2f%%\n' % Xmin)
                 print('Max. Accuracy: %.2f%%\n'% Xmax)
 
-                os.remove(net_name+'_weights.h5')   #Delete created weight file
+                #os.remove(net_name+'_weights.h5')   #Delete created weight file
                 #np.savetxt(net_name+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt
                 #np.savetxt(net_name+'_stats'+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',stats,fmt="%.2f") #Save the median and iqr of M samples in a txt
                 #if top5:
