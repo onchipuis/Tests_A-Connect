@@ -3,6 +3,7 @@ import tensorflow as tf
 import os
 import gc
 from memory_profiler import profile
+import keras
 #Function to make the monte carlo simulation. To see more please go to the original file in Scripts
 def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="normal",
         force="no",Derr=0,net_name="Network",custom_objects=None,dtype='float32',
@@ -162,7 +163,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy
                 top5acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy   top5
                 local_net = tf.keras.models.load_model(net,custom_objects = custom_objects) #Load the trained model
-                local_net.save_weights(filepath=(net_name+'_weights.h5')) #Save the weights. It is used to optimize the script RAM consumption
+                #local_net.save_weights(filepath=(net_name+'_weights.h5')) #Save the weights. It is used to optimize the script RAM consumption
                 #print(local_net.summary()) #Print the network summary
                 if top5:
                     print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy | \tTop-5 Accuracy\n')
@@ -189,7 +190,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                             print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i]))
                         del NetNoisy
                         gc.collect()
-                        tf.keras.backend.clear_session()
+                        #tf.keras.backend.clear_session()
+                        keras.backend.clear_session()
                         tf.compat.v1.reset_default_graph()
                         #local_net.load_weights(filepath=(net_name+'_weights.h5')) #Takes the original weights value.
 
@@ -209,6 +211,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
 
                 del local_net
                 gc.collect()
+                keras.backend.clear_session()
+                tf.compat.v1.reset_default_graph()
                 os.remove(net_name+'_weights.h5')   #Delete created weight file
                 #np.savetxt(net_name+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt
                 #np.savetxt(net_name+'_stats'+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',stats,fmt="%.2f") #Save the median and iqr of M samples in a txt
