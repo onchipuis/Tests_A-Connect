@@ -11,7 +11,6 @@ import gc
 from datetime import datetime
 from aconnect1 import layers, scripts
 #from keras.callbacks import LearningRateScheduler
-tf.compat.v1.disable_eager_execution()
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
 tic=time.time()
