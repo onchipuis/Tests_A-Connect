@@ -139,7 +139,10 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             print('With simulation error: ', Err)
                             print('\n\n**********************************************************************')
                             
-                            acc, stats = scripts.MonteCarlo(net=string,Xtest=X_test,Ytest=Y_test,M=N,
+                            #Load the trained model
+                            net = tf.keras.models.load_model(string,custom_objects = custom_objects) 
+                            #MC sim
+                            acc, stats = scripts.MonteCarlo(local_net=net,Xtest=X_test,Ytest=Y_test,M=N,
                                     Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
                                     custom_objects=custom_objects,
                                     optimizer=optimizer,
@@ -160,7 +163,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             print('\n\n*********************************************************************')
                             print('\n Simulation started at: ',starttime)
                             print('Simulation finished at: ', endtime)
-                            del acc,stats
+                            del net,acc,stats
                             tf.keras.backend.clear_session()
                             gc.collect()
                             tf.compat.v1.reset_default_graph()
