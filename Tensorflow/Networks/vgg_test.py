@@ -55,7 +55,7 @@ Wbw = [8]
 Bbw = Wbw
 #errDistr = "lognormal"
 errDistr = ["normal"]
-MCsims = 10
+MCsims = 100
 acc=np.zeros([500,1])
 force = "yes"
 
