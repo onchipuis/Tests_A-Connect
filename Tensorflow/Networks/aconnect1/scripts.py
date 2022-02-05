@@ -191,7 +191,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         gc.collect()
                         tf.keras.backend.clear_session()
                         tf.compat.v1.reset_default_graph()
-                        local_net.load_weights(filepath=(net_name+'_weights.h5')) #Takes the original weights value.
+                        #local_net.load_weights(filepath=(net_name+'_weights.h5')) #Takes the original weights value.
 
                 #pool = Pool(mp.cpu_count())
                 #acc_noisy = pool.map(parallel, range(M))
