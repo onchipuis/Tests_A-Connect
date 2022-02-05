@@ -47,7 +47,7 @@ X_train, X_test = normalization(X_train,X_test)
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.3,0.5]   # Define the stddev for training
+Wstd_err = [0.5]   # Define the stddev for training
 Sim_err = [0.7]
 Conv_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
@@ -140,7 +140,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             print('\n\n**********************************************************************')
                             
                             #Load the trained model
-                            net = tf.keras.models.load_model(string,custom_objects = custom_objects) 
+                            #net = tf.keras.models.load_model(string,custom_objects = custom_objects) 
+                            net = string
                             #MC sim
                             acc, stats = scripts.MonteCarlo(net=net,Xtest=X_test,Ytest=Y_test,M=N,
                                     Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,

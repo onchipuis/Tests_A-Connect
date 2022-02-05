@@ -135,63 +135,58 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
             precision = [1 if target[i] in pre_top_n[i] else 0 for i in range(target.shape[0])]
             #se retorna la precision
             return np.mean(precision)
-        def classify(net,Xtest,Ytest,top5,ev_batch_size=None):
+        def classify(net,Xtest,Ytest,top5)#,ev_batch_size=None):
                 if top5:
-                        _, accuracy, top5acc = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
+                        #_, accuracy, top5acc = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
+                        XtestIn = tf.convert_to_tensor(Xtest) 
+                        y_predict = net(XtestIn,training=False)
+                        accuracy = get_top_n_score(Ytest, y_predict, 1)
+                        top5acc = get_top_n_score(Ytest, y_predict, 5)
                         return accuracy, top5acc
                 else:
                         #_,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
-                        Xtestin=tf.convert_to_tensor(Xtest) 
                         #y_predict = net.predict(Xtestin,verbose=0,batch_size=ev_batch_size)
-                        y_predict = net(Xtestin,training=False)
+                        XtestIn = tf.convert_to_tensor(Xtest) 
+                        y_predict = net(XtestIn,training=False)
                         accuracy = get_top_n_score(Ytest, y_predict, 1)
                         return accuracy
-        """
-        def classify(net,Xtest,Ytest,top5,ev_batch_size=None):
-                if top5:
-                        _, accuracy, top5acc = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
-                        return accuracy, top5acc
-                else:
-                        _,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
-                        return accuracy
-        """
         
-        @profile
+        #@profile
         def MCsim(net=net,Xtest=Xtest,Ytest=Ytest,M=M,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,
                 force=force,Derr=Derr,net_name=net_name,custom_objects=custom_objects,dtype=dtype,
                 optimizer=optimizer,loss=loss,metrics=metrics,top5=top5):
 
-                acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy
-                top5acc_noisy = np.zeros((M,1)) #Initilize the variable where im going to save the noisy accuracy   top5
-                #local_net = tf.keras.models.load_model(net,custom_objects = custom_objects) #Load the trained model
-                #local_net.save_weights(filepath=(net_name+'_weights.h5')) #Save the weights. It is used to optimize the script RAM consumption
+                #Initilize the variable where im going to save the noisy accuracy
+                acc_noisy = np.zeros((M,1)) 
+                top5acc_noisy = np.zeros((M,1))
+
+                #Load the trained model
+                local_net = tf.keras.models.load_model(net,custom_objects = custom_objects) 
+                #Save the weights. It is used to optimize the script RAM consumption
+                #local_net.save_weights(filepath=(net_name+'_weights.h5')) 
                 #print(local_net.summary()) #Print the network summary
                 if top5:
                     print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy | \tTop-5 Accuracy\n')
-                    print('---------------------------------------------------------------------------------------')
+                    print('------------------------------------------------------------------------------------')
                 else:
                     print('Simulation Nr.\t | \tWstd\t | \tBstd\t | \tAccuracy\n')
-                    print('---------------------------------------------------------------------------------------')
+                    print('------------------------------------------------------------------------------------')
 
                 for i in range(M): #Iterate over M samples
                         #Function that adds the new noisy matrices to the layers
-                        #[NetNoisy,Wstdn,Bstdn] = add_Wnoise(local_net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) 
+                        [NetNoisy,Wstdn,Bstdn] = add_Wnoise(local_net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) 
                         #Compile the model. It is necessary to use the model.evaluate
                         #NetNoisy.compile(optimizer,loss,metrics,run_eagerly=run_model_eagerly) 
                         
-                        #Function that adds the new noisy matrices to the layers
-                        [NetNoisy,Wstdn,Bstdn] = add_Wnoise(net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) 
                         if top5:
                             #Get the accuracy of the network    
-                            acc_noisy[i],top5acc_noisy[i] = classify(NetNoisy,
-                                    Xtest,Ytest,top5,ev_batch_size=evaluate_batch_size) 
+                            acc_noisy[i],top5acc_noisy[i] = classify(NetNoisy,Xtest,Ytest,top5)
                             top5acc_noisy[i] = 100*top5acc_noisy[i]
                             acc_noisy[i] = 100*acc_noisy[i]
                             print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i],top5acc_noisy[i]))
                         else:
                             #Get the accuracy of the network
-                            acc_noisy[i] = classify(NetNoisy,Xtest,Ytest,
-                                    top5,ev_batch_size=evaluate_batch_size) 
+                            acc_noisy[i] = classify(NetNoisy,Xtest,Ytest,top5)
                             acc_noisy[i] = 100*acc_noisy[i]
                             print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i]))
                         del NetNoisy
@@ -215,6 +210,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 print('Min. Accuracy: %.2f%%\n' % Xmin)
                 print('Max. Accuracy: %.2f%%\n'% Xmax)
 
+                del local_net
                 #os.remove(net_name+'_weights.h5')   #Delete created weight file
                 #if top5:
                 #        np.savetxt(net_name+'_TOP5'+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',top5acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt
@@ -222,34 +218,6 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
         return  MCsim(net=net,Xtest=Xtest,Ytest=Ytest,M=M,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,
                 force=force,Derr=Derr,net_name=net_name,custom_objects=custom_objects,dtype=dtype,
                 optimizer=optimizer,loss=loss,metrics=metrics,top5=top5)
-
-#Function to do inference. You also could have the top-5 accuracy if you passed to the model metrics and then setting top5=True
-def classify(net,Xtest,Ytest,top5,ev_batch_size=None):
-        def get_top_n_score(target, prediction, n):
-            #ordeno los indices de menor a mayor probabilidad
-            pre_sort_index = np.argsort(prediction)
-            #ordeno de mayor probabilidad a menor
-            pre_sort_index = pre_sort_index[:,::-1]
-            #cojo las n-top predicciones
-            pre_top_n = pre_sort_index[:,:n]
-            #obtengo el conteo de acierto
-            precision = [1 if target[i] in pre_top_n[i] else 0 for i in range(target.shape[0])]
-            #se retorna la precision
-            return np.mean(precision)
-        def classify(net,Xtest,Ytest,top5):
-                if top5:
-                        _, accuracy, top5acc = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
-                        return accuracy, top5acc
-                else:
-                        Xtest_tensor = tf.convert_to_tensor(Xtest)
-                        y_predict_tensor =model(Xtest_tensor)
-                        y_predict = y_predict_tensor.numpy()
-                        accuracy = get_top_n_score(Ytest, y_predict, 1)
-                        #tf.keras.backend.clear_session()
-                        #gc.collect()
-                        #_,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
-                        return accuracy
-        return classify(net,Xtest,Ytest,top5)
 
 #Function to load the MNIST dataset. THis function could load the standard 28x28 8 or 4 bits dataset, or 11x11 8 or 4 bits dataset.
 def load_ds(imgSize=[28,28], Quant=8):
