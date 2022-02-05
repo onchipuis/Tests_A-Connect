@@ -160,6 +160,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             print('\n\n*********************************************************************')
                             print('\n Simulation started at: ',starttime)
                             print('Simulation finished at: ', endtime)
+                            del acc,stats
                             tf.keras.backend.clear_session()
                             gc.collect()
                             tf.compat.v1.reset_default_graph()

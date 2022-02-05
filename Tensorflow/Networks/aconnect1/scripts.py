@@ -140,7 +140,9 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         _, accuracy, top5acc = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         return accuracy, top5acc
                 else:
-                        _,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
+                        #_,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
+                        y_predict = net.predict(Xtest,verbose=0,batch_size=ev_batch_size)
+                        accuracy = get_top_n_score(Ytest, y_predict, 1)
                         return accuracy
         """
         def classify(net,Xtest,Ytest,top5,ev_batch_size=None):
