@@ -135,7 +135,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
             precision = [1 if target[i] in pre_top_n[i] else 0 for i in range(target.shape[0])]
             #se retorna la precision
             return np.mean(precision)
-        def classify(net,Xtest,Ytest,top5)#,ev_batch_size=None):
+        def classify(net,Xtest,Ytest,top5):#,ev_batch_size=None):
                 if top5:
                         #_, accuracy, top5acc = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         XtestIn = tf.convert_to_tensor(Xtest) 
