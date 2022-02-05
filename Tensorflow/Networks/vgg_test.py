@@ -142,7 +142,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             #Load the trained model
                             net = tf.keras.models.load_model(string,custom_objects = custom_objects) 
                             #MC sim
-                            acc, stats = scripts.MonteCarlo(local_net=net,Xtest=X_test,Ytest=Y_test,M=N,
+                            acc, stats = scripts.MonteCarlo(net=net,Xtest=X_test,Ytest=Y_test,M=N,
                                     Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
                                     custom_objects=custom_objects,
                                     optimizer=optimizer,

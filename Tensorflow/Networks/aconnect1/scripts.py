@@ -155,7 +155,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
         """
         
         @profile
-        def MCsim(local_net=net,Xtest=Xtest,Ytest=Ytest,M=M,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,
+        def MCsim(net=net,Xtest=Xtest,Ytest=Ytest,M=M,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,
                 force=force,Derr=Derr,net_name=net_name,custom_objects=custom_objects,dtype=dtype,
                 optimizer=optimizer,loss=loss,metrics=metrics,top5=top5):
 
@@ -172,7 +172,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                     print('---------------------------------------------------------------------------------------')
 
                 for i in range(M): #Iterate over M samples
-                        [NetNoisy,Wstdn,Bstdn] = add_Wnoise(local_net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) #Function that adds the new noisy matrices to the layers
+                        #[NetNoisy,Wstdn,Bstdn] = add_Wnoise(local_net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) #Function that adds the new noisy matrices to the layers
+                        [NetNoisy,Wstdn,Bstdn] = add_Wnoise(net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) #Function that adds the new noisy matrices to the layers
                         NetNoisy.compile(optimizer,loss,metrics,run_eagerly=run_model_eagerly) #Compile the model. It is necessary to use the model.evaluate
                         if top5:
                             #Get the accuracy of the network    
