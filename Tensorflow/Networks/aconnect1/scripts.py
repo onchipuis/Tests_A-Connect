@@ -141,7 +141,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         return accuracy, top5acc
                 else:
                         #_,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
-                        y_predict = net.predict(Xtest,verbose=0,batch_size=ev_batch_size)
+                        Xtestin=tf.convert_to_tensor(Xtest) 
+                        y_predict = net.predict(Xtestin,verbose=0,batch_size=ev_batch_size)
                         #y_predict = net(Xtest)
                         accuracy = get_top_n_score(Ytest, y_predict, 1)
                         return accuracy
@@ -173,9 +174,13 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                     print('---------------------------------------------------------------------------------------')
 
                 for i in range(M): #Iterate over M samples
-                        #[NetNoisy,Wstdn,Bstdn] = add_Wnoise(local_net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) #Function that adds the new noisy matrices to the layers
-                        [NetNoisy,Wstdn,Bstdn] = add_Wnoise(net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) #Function that adds the new noisy matrices to the layers
-                        #NetNoisy.compile(optimizer,loss,metrics,run_eagerly=run_model_eagerly) #Compile the model. It is necessary to use the model.evaluate
+                        #Function that adds the new noisy matrices to the layers
+                        #[NetNoisy,Wstdn,Bstdn] = add_Wnoise(local_net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) 
+                        #Compile the model. It is necessary to use the model.evaluate
+                        #NetNoisy.compile(optimizer,loss,metrics,run_eagerly=run_model_eagerly) 
+                        
+                        #Function that adds the new noisy matrices to the layers
+                        [NetNoisy,Wstdn,Bstdn] = add_Wnoise(net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) 
                         if top5:
                             #Get the accuracy of the network    
                             acc_noisy[i],top5acc_noisy[i] = classify(NetNoisy,
@@ -193,7 +198,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         gc.collect()
                         tf.keras.backend.clear_session()
                         tf.compat.v1.reset_default_graph()
-                        #local_net.load_weights(filepath=(net_name+'_weights.h5')) #Takes the original weights value.
+                        #Takes the original weights value.
+                        #local_net.load_weights(filepath=(net_name+'_weights.h5')) 
 
                 #pool = Pool(mp.cpu_count())
                 #acc_noisy = pool.map(parallel, range(M))
@@ -209,10 +215,6 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 print('Min. Accuracy: %.2f%%\n' % Xmin)
                 print('Max. Accuracy: %.2f%%\n'% Xmax)
 
-                #del local_net
-                gc.collect()
-                tf.keras.backend.clear_session()
-                tf.compat.v1.reset_default_graph()
                 #os.remove(net_name+'_weights.h5')   #Delete created weight file
                 #if top5:
                 #        np.savetxt(net_name+'_TOP5'+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',top5acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt
