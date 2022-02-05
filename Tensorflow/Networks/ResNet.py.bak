@@ -143,7 +143,7 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
     y = Flatten()(x)
     
     if isAConnect:
-        outputs = FC_AConnect((num_classes,Wstd=Wstd,Bstd=Bstd, errDistr=errDistr)
+        outputs = FC_AConnect((num_classes,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr)(y)
     else:
         outputs = Dense(num_classes,
                         activation='softmax',
