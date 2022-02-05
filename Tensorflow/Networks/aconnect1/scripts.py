@@ -140,8 +140,6 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         return accuracy, top5acc
                 else:
                         _,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
-                        tf.keras.backend.clear_session()
-                        gc.collect()
                         return accuracy
         """
         def classify(net,Xtest,Ytest,top5,ev_batch_size=None):
@@ -185,6 +183,9 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                     top5,ev_batch_size=evaluate_batch_size) 
                             acc_noisy[i] = 100*acc_noisy[i]
                             print('\t%i\t | \t%.1f\t | \t%.1f\t | \t%.2f\n' %(i,Wstd*100,Bstd*100,acc_noisy[i]))
+                        del NetNoisy
+                        tf.keras.backend.clear_session()
+                        gc.collect()
                         local_net.load_weights(filepath=(net_name+'_weights.h5')) #Takes the original weights value.
 
                 #pool = Pool(mp.cpu_count())
@@ -201,7 +202,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 print('Min. Accuracy: %.2f%%\n' % Xmin)
                 print('Max. Accuracy: %.2f%%\n'% Xmax)
 
-                del NetNoisy, local_net, acc_noisy
+                del local_net
                 os.remove(net_name+'_weights.h5')   #Delete created weight file
                 #np.savetxt(net_name+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',acc_noisy,fmt="%.2f") #Save the accuracy of M samples in a txt
                 #np.savetxt(net_name+'_stats'+'_simerr_'+str(int(100*Wstd))+'_'+str(int(100*Bstd))+'.txt',stats,fmt="%.2f") #Save the median and iqr of M samples in a txt
