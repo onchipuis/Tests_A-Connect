@@ -143,7 +143,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         #_,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         Xtestin=tf.convert_to_tensor(Xtest) 
                         #y_predict = net.predict(Xtestin,verbose=0,batch_size=ev_batch_size)
-                        y_predict = net(Xtest,training=False)
+                        y_predict = net(Xtestin,training=False)
                         accuracy = get_top_n_score(Ytest, y_predict, 1)
                         return accuracy
         """
