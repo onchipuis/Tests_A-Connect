@@ -141,8 +141,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         return accuracy, top5acc
                 else:
                         #_,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
-                        #y_predict = net.predict(Xtest,verbose=0,batch_size=ev_batch_size)
-                        y_predict = net(Xtest)
+                        y_predict = net.predict(Xtest,verbose=0,batch_size=ev_batch_size)
+                        #y_predict = net(Xtest)
                         accuracy = get_top_n_score(Ytest, y_predict, 1)
                         return accuracy
         """
@@ -175,7 +175,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 for i in range(M): #Iterate over M samples
                         #[NetNoisy,Wstdn,Bstdn] = add_Wnoise(local_net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) #Function that adds the new noisy matrices to the layers
                         [NetNoisy,Wstdn,Bstdn] = add_Wnoise(net,Wstd,Bstd,errDistr,force,Derr,dtype=dtype) #Function that adds the new noisy matrices to the layers
-                        NetNoisy.compile(optimizer,loss,metrics,run_eagerly=run_model_eagerly) #Compile the model. It is necessary to use the model.evaluate
+                        #NetNoisy.compile(optimizer,loss,metrics,run_eagerly=run_model_eagerly) #Compile the model. It is necessary to use the model.evaluate
                         if top5:
                             #Get the accuracy of the network    
                             acc_noisy[i],top5acc_noisy[i] = classify(NetNoisy,
