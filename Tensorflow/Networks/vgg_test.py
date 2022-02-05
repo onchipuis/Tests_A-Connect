@@ -10,6 +10,7 @@ import time
 import gc
 from datetime import datetime
 from aconnect1 import layers, scripts
+
 #from keras.callbacks import LearningRateScheduler
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
@@ -46,8 +47,8 @@ X_train, X_test = normalization(X_train,X_test)
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.7]   # Define the stddev for training
-Sim_err = [0.5]
+Wstd_err = [0.3,0.5]   # Define the stddev for training
+Sim_err = [0.7]
 Conv_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 

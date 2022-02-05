@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import os
 import gc
+from memory_profiler import profile
 #Function to make the monte carlo simulation. To see more please go to the original file in Scripts
 def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="normal",
         force="no",Derr=0,net_name="Network",custom_objects=None,dtype='float32',
@@ -150,7 +151,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                         _,accuracy = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
                         return accuracy
         """
-
+        
+        @profile
         def MCsim(net=net,Xtest=Xtest,Ytest=Ytest,M=M,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,
                 force=force,Derr=Derr,net_name=net_name,custom_objects=custom_objects,dtype=dtype,
                 optimizer=optimizer,loss=loss,metrics=metrics,top5=top5):
