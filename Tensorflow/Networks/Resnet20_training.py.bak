@@ -1,15 +1,15 @@
 from __future__ import print_function
 import tensorflow as tf
-from tf.keras.layers import Dense, Conv2D, BatchNormalization, Activation
-from tf.keras.layers import AveragePooling2D, Input, Flatten
-from tf.keras.optimizers import Adam, SGD
-from tf.keras.callbacks import ModelCheckpoint, LearningRateScheduler
-from tf.keras.callbacks import ReduceLROnPlateau
-from tf.keras.preprocessing.image import ImageDataGenerator
-from tf.keras.regularizers import l2
-from tf.keras import backend as K
-from tf.keras.models import Model
-from tf.keras.datasets import cifar10
+from tensorflow.keras.layers import Dense, Conv2D, BatchNormalization, Activation
+from tensorflow.keras.layers import AveragePooling2D, Input, Flatten
+from tensorflow.keras.optimizers import Adam, SGD
+from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
+from tensorflow.keras.callbacks import ReduceLROnPlateau
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras import backend as K
+from tensorflow.keras.models import Model
+from tensorflow.keras.datasets import cifar10
 from ResNet import resnet_v1, resnet_v2
 import numpy as np
 import os
