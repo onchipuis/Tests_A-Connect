@@ -81,8 +81,10 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                                                 Bstd = Bstd
                                                 else:
                                                         Bstd = Bstd
+                                                        Bstd_layer = 0
                                         else:
                                                 Bstd = Bstd
+                                                Bstd_layer = 0
 
                                         #Create the error matrix taking into account the Wstd and Bstd
                                         Werr = Merr_distr(Merr_aux,Wstd,Wstd_layer,errDistr)
