@@ -7,7 +7,7 @@ from aconnect.layers import Conv_AConnect, FC_AConnect
 
 def resnet_layer(inputs,
                  num_filters=16,
-                 kernel_size=3,
+                 kernel_size=(3,3),
                  strides=1,
                  activation='relu',
                  batch_normalization=True,
@@ -127,7 +127,7 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
                 # changed dims
                 x = resnet_layer(inputs=x,
                                  num_filters=num_filters,
-                                 kernel_size=1,
+                                 kernel_size=(1,1),
                                  strides=strides,
                                  activation=None,
                                  batch_normalization=False,isAConnect=isAConnect,
