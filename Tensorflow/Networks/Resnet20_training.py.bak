@@ -17,14 +17,13 @@ import os
 # Training parameters
 batch_size = 128 # orig paper trained all networks with batch_size=128
 epochs = 200
-data_augmentation = True
 num_classes = 10
 
 # Subtracting pixel mean improves accuracy
 subtract_pixel_mean = True
 
 # A-Connect model
-isAConnect = False
+isAConnect = True
 
 # Extra parameters 
 
