@@ -98,7 +98,7 @@ momentum = 0.9
 batch_size = 256
 epochs = 100
 lr_decay = 1e-6
-lr_drop = 30
+lr_drop = 60
 """
 lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 initial_learning_rate=0.01,
