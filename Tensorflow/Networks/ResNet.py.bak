@@ -119,7 +119,6 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
             y = resnet_layer(inputs=x,
                              num_filters=num_filters,
                              strides=strides,isAConnect=isAConnect,
-                             conv_first = False
                              Wstd=Wstd,Bstd=Bstd,
                              errDistr=errDistr,Op=Op,Slice=Slice,
                              pool = pool)
