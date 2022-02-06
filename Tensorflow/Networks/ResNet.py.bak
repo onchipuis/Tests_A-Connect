@@ -106,7 +106,7 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
     x = Flip(inputs)
     x = RandomTranslation(0.1,0.1)(x)
     x = RandomZoom(0.2)(x)
-    x = resnet_layer(inputs=inputs, isAConnect=isAConnect, Wstd=Wstd, Bstd=Bstd, errDistr=errDistr, Op=Op, Slice=Slice)(x)
+    x = resnet_layer(isAConnect=isAConnect, Wstd=Wstd, Bstd=Bstd, errDistr=errDistr, Op=Op, Slice=Slice)(x)
 
     # Instantiate the stack of residual units
     for stack in range(3):
