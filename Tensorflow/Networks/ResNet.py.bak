@@ -102,10 +102,11 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
     num_res_blocks = int((depth - 2) / 6)
 
     inputs = Input(shape=input_shape)
-    x = resnet_layer(inputs=inputs, isAConnect=isAConnect, Wstd=Wstd, Bstd=Bstd, errDistr=errDistr, Op=Op, Slice=Slice)
     x = RandomFlip("horizontal")(x)
     x = RandomTranslation(0.1,0.1)(x)
     x = RandomZoom(0.2)(x)
+    x = resnet_layer(inputs=inputs, isAConnect=isAConnect, Wstd=Wstd, Bstd=Bstd, errDistr=errDistr, Op=Op, Slice=Slice)(x)
+
     # Instantiate the stack of residual units
     for stack in range(3):
         for res_block in range(num_res_blocks):
