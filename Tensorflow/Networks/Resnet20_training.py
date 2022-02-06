@@ -151,13 +151,16 @@ lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
 callbacks = [checkpoint, lr_reducer, lr_scheduler]
 
 # Run training, with or without data augmentation.
-model.fit(x_train, y_train,
+history = model.fit(x_train, y_train,
               batch_size=batch_size,
               epochs=epochs,
               validation_data=(x_test, y_test),
               shuffle=True,
               callbacks=callbacks)
               
+
+acc = history.history['accuracy'] 
+val_acc = history.history['val_accuracy']
               
 # SAVE MODEL:
 string = folder_models + name + '.h5'
