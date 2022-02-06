@@ -5,25 +5,22 @@ from tensorflow.keras.layers import AveragePooling2D, Input, Flatten
 from tensorflow.keras.optimizers import Adam, SGD
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from tensorflow.keras.callbacks import ReduceLROnPlateau
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.regularizers import l2
-from tensorflow.keras import backend as K
 from tensorflow.keras.models import Model
 from tensorflow.keras.datasets import cifar10
 from ResNet import resnet_v1, resnet_v2
 import numpy as np
-import os
 
 # Training parameters
 batch_size = 128 # orig paper trained all networks with batch_size=128
-epochs = 200
+epochs = 90
 num_classes = 10
 
 # Subtracting pixel mean improves accuracy
 subtract_pixel_mean = True
 
 # A-Connect model
-isAConnect = True
+isAConnect = False
 
 # Extra parameters 
 
