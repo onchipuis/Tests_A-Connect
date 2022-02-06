@@ -23,6 +23,9 @@ num_classes = 10
 # Subtracting pixel mean improves accuracy
 subtract_pixel_mean = True
 
+# A-Connect model
+isAConnect = True
+
 # Model parameter
 # ----------------------------------------------------------------------------
 #           |      | 200-epoch | Orig Paper| 200-epoch | Orig Paper| sec/epoch
@@ -107,7 +110,7 @@ def lr_schedule(epoch):
 if version == 2:
     model = resnet_v2(input_shape=input_shape, depth=depth)
 else:
-    model = resnet_v1(input_shape=input_shape, depth=depth)
+    model = resnet_v1(input_shape=input_shape, depth=depth, isAConnect = isAConnect)
 
 model.compile(loss='categorical_crossentropy',
               optimizer=Adam(lr=lr_schedule(0)),

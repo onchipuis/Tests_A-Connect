@@ -74,8 +74,8 @@ print(x_test.shape[0], 'test samples')
 print('y_train shape:', y_train.shape)
 
 # Convert class vectors to binary class matrices.
-y_train = keras.utils.to_categorical(y_train, num_classes)
-y_test = keras.utils.to_categorical(y_test, num_classes)
+y_train = tf.keras.utils.to_categorical(y_train, num_classes)
+y_test = tf.keras.utils.to_categorical(y_test, num_classes)
 
 
 def lr_schedule(epoch):
