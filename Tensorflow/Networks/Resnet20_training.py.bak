@@ -26,6 +26,17 @@ subtract_pixel_mean = True
 # A-Connect model
 isAConnect = True
 
+# Extra parameters 
+
+errDistr = ["normal"]
+model_name = 'ResNet20_CIFAR10/'
+folder_models = './Models/'+model_name
+folder_results = '../Results/'+model_name+'Training_data/'
+if isAConnect:
+    name = '16Werr_Wstd_80_Bstd_80'
+else:
+    name = 'Base'
+
 # Model parameter
 # ----------------------------------------------------------------------------
 #           |      | 200-epoch | Orig Paper| 200-epoch | Orig Paper| sec/epoch
@@ -46,11 +57,7 @@ n = 3
 # Orig paper: version = 1 (ResNet v1), Improved ResNet: version = 2 (ResNet v2)
 version = 1
 
-errDistr = ["normal"]
-model_name = 'ResNet20_CIFAR10/'
-folder_models = './Models/'+model_name
-folder_results = '../Results/'+model_name+'Training_data/'
-net = folder_models+'32x32_16Werr_Wstd_80_Bstd_80.h5'
+
 
 # Computed depth from supplied model parameter n
 if version == 1:
@@ -153,6 +160,14 @@ model.fit(x_train, y_train,
               validation_data=(x_test, y_test),
               shuffle=True,
               callbacks=callbacks)
+              
+              
+# SAVE MODEL:
+string = folder_models + name + '.h5'
+model.save(string,include_optimizer=False)
+#Save in a txt the accuracy and the validation accuracy for further analysis
+np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
+np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")              
 
 
 # Score trained model.
