@@ -10,6 +10,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.datasets import cifar10
 from ResNet import resnet_v1, resnet_v2
 import numpy as np
+import os
 
 # Training parameters
 batch_size = 128 # orig paper trained all networks with batch_size=128
@@ -128,7 +129,7 @@ model.summary()
 print(model_type)
 
 # Prepare model model saving directory.
-save_dir = os.path.join(os.getcwd(), 'saved_models')
+save_dir = folder_models
 model_name = 'cifar10_%s_model.{epoch:03d}.h5' % model_type
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
