@@ -123,7 +123,7 @@ def lr_schedule(epoch):
 if version == 2:
     model = resnet_v2(input_shape=input_shape, depth=depth)
 else:
-    model = resnet_v1(input_shape=input_shape, depth=depth, isAConnect = isAConnect)
+    model = resnet_v1(input_shape=input_shape, depth=depth, isAConnect = isAConnect, Wstd=0.3,Bstd=0.3)
 
 model.compile(loss='categorical_crossentropy',
               optimizer=Adam(lr=lr_schedule(0)),

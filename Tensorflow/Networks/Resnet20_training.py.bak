@@ -24,7 +24,7 @@ num_classes = 10
 subtract_pixel_mean = True
 
 # A-Connect model
-isAConnect = True
+isAConnect = False
 
 # Extra parameters 
 
