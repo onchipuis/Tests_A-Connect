@@ -119,6 +119,7 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
             y = resnet_layer(inputs=x,
                              num_filters=num_filters,
                              strides=strides,isAConnect=isAConnect,
+                             conv_first = False
                              Wstd=Wstd,Bstd=Bstd,
                              errDistr=errDistr,Op=Op,Slice=Slice,
                              pool = pool)
@@ -150,7 +151,7 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
     y = Flatten()(x)
     
     if isAConnect:
-        outputs = FC_AConnect(num_classes,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr, pool = pool_FC)(y)
+        outputs = FC_AConnect(num_classes,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr)(y)
     else:
         outputs = Dense(num_classes,
                         activation='softmax',
