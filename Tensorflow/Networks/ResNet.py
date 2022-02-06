@@ -17,7 +17,8 @@ def resnet_layer(inputs,
                  Bstd=0,
                  errDistr = "normal",
                  Op = 1,
-                 Slice = 1):
+                 Slice = 1,
+                 pool = 2):
     """2D Convolution-Batch Normalization-Activation stack builder
 
     # Arguments
@@ -41,7 +42,8 @@ def resnet_layer(inputs,
                              errDistr = errDistr,
                              Op = Op,
                              Slice = Slice,
-                             weights_regularizer=l2(1e-4))
+                             weights_regularizer=l2(1e-4),
+                             pool = pool)
     
     else:
         conv = Conv2D(num_filters,
@@ -67,7 +69,7 @@ def resnet_layer(inputs,
     return x
 
 
-def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd=0, errDistr="normal", Op=1, Slice=1):
+def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd=0, errDistr="normal", Op=1, Slice=1, pool=2):
     """ResNet Version 1 Model builder [a]
 
     Stacks of 2 x (3 x 3) Conv2D-BN-ReLU
@@ -118,12 +120,14 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
                              num_filters=num_filters,
                              strides=strides,isAConnect=isAConnect,
                              Wstd=Wstd,Bstd=Bstd,
-                             errDistr=errDistr,Op=Op,Slice=Slice)
+                             errDistr=errDistr,Op=Op,Slice=Slice,
+                             pool = pool)
             y = resnet_layer(inputs=y,
                              num_filters=num_filters,
                              activation=None,isAConnect=isAConnect,
                              Wstd=Wstd,Bstd=Bstd,
-                             errDistr=errDistr,Op=Op,Slice=Slice)
+                             errDistr=errDistr,Op=Op,Slice=Slice,
+                             pool = pool)
             if stack > 0 and res_block == 0:  # first layer but not first stack
                 # linear projection residual shortcut connection to match
                 # changed dims
@@ -134,7 +138,8 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
                                  activation=None,
                                  batch_normalization=False,isAConnect=isAConnect,
                                  Wstd=Wstd,Bstd=Bstd,
-                                errDistr=errDistr,Op=Op,Slice=Slice)
+                                errDistr=errDistr,Op=Op,Slice=Slice,
+                                pool = pool)
             x = keras.layers.add([x, y])
             x = Activation('relu')(x)
         num_filters *= 2
