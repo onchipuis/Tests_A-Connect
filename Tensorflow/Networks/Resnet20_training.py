@@ -5,9 +5,7 @@ from tensorflow.keras.layers import AveragePooling2D, Input, Flatten
 from tensorflow.keras.optimizers import Adam, SGD
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from tensorflow.keras.callbacks import ReduceLROnPlateau
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.regularizers import l2
-from tensorflow.keras import backend as K
 from tensorflow.keras.models import Model
 from tensorflow.keras.datasets import cifar10
 from ResNet import resnet_v1, resnet_v2
@@ -16,14 +14,14 @@ import os
 
 # Training parameters
 batch_size = 128 # orig paper trained all networks with batch_size=128
-epochs = 200
+epochs = 90
 num_classes = 10
 
 # Subtracting pixel mean improves accuracy
 subtract_pixel_mean = True
 
 # A-Connect model
-isAConnect = True
+isAConnect = False
 
 # Extra parameters 
 
@@ -131,7 +129,7 @@ model.summary()
 print(model_type)
 
 # Prepare model model saving directory.
-save_dir = os.path.join(os.getcwd(), 'saved_models')
+save_dir = folder_models
 model_name = 'cifar10_%s_model.{epoch:03d}.h5' % model_type
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
@@ -153,13 +151,16 @@ lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
 callbacks = [checkpoint, lr_reducer, lr_scheduler]
 
 # Run training, with or without data augmentation.
-model.fit(x_train, y_train,
+history = model.fit(x_train, y_train,
               batch_size=batch_size,
               epochs=epochs,
               validation_data=(x_test, y_test),
               shuffle=True,
               callbacks=callbacks)
               
+
+acc = history.history['accuracy'] 
+val_acc = history.history['val_accuracy']
               
 # SAVE MODEL:
 string = folder_models + name + '.h5'
