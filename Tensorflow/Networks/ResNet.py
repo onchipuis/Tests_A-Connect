@@ -141,12 +141,12 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
                                 errDistr=errDistr,Op=Op,Slice=Slice,
                                 pool = pool)
             x = keras.layers.add([x, y])
-            x = BatchNormalization()(x)
             x = Activation('relu')(x)
         num_filters *= 2
 
     # Add classifier on top.
     # v1 does not use BN after last shortcut connection-ReLU
+    x = BatchNormalization()(x)    
     x = AveragePooling2D(pool_size=8)(x)
     y = Flatten()(x)
     

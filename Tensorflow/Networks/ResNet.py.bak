@@ -141,7 +141,6 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
                                 errDistr=errDistr,Op=Op,Slice=Slice,
                                 pool = pool)
             x = keras.layers.add([x, y])
-            #x = BatchNormalization()(x)
             x = Activation('relu')(x)
         num_filters *= 2
 
