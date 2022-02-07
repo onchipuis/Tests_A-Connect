@@ -96,7 +96,7 @@ learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
 epochs = 100
-lr_decay = 1e-6
+lr_decay = 1e-4
 lr_drop = 30
 """
 lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
@@ -109,14 +109,16 @@ optimizer = tf.optimizers.SGD(learning_rate=lr_schedule,
 """
 def lr_scheduler(epoch):
     if epoch < 50:
-        lr = learning_rate * (0.5 ** (epoch // lr_drop))
+        #lr = 0.1 * (0.5 ** (epoch // lr_drop))
+        lr = 0.1
     else:
-        lr = learning_rate * (0.5 ** ((epoch-50) // lr_drop))
+        #lr = 0.02 * (0.5 ** ((epoch-50) // lr_drop))
+        lr = 0.01
     return lr
 
 reduce_lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)    
-optimizer = tf.optimizers.SGD(learning_rate=learning_rate, 
-                            momentum=momentum, decay = lr_decay, nesterov= True) #Define optimizer
+optimizer = tf.optimizers.SGD(learning_rate=0.0, 
+                            momentum=momentum, nesterov= True, decay = lr_decay) #Define optimizer
             
 ### TRAINING
 for d in range(len(isAConnect)): #Iterate over the networks
