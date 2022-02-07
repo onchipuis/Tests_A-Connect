@@ -52,7 +52,7 @@ Nlayers_AC = [1,4,8,11,15,18,21,25,28,31,35,38,41] #AConnect layer numbers
 
 #Shift the layer index due to the preprocessing layers
 for j in range(len(NlayersBase)):
-    Nlayers_AC[j] = Nlayers_AC[j] + sL 
+    Nlayers_AC[j] = Nlayers_AC[j]# + sL 
     Nlayers_noAC[j] = Nlayers_noAC[j] + sL
 """
 # prepare data augmentation configuration
@@ -159,13 +159,13 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             Nlayers0 = NlayersBase
                             model0 = model_aux
                         
+                        """
                         net0='./Models/VGG16_CIFAR10/2Werr_Wstd_70_Bstd_70_8bQuant_lognormalDistr.h5'
                         model0 = tf.keras.models.load_model(net0,custom_objects = custom_objects)
                         model.set_weights(model0.get_weights())
                         """
                         for m in range(len(Nlayers)):
                             model.layers[Nlayers[m]].set_weights(model0.layers[Nlayers0[m]].get_weights())
-                        """
 
                         # NAME
                         if isAConnect[d]:
