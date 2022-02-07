@@ -721,7 +721,7 @@ def Merr_distr(shape,stddev,dtype,errDistr): #Used to reshape the output of the 
     if errDistr == "normal":
       Merr = tf.math.abs(1+N)
     elif errDistr == "lognormal":
-      Merr = tf.math.exp(-N)*tf.math.exp(-0.5*tf.pow(stddev,2))
+      Merr = tf.math.exp(-N)*np.exp(-0.5*np.power(stddev,2))
     return Merr
 
 
