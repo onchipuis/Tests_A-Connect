@@ -76,7 +76,7 @@ isAConnect = [True]   # Which network you want to train/test True for A-Connect 
 Wstd_err = [0.7]   # Define the stddev for training
 Conv_pool = [2]
 FC_pool = [4]
-WisQuant = ["yes"]		    # Do you want binary weights?
+WisQuant = ["no"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
 Bbw = Wbw
@@ -212,5 +212,5 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             string = folder_models + name + '.h5'
                             model.save(string,include_optimizer=False)
                             #Save in a txt the accuracy and the validation accuracy for further analysis
-                            np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
-                            np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
+                            np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.4f") 
+                            np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.4f")
