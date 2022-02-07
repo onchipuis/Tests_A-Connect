@@ -22,6 +22,9 @@ subtract_pixel_mean = True
 
 # A-Connect model
 isAConnect = False
+Nlayers = [4, 7, 10, 14, 17, 21, 24, 28, 31, 32, 36, 39, 43, 46, 50, 53, 54, 58, 61, 65, 68, 75]
+net_base = "./Models/ResNet20_FICAR10/Base.h5"
+model_base = tf.keras.models.load_model(net_base)
 # Extra parameters 
 
 errDistr = ["normal"]
@@ -126,9 +129,7 @@ model.compile(loss='categorical_crossentropy',
               metrics=['accuracy'])
 model.summary()
 print(model_type)
-Nlayers = model.get_layer()
-print(Nlayers)
-print("CANTIDAD DE LAYERS: ", len(Nlayers))
+
 # Prepare model model saving directory.
 save_dir = folder_models
 model_name = 'cifar10_%s_model.{epoch:03d}.h5' % model_type
