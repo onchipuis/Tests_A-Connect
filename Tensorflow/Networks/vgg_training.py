@@ -75,7 +75,7 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,inpu
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.7]   # Define the stddev for training
+Wstd_err = [0.8]   # Define the stddev for training
 Conv_pool = [2]
 FC_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
@@ -93,7 +93,7 @@ net_base = folder_models+'Base.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
-learning_rate = 0.05
+learning_rate = 0.02
 momentum = 0.9
 batch_size = 256
 epochs = 50
@@ -117,7 +117,7 @@ def lr_scheduler(epoch):
 
 reduce_lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)    
 optimizer = tf.optimizers.SGD(learning_rate=learning_rate, 
-                            momentum=momentum)#, decay = lr_decay, nesterov= True) #Define optimizer
+                            momentum=momentum, decay = lr_decay, nesterov= True) #Define optimizer
             
 ### TRAINING
 for d in range(len(isAConnect)): #Iterate over the networks
