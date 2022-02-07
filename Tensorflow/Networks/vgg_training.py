@@ -93,7 +93,7 @@ net_base = folder_models+'Base.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
-learning_rate = 0.02
+learning_rate = 0.05
 momentum = 0.9
 batch_size = 256
 epochs = 50
@@ -196,8 +196,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                   batch_size=batch_size,
                                   epochs=epochs,
                                   validation_data=(X_test, Y_test),
+                                  callbacks = [reduce_lr],
                                   shuffle=True)
-                                  #callbacks = [reduce_lr],
                         model.evaluate(X_test,Y_test) 
                         string = folder_models + name + '.h5'                                
                         model.save(string,include_optimizer=False)
