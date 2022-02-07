@@ -22,7 +22,10 @@ subtract_pixel_mean = True
 
 # A-Connect model
 isAConnect = True
-Nlayers_base = [4, 7, 10, 14, 17, 21, 24, 28, 31, 32, 36, 39, 43, 46, 50, 53, 54, 58, 61, 65, 68, 74]
+Wstd = 0.3
+Bstd = Wstd
+pool = 2
+Nlayers = [4, 7, 10, 14, 17, 21, 24, 28, 31, 32, 36, 39, 43, 46, 50, 53, 54, 58, 61, 65, 68, 74]
 net_base = "./Models/ResNet20_CIFAR10/Base.h5"
 model_base = tf.keras.models.load_model(net_base) #Load pretrained model with 89.5%
 # Extra parameters 
@@ -32,7 +35,7 @@ model_name = 'ResNet20_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 if isAConnect:
-    name = '16Werr_Wstd_80_Bstd_80'
+    name = '2Werr_Wstd_30_Bstd_30'
 else:
     name = 'Base'
 
@@ -122,7 +125,7 @@ def lr_schedule(epoch):
 if version == 2:
     model = resnet_v2(input_shape=input_shape, depth=depth)
 else:
-    model = resnet_v1(input_shape=input_shape, depth=depth, isAConnect = isAConnect, Wstd=0.3,Bstd=0.3, Op=2, pool=2)
+    model = resnet_v1(input_shape=input_shape, depth=depth, isAConnect = isAConnect, Wstd=Wstd,Bstd=Bstd Op=1, pool=pool)
 
 model.compile(loss='categorical_crossentropy',
               optimizer=Adam(lr=lr_schedule(0)),
@@ -153,11 +156,11 @@ lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
 callbacks = [checkpoint, lr_reducer, lr_scheduler]
 
 #Loading pretrained weights
-
-for m in range(len(Nlayers_base)):
-    model.layers[Nlayers[m]].set_weights(
-        model_base.layers[Nlayers_base[m]].get_weights()
-    )
+if isAConnect:
+    for m in range(len(Nlayers_base)):
+        model.layers[Nlayers[m]].set_weights(
+            model_base.layers[Nlayers[m]].get_weights()
+        )
 
 # Run training, with or without data augmentation.
 history = model.fit(x_train, y_train,
