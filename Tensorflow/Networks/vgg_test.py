@@ -8,6 +8,7 @@ import tensorflow as tf
 import VGG as vgg
 import time
 import gc
+import os
 from datetime import datetime
 from aconnect1 import layers, scripts
 
@@ -47,8 +48,8 @@ X_train, X_test = normalization(X_train,X_test)
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.3]   # Define the stddev for training
-Sim_err = [0.5]
+Wstd_err = [0.3,0.5]   # Define the stddev for training
+Sim_err = [0,0.3,0.5,0.7]
 Conv_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
@@ -123,49 +124,50 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             else:
                                 name = 'Base'
                             string = folder_models + name + '.h5'
-                        
-                            if Err == 0:
-                                N = 1
-                            else:
-                                N = MCsims
-                                    #####
-                            
-                            elapsed_time = time.time() - start_time
-                            print("Elapsed time: {}".format(hms_string(elapsed_time)))
-                            now = datetime.now()
-                            starttime = now.time()
-                            print('\n\n******************************************************************\n\n')
-                            print('TESTING NETWORK: ', name)
-                            print('With simulation error: ', Err)
-                            print('\n\n**********************************************************************')
-                            
-                            #Load the trained model
-                            #net = tf.keras.models.load_model(string,custom_objects = custom_objects) 
-                            net = string
-                            #MC sim
-                            acc, stats = scripts.MonteCarlo(net=net,Xtest=X_test,Ytest=Y_test,M=N,
-                                    Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
-                                    custom_objects=custom_objects,
-                                    optimizer=optimizer,
-                                    loss='sparse_categorical_crossentropy',
-                                    metrics=['accuracy'],top5=False,dtype='float16',
-                                    errDistr="lognormal",evaluate_batch_size=16
-                                    )#errDistr=errDistr[k],evaluate_batch_size=16
-                                    #)
                             name_sim = name+'_simErr_'+str(int(100*Err))                      
                             name_stats = name+'_stats_simErr_'+str(int(100*Err))                      
-                            np.savetxt(folder_results+name_sim+'.txt',acc,fmt="%.2f")
-                            np.savetxt(folder_results+name_stats+'.txt',stats,fmt="%.2f")
+                       
+                            if not os.path.exists(folder_results+name_sim+'.txt'): 
+                                if Err == 0:
+                                    N = 1
+                                else:
+                                    N = MCsims
+                                        #####
+                                
+                                elapsed_time = time.time() - start_time
+                                print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                                now = datetime.now()
+                                starttime = now.time()
+                                print('\n\n******************************************************************\n\n')
+                                print('TESTING NETWORK: ', name)
+                                print('With simulation error: ', Err)
+                                print('\n\n**********************************************************************')
+                                
+                                #Load the trained model
+                                #net = tf.keras.models.load_model(string,custom_objects = custom_objects) 
+                                net = string
+                                #MC sim
+                                acc, stats = scripts.MonteCarlo(net=net,Xtest=X_test,Ytest=Y_test,M=N,
+                                        Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
+                                        custom_objects=custom_objects,
+                                        optimizer=optimizer,
+                                        loss='sparse_categorical_crossentropy',
+                                        metrics=['accuracy'],top5=False,dtype='float16',
+                                        errDistr="lognormal",evaluate_batch_size=16
+                                        )#errDistr=errDistr[k],evaluate_batch_size=16
+                                        #)
+                                np.savetxt(folder_results+name_sim+'.txt',acc,fmt="%.2f")
+                                np.savetxt(folder_results+name_stats+'.txt',stats,fmt="%.2f")
 
-                            now = datetime.now()
-                            endtime = now.time()
-                            elapsed_time = time.time() - start_time
-                            print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                                now = datetime.now()
+                                endtime = now.time()
+                                elapsed_time = time.time() - start_time
+                                print("Elapsed time: {}".format(hms_string(elapsed_time)))
 
-                            print('\n\n*********************************************************************')
-                            print('\n Simulation started at: ',starttime)
-                            print('Simulation finished at: ', endtime)
-                            del net,acc,stats
-                            gc.collect()
-                            tf.keras.backend.clear_session()
-                            tf.compat.v1.reset_default_graph()
+                                print('\n\n*********************************************************************')
+                                print('\n Simulation started at: ',starttime)
+                                print('Simulation finished at: ', endtime)
+                                del net,acc,stats
+                                gc.collect()
+                                tf.keras.backend.clear_session()
+                                tf.compat.v1.reset_default_graph()
