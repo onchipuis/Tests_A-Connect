@@ -98,7 +98,7 @@ momentum = 0.9
 batch_size = 256
 epochs = 100
 lr_decay = 1e-6
-lr_drop = 60
+lr_drop = 30
 """
 lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
                 initial_learning_rate=0.01,
@@ -112,7 +112,7 @@ def lr_scheduler(epoch):
     if epoch < 50:
         lr = learning_rate * (0.5 ** (epoch // lr_drop))
     else:
-        lr = learning_rate * (0.5 ** ((epoch-50) // lr_drop))
+        lr = 0.1*learning_rate * (0.5 ** ((epoch-50) // lr_drop))
     return lr
 
 reduce_lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)    
