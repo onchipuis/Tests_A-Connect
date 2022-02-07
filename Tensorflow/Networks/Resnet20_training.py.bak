@@ -14,7 +14,7 @@ import os
 
 # Training parameters
 batch_size = 128 # orig paper trained all networks with batch_size=128
-epochs = 90
+epochs = 200
 num_classes = 10
 
 # Subtracting pixel mean improves accuracy
