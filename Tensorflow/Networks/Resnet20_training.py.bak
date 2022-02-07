@@ -157,7 +157,7 @@ callbacks = [checkpoint, lr_reducer, lr_scheduler]
 
 #Loading pretrained weights
 if isAConnect:
-    for m in range(len(Nlayers_base)):
+    for m in range(len(Nlayers)):
         model.layers[Nlayers[m]].set_weights(
             model_base.layers[Nlayers[m]].get_weights()
         )
