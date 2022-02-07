@@ -126,7 +126,7 @@ model.compile(loss='categorical_crossentropy',
               metrics=['accuracy'])
 model.summary()
 print(model_type)
-Nlayers = model.layers()
+Nlayers = model.get_layer()
 print(Nlayers)
 print("CANTIDAD DE LAYERS: ", len(Nlayers))
 # Prepare model model saving directory.
