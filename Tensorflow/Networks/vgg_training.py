@@ -76,7 +76,7 @@ isAConnect = [True]   # Which network you want to train/test True for A-Connect 
 Wstd_err = [0.7]   # Define the stddev for training
 Conv_pool = [2]
 FC_pool = [4]
-WisQuant = ["no"]		    # Do you want binary weights?
+WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
 Bbw = Wbw
@@ -94,7 +94,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
-epochs = 100
+epochs = 50
 lr_decay = 1e-6
 lr_drop = 30
 """
