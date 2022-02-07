@@ -59,9 +59,10 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                                 Merr_aux = np.random.randn(Wsz[0],Wsz[1],Wsz[2],Wsz[3]).astype(dtype)
                                         else:
                                                 Merr_aux = np.random.randn(Wsz[0], Wsz[1]).astype(dtype) #If the layer does not have strides, it is a FC layer
-
-                                        if hasattr(layers[i], 'Wstd'): #Does the layer have Wstd? if it is true is an A-Connect or DropConnect network
-                                                if(layers[i].Wstd != 0): #IF the value it is different from zero, the layer is working with the algorithm
+                                        #Does the layer have Wstd? if it is true is an A-Connect or DropConnect network
+                                        if hasattr(layers[i], 'Wstd'):
+                                                #IF the value it is different from zero, the layer is working with the algorithm
+                                                if(layers[i].Wstd != 0 and layers[i].errDistr=="lognormal"): 
                                                         Wstd_layer = layers[i].Wstd
                                                         if force == "no": #Do you want to take the training or simulation Wstd value?
                                                                 Wstd = Wstd_layer
@@ -72,8 +73,9 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                                         Wstd = Wstd
                                         else:
                                                 Wstd = Wstd #If it is false, is a FC layers
+                                                Wstd_layer = 0
                                         if hasattr(layers[i], 'Bstd'): #The same logic is applied for Bstd
-                                                if(layers[i].Bstd != 0):
+                                                if(layers[i].Bstd != 0 and layers[i].errDistr=="lognormal"):
                                                         Bstd_layer = layers[i].Bstd
                                                         if force == "no":
                                                                 Bstd = Bstd_layer
