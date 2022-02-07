@@ -112,7 +112,7 @@ def lr_scheduler(epoch):
     if epoch < 50:
         lr = learning_rate * (0.5 ** (epoch // lr_drop))
     else:
-        lr = 0.1*learning_rate * (0.5 ** ((epoch-50) // lr_drop))
+        lr = learning_rate * (0.5 ** ((epoch-50) // lr_drop))
     return lr
 
 reduce_lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)    

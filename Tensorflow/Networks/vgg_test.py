@@ -54,8 +54,8 @@ WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
 Bbw = Wbw
-errDistr = ["lognormal"]
-#errDistr = ["normal"]
+#errDistr = ["lognormal"]
+errDistr = ["normal"]
 MCsims = 100
 acc=np.zeros([500,1])
 force = "yes"
@@ -149,8 +149,9 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                     optimizer=optimizer,
                                     loss='sparse_categorical_crossentropy',
                                     metrics=['accuracy'],top5=False,dtype='float16',
-                                    errDistr=errDistr[k],evaluate_batch_size=16
-                                    )
+                                    errDistr="lognormal",evaluate_batch_size=16
+                                    )#errDistr=errDistr[k],evaluate_batch_size=16
+                                    #)
                             name_sim = name+'_simErr_'+str(int(100*Err))                      
                             name_stats = name+'_stats_simErr_'+str(int(100*Err))                      
                             np.savetxt(folder_results+name_sim+'.txt',acc,fmt="%.2f")
