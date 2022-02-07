@@ -196,8 +196,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                   batch_size=batch_size,
                                   epochs=epochs,
                                   validation_data=(X_test, Y_test),
-                                  callbacks = [reduce_lr],
                                   shuffle=True)
+                                  #callbacks = [reduce_lr],
                         model.evaluate(X_test,Y_test) 
                         string = folder_models + name + '.h5'                                
                         model.save(string,include_optimizer=False)
