@@ -95,7 +95,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 learning_rate = 0.1
 momentum = 0.9
 batch_size = 256
-epochs = 100
+epochs = 50
 lr_decay = 0#1e-4
 lr_drop = 20
 """
@@ -109,7 +109,7 @@ optimizer = tf.optimizers.SGD(learning_rate=lr_schedule,
 """
 def lr_scheduler(epoch):
     if epoch < 50:
-        lr = 0.1 * (0.5 ** (epoch // lr_drop))
+        lr = 0.02 * (0.5 ** (epoch // lr_drop))
     else:
         lr = 0.02 * (0.5 ** ((epoch-50) // lr_drop))
     return lr
@@ -160,13 +160,13 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             Nlayers0 = NlayersBase
                             model0 = model_aux
                         
-                        """
                         net0='./Models/VGG16_CIFAR10/2Werr_Wstd_70_Bstd_70_8bQuant_lognormalDistr.h5'
                         model0 = tf.keras.models.load_model(net0,custom_objects = custom_objects)
                         model.set_weights(model0.get_weights())
                         """
                         for m in range(len(Nlayers)):
                             model.layers[Nlayers[m]].set_weights(model0.layers[Nlayers0[m]].get_weights())
+                        """
 
                         # NAME
                         if isAConnect[d]:
