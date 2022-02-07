@@ -93,7 +93,7 @@ net_base = folder_models+'Base.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
-learning_rate = 0.02
+learning_rate = 0.01
 momentum = 0.9
 batch_size = 256
 epochs = 50
