@@ -26,7 +26,7 @@ Wstd = 0.3
 Bstd = Wstd
 pool = 2
 Nlayers = [4, 7, 10, 14, 17, 21, 24, 28, 31, 32, 36, 39, 43, 46, 50, 53, 54, 58, 61, 65, 68, 74]
-Nlayers2 = [4, 7, 10, 14, 17, 21, 24, 28, 31, 32, 36, 39, 43, 46, 50, 53, 54, 58, 61, 65, 68, 74]
+Nlayers2 = [4, 7, 10, 14, 17, 21, 24, 28, 31, 32, 36, 39, 43, 46, 50, 53, 54, 58, 61, 65, 68, 75]
 net_base = "./Models/ResNet20_CIFAR10/Base.h5"
 model_base = tf.keras.models.load_model(net_base) #Load pretrained model with 89.5%
 # Extra parameters 
