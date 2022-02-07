@@ -109,9 +109,9 @@ optimizer = tf.optimizers.SGD(learning_rate=lr_schedule,
 """
 def lr_scheduler(epoch):
     if epoch < 50:
-        lr = 0.02 * (0.5 ** (epoch // lr_drop))
+        lr = 0.01 * (0.5 ** (epoch // lr_drop))
     else:
-        lr = 0.02 * (0.5 ** ((epoch-50) // lr_drop))
+        lr = 0.01 * (0.5 ** ((epoch-50) // lr_drop))
     return lr
 
 reduce_lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)    
