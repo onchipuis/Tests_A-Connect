@@ -54,7 +54,7 @@ Nlayers_AC = [1,4,8,11,15,18,21,25,28,31,35,38,41] #AConnect layer numbers
 for j in range(len(NlayersBase)):
     #Nlayers_AC[j] = Nlayers_AC[j] + sL 
     Nlayers_noAC[j] = Nlayers_noAC[j] + sL
-    Nlayers_AC[j] = Nlayers_AC[j]+1
+    Nlayers_AC[j] = Nlayers_AC[j]+2
 """
 # prepare data augmentation configuration
 train_datagen = ImageDataGenerator(
@@ -76,7 +76,7 @@ model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,inpu
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.7]   # Define the stddev for training
 Conv_pool = [2]
-FC_pool = [4]
+FC_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
@@ -94,7 +94,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 # TRAINING PARAMETERS
 learning_rate = 0.1
 momentum = 0.9
-batch_size = 128
+batch_size = 256
 epochs = 100
 lr_decay = 1e-6
 lr_drop = 30

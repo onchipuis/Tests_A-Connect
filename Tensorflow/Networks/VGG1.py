@@ -8,7 +8,7 @@ import tensorflow as tf
 from aconnect1.layers import Conv_AConnect, FC_AConnect 
 #from aconnect.layers import Conv_AConnect, FC_AConnect
 from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatten, RandomFlip, RandomRotation, RandomZoom
-from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax, Rescaling, RandomTranslation
+from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax, Rescaling, RandomTranslation, RandomCrop
 Xsz = 32
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,
@@ -68,6 +68,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,
                         tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),   
                         ## Data augmentation layers
                         RandomFlip("horizontal"),
+                        RandomCrop(25,25)
                         #RandomTranslation(0.1,0.1),
                         #RandomZoom(0.2),
                         Conv_AConnect(filters=64,kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,padding="SAME",isQuant=isQuant,bw=bw),
