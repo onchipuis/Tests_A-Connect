@@ -94,7 +94,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 # TRAINING PARAMETERS
 learning_rate = 0.1
 momentum = 0.9
-batch_size = 256
+batch_size = 128
 epochs = 100
 lr_decay = 1e-6
 lr_drop = 30
