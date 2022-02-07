@@ -68,7 +68,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,
                         tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),   
                         ## Data augmentation layers
                         RandomFlip("horizontal"),
-                        RandomCrop(25,25)
+                        RandomCrop(25,25),
                         #RandomTranslation(0.1,0.1),
                         #RandomZoom(0.2),
                         Conv_AConnect(filters=64,kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,padding="SAME",isQuant=isQuant,bw=bw),
