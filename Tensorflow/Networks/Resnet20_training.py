@@ -22,7 +22,6 @@ subtract_pixel_mean = True
 
 # A-Connect model
 isAConnect = False
-
 # Extra parameters 
 
 errDistr = ["normal"]
@@ -127,7 +126,9 @@ model.compile(loss='categorical_crossentropy',
               metrics=['accuracy'])
 model.summary()
 print(model_type)
-
+Nlayers = model.layers()
+print(Nlayers)
+print("CANTIDAD DE LAYERS: ", len(Nlayers))
 # Prepare model model saving directory.
 save_dir = folder_models
 model_name = 'cifar10_%s_model.{epoch:03d}.h5' % model_type
