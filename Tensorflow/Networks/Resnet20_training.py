@@ -92,7 +92,7 @@ print('y_train shape:', y_train.shape)
 #y_test = tf.keras.utils.to_categorical(y_test, num_classes)
 
 # TRAINING PARAMETERS
-lrate = 1e-2
+lrate = 1e-1
 epochs = 200
 num_classes = 10
 momentum = 0.9
