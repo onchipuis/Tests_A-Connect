@@ -93,7 +93,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
 lrate = 1e-1
-epochs = 200
+epochs = 100
 num_classes = 10
 momentum = 0.9
 batch_size = 256
@@ -112,15 +112,23 @@ def lr_schedule(epoch):
     # Returns
         lr (float32): learning rate
     """
-    lr = lrate
-    if epoch > 180:
-        lr *= 0.5e-3
-    elif epoch > 160:
-        lr *= 1e-3
-    elif epoch > 120:
-        lr *= 1e-2
-    elif epoch > 80:
-        lr *= 1e-1
+    if isAConnect[0]:
+        lr = lrate*0.1
+        elif epoch > 75:
+            lr *= 1e-2
+        elif epoch > 50:
+            lr *= 1e-1
+    else:
+        lr = lrate
+        if epoch > 180:
+            lr *= 0.5e-3
+        elif epoch > 160:
+            lr *= 1e-3
+        elif epoch > 120:
+            lr *= 1e-2
+        elif epoch > 80:
+            lr *= 1e-1
+    
     print('Learning rate: ', lr)
     return lr
 
@@ -175,6 +183,9 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                             Conv_pool=Conv_pool_aux[i],
                                             FC_pool=FC_pool_aux[i],
                                             errDistr=errDistr[k])
+                        
+                        ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
+                        model.set_weights(model_base.get_weights())
                         
                         # NAME
                         if isAConnect[d]:
