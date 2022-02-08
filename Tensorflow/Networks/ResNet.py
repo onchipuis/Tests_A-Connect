@@ -107,7 +107,7 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
     Flip = RandomFlip("horizontal")
     x = Flip(inputs)
     x = RandomTranslation(0.1,0.1)(x)
-    x = RandomZoom(0.2)(x)
+    x = RandomZoom(0)(x)
     x = resnet_layer(inputs=x,isAConnect=isAConnect, Wstd=Wstd, Bstd=Bstd, errDistr=errDistr, Op=Op, Slice=Slice)
 
     # Instantiate the stack of residual units
@@ -146,7 +146,7 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
 
     # Add classifier on top.
     # v1 does not use BN after last shortcut connection-ReLU
-    x = BatchNormalization()(x)    
+    #x = BatchNormalization()(x)    
     x = AveragePooling2D(pool_size=8)(x)
     y = Flatten()(x)
     
