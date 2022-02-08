@@ -1,8 +1,7 @@
-import keras
-from keras.layers import Dense, Conv2D, BatchNormalization, Activation,RandomTranslation,ZeroPadding2D,RandomCrop
-from keras.layers import AveragePooling2D, Input, Flatten, RandomFlip, RandomZoom, Softmax
-from keras.regularizers import l2
-from keras.models import Model
+from tensorflow.keras.layers import Dense, Conv2D, BatchNormalization, Activation,RandomTranslation,ZeroPadding2D,RandomCrop
+from tensorflow.keras.layers import AveragePooling2D, Input, Flatten, RandomFlip, RandomZoom, Softmax
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.models import Model
 from aconnect.layers import Conv_AConnect, FC_AConnect
 
 def resnet_layer(inputs,
@@ -142,7 +141,7 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
                                  Wstd=Wstd,Bstd=Bstd,
                                 errDistr=errDistr,Op=Op,Slice=Slice,
                                 pool = pool)
-            x = keras.layers.add([x, y])
+            x = tf.keras.layers.add([x, y])
             x = Activation('relu')(x)
         num_filters *= 2
 
@@ -241,7 +240,7 @@ def resnet_v2(input_shape, depth, num_classes=10):
                                  strides=strides,
                                  activation=None,
                                  batch_normalization=False)
-            x = keras.layers.add([x, y])
+            x = tf.keras.layers.add([x, y])
 
         num_filters_in = num_filters_out
 
