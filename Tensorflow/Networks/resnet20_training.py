@@ -66,10 +66,10 @@ def get_top_n_score(target, prediction, n):
     return np.mean(precision)
 
 # Load the CIFAR10 data.
-(x_train, y_train), (x_test, y_test) = cifar10.load_data()
-x_train, x_test = normalization(x_train,x_test)    
+(X_train, Y_train), (X_test, Y_test) = cifar10.load_data()
+X_train, X_test = normalization(X_train,X_test)    
 # Input image dimensions.
-input_shape = x_train.shape[1:]
+input_shape = X_train.shape[1:]
 
 
 # INPUT PARAMTERS:
@@ -211,10 +211,10 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                       metrics=['accuracy'])
 
                         # Run training, with or without data augmentation.
-                        history = model.fit(x_train, y_train,
+                        history = model.fit(X_train, Y_train,
                                       batch_size=batch_size,
                                       epochs=epochs,
-                                      validation_data=(x_test, y_test),
+                                      validation_data=(X_test, Y_test),
                                       shuffle=True,
                                       callbacks=callbacks)
                         model.evaluate(X_test,Y_test) 
