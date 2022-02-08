@@ -93,7 +93,7 @@ print('y_train shape:', y_train.shape)
 
 # TRAINING PARAMETERS
 lrate = 1e-1
-epochs = 120
+epochs = 200
 num_classes = 10
 momentum = 0.9
 batch_size = 256
@@ -113,14 +113,16 @@ def lr_schedule(epoch):
         lr (float32): learning rate
     """
     lr = lrate
-    if epoch > 120:
+    if epoch > 150:
         lr *= 0.5e-3
-    elif epoch > 90:
+    elif epoch > 100:
         lr *= 1e-3
-    elif epoch > 60:
+    elif epoch > 75:
         lr *= 1e-2
-    elif epoch > 30:
+    elif epoch > 50:
         lr *= 1e-1
+    elif epoch > 25:
+        lr *= 0.5
     print('Learning rate: ', lr)
     return lr
 
