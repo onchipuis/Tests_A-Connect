@@ -103,7 +103,7 @@ def resnet_v1(input_shape, depth, num_classes=10,
     #x = RandomCrop(32,32)(x)
     x = Flip(inputs)
     x = RandomTranslation(0.1,0.1)(x)
-    x = RandomZoom(0.2)(x)
+    #x = RandomZoom(0.2)(x)
     x = resnet_layer(inputs=x,
             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
             pool=Conv_pool,errDistr=errDistr,

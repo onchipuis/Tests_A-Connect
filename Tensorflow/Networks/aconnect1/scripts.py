@@ -44,7 +44,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
         This function returns a NoisyNet and the values of Wstd and Bstd used
         """
         def add_Wnoise(net,Wstd,Bstd,errDistr,force,Derr,dtype='float32'):
-                layers = net.layers #Get the list of layers used in the model
+            NoisyNet = tf.keras.models.clone_model(net)    
+            layers = net.layers #Get the list of layers used in the model
                 Nlayers = np.size(layers) #Get the number of layers
 
                 for i in range(Nlayers): #Iterate over the number of layers
@@ -105,27 +106,27 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                                                 Werr = Derr*wn*Werr + Werr*wp
                                                 if hasattr(layers[i], 'Wstd'):
                                                         if(layers[i].Wstd != 0):
-                                                                layers[i].infWerr = Werr #Change the inference error matrix
+                                                                NoisyNet.layers[i].infWerr = Werr #Change the inference error matrix
                                                         else:
                                                                 #print(layers[i].Werr)
-                                                                layers[i].Werr = Werr
+                                                                NoisyNet.layers[i].Werr = Werr
                                                 else:
-                                                                layers[i].Werr = Werr
+                                                                NoisyNet.layers[i].Werr = Werr
                                                 if hasattr(layers[i], 'Bstd'):
                                                         if(layers[i].Bstd != 0):
-                                                                layers[i].infBerr = Berr #Change the inference error matrix
+                                                                NoisyNet.layers[i].infBerr = Berr #Change the inference error matrix
                                                         else:
-                                                                layers[i].Berr = Berr
+                                                                NoisyNet.layers[i].Berr = Berr
                                                 else:
-                                                        layers[i].Berr = Berr
+                                                        NoisyNet.layers[i].Berr = Berr
                                         #if the layer is not A-Conenct or DropCOnnect the error must be introduced to the weights because it is a normal FC or normal Conv layer
                                         else:
                                                 weights = layers[i].weights[0]*Werr #Introduce the mismatch to the weights
                                                 bias = layers[i].weights[1]*Berr #Introduce the mismatch to the bias
                                                 local_weights = [weights,bias] #Create the tuple of modified values
-                                                layers[i].set_weights(local_weights) #Update the values of the weights
+                                                NoisyNet.layers[i].set_weights(local_weights) #Update the values of the weights
 
-                NoisyNet = tf.keras.Sequential(layers)
+                #NoisyNet = tf.keras.Sequential(layers)
                 return NoisyNet,Wstd,Bstd
 
         def get_top_n_score(target, prediction, n):
