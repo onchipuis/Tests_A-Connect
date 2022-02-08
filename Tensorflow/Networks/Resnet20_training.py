@@ -14,7 +14,7 @@ import os
 
 # Training parameters
 batch_size = 256 # orig paper trained all networks with batch_size=128
-epochs = 90
+epochs = 200
 num_classes = 10
 
 # Subtracting pixel mean improves accuracy
@@ -102,13 +102,13 @@ def lr_schedule(epoch):
         lr (float32): learning rate
     """
     lr = 1e-3
-    if epoch > 180:
+    if epoch > 150:
         lr *= 0.5e-3
-    elif epoch > 160:
+    elif epoch > 125
         lr *= 1e-3
-    elif epoch > 120:
+    elif epoch > 100:
         lr *= 1e-2
-    elif epoch > 80:
+    elif epoch > 75:
         lr *= 1e-1
     elif epoch > 50:
         lr *= 0.25
