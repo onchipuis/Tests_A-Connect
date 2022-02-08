@@ -93,7 +93,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
 lrate = 1e-1
-epochs = 100
+epochs = 200
 num_classes = 10
 momentum = 0.9
 batch_size = 256
@@ -112,6 +112,7 @@ def lr_schedule(epoch):
     # Returns
         lr (float32): learning rate
     """
+    """
     if isAConnect[0]:
         lr = lrate
         if epoch > 75:
@@ -119,6 +120,7 @@ def lr_schedule(epoch):
         elif epoch > 50:
             lr *= 1e-1
     else:
+    """
         lr = lrate
         if epoch > 180:
             lr *= 0.5e-3
