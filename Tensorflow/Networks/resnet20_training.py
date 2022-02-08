@@ -114,7 +114,7 @@ def lr_schedule(epoch):
     """
     if isAConnect[0]:
         lr = lrate*0.1
-        elif epoch > 75:
+        if epoch > 75:
             lr *= 1e-2
         elif epoch > 50:
             lr *= 1e-1
