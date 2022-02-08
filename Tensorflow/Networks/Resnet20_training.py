@@ -21,7 +21,7 @@ num_classes = 10
 subtract_pixel_mean = True
 
 # A-Connect model
-isAConnect = True
+isAConnect = False
 Wstd = 0.3
 Bstd = Wstd
 pool = 2
