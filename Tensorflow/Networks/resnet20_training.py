@@ -2,6 +2,7 @@
 import tensorflow as tf
 import numpy as np
 import os
+import time
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from tensorflow.keras.callbacks import ReduceLROnPlateau
 from tensorflow.keras.regularizers import l2
