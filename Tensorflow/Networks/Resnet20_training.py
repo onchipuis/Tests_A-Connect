@@ -16,10 +16,6 @@ def normalization(train_images, test_images):
     test_images = (test_images - mean) / (std + 1e-7)
     return train_images, test_images
 
-# Training parameters
-batch_size = 256 # orig paper trained all networks with batch_size=128
-epochs = 200
-num_classes = 10
 
 # Subtracting pixel mean improves accuracy
 subtract_pixel_mean = True
@@ -97,9 +93,10 @@ print('y_train shape:', y_train.shape)
 
 # TRAINING PARAMETERS
 lrate = 1e-3
+epochs = 200
+num_classes = 10
 momentum = 0.9
 batch_size = 256
-epochs = 50
 lr_decay = 0#1e-4
 lr_drop = 20
 
