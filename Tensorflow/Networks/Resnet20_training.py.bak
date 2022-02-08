@@ -127,9 +127,13 @@ if version == 2:
     model = resnet_v2(input_shape=input_shape, depth=depth)
 else:
     model = resnet_v1(input_shape=input_shape, depth=depth, isAConnect = isAConnect, Wstd=Wstd,Bstd=Bstd, Op=1, pool=pool)
+    
+optimizer = tf.optimizers.SGD(learning_rate=lr_schedule(0), 
+                            momentum=momentum, nesterov= True, decay = lr_decay)  
+#optimizer =   Adam(lr=lr_schedule(0))                          
 
 model.compile(loss='categorical_crossentropy',
-              optimizer=Adam(lr=lr_schedule(0)),
+              optimizer= optimizer,
               metrics=['accuracy'])
 model.summary()
 print(model_type)
@@ -157,12 +161,12 @@ lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
 callbacks = [checkpoint, lr_reducer, lr_scheduler]
 
 #Loading pretrained weights
-"""
+
 if isAConnect:
     for m in range(len(Nlayers)):
         model.layers[Nlayers2[m]].set_weights(
             model_base.layers[Nlayers[m]].get_weights()
-        )"""
+        )
 
 # Run training, with or without data augmentation.
 history = model.fit(x_train, y_train,
