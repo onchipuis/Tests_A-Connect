@@ -1,16 +1,12 @@
-from __future__ import print_function
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, Conv2D, BatchNormalization, Activation
-from tensorflow.keras.layers import AveragePooling2D, Input, Flatten
-from tensorflow.keras.optimizers import Adam, SGD
+import numpy as np
+import os
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from tensorflow.keras.callbacks import ReduceLROnPlateau
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.models import Model
 from tensorflow.keras.datasets import cifar10
 from ResNet import resnet_v1, resnet_v2
-import numpy as np
-import os
 
 #Extra code to improve model accuracy
 def normalization(train_images, test_images):
@@ -148,8 +144,8 @@ lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
 
 callbacks = [checkpoint, lr_reducer, lr_scheduler]
 
-optimizer = Adamax(lr=lr_schedule(0))
-#optimizer = Adam(lr=lr_schedule(0))
+optimizer = tf.keras.optimizers.Adamax(lr=lr_schedule(0))
+#optimizer = tf.keras.optimizers.Adam(lr=lr_schedule(0))
 
 ################################################################
 
