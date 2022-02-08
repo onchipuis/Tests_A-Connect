@@ -95,6 +95,13 @@ print('y_train shape:', y_train.shape)
 #y_train = tf.keras.utils.to_categorical(y_train, num_classes)
 #y_test = tf.keras.utils.to_categorical(y_test, num_classes)
 
+# TRAINING PARAMETERS
+lrate = 1e-3
+momentum = 0.9
+batch_size = 256
+epochs = 50
+lr_decay = 0#1e-4
+lr_drop = 20
 
 def lr_schedule(epoch):
     """Learning Rate Schedule
@@ -108,7 +115,7 @@ def lr_schedule(epoch):
     # Returns
         lr (float32): learning rate
     """
-    lr = 1e-3
+    lr = lrate
     if epoch > 150:
         lr *= 0.5e-3
     elif epoch > 125:
@@ -117,8 +124,8 @@ def lr_schedule(epoch):
         lr *= 1e-2
     elif epoch > 75:
         lr *= 1e-1
-    #elif epoch < 10:
-    #    lr = 1e-2
+    elif epoch < 10:
+        lr = 1e-2
     print('Learning rate: ', lr)
     return lr
 
@@ -144,8 +151,9 @@ lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
 
 callbacks = [checkpoint, lr_reducer, lr_scheduler]
 
-optimizer = tf.keras.optimizers.Adamax(lr=lr_schedule(0))
-#optimizer = tf.keras.optimizers.Adam(lr=lr_schedule(0))
+optimizer = tf.keras.optimizers.Adam(lr=0.0)
+#optimizer = tf.optimizers.SGD(learning_rate=0.0, 
+#                            momentum=momentum, nesterov= True, decay = lr_decay) #Define optimizer
 
 ################################################################
 
