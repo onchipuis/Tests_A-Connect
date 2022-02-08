@@ -12,6 +12,14 @@ from ResNet import resnet_v1, resnet_v2
 import numpy as np
 import os
 
+#Extra code to improve model accuracy
+def normalization(train_images, test_images):
+    mean = np.mean(train_images, axis=(0, 1, 2, 3))
+    std = np.std(train_images, axis=(0, 1, 2, 3))
+    train_images =(train_images - mean) / (std + 1e-7)
+    test_images = (test_images - mean) / (std + 1e-7)
+    return train_images, test_images
+
 # Training parameters
 batch_size = 256 # orig paper trained all networks with batch_size=128
 epochs = 200
@@ -65,10 +73,12 @@ model_type = 'ResNet%dv%d' % (depth, version)
 
 # Load the CIFAR10 data.
 (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+x_train, x_test = normalization(X_train,X_test)    
 
 # Input image dimensions.
 input_shape = x_train.shape[1:]
 
+"""
 # Normalize data.
 x_train = x_train.astype('float32') / 255
 x_test = x_test.astype('float32') / 255
@@ -83,6 +93,7 @@ print('x_train shape:', x_train.shape)
 print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')
 print('y_train shape:', y_train.shape)
+"""
 
 # Convert class vectors to binary class matrices.
 #y_train = tf.keras.utils.to_categorical(y_train, num_classes)
