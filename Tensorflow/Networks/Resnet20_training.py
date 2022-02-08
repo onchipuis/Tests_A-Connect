@@ -21,7 +21,7 @@ num_classes = 10
 subtract_pixel_mean = True
 
 # A-Connect model
-isAConnect = False
+isAConnect = True
 Wstd = 0.3
 Bstd = Wstd
 pool = 2
@@ -157,12 +157,12 @@ lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
 callbacks = [checkpoint, lr_reducer, lr_scheduler]
 
 #Loading pretrained weights
-"""
+
 if isAConnect:
     for m in range(len(Nlayers)):
         model.layers[Nlayers2[m]].set_weights(
             model_base.layers[Nlayers[m]].get_weights()
-        )"""
+        )
 
 # Run training, with or without data augmentation.
 history = model.fit(x_train, y_train,
