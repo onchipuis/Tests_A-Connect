@@ -14,7 +14,7 @@ import os
 
 # Training parameters
 batch_size = 128 # orig paper trained all networks with batch_size=128
-epochs = 90
+epochs = 200
 num_classes = 10
 
 # Subtracting pixel mean improves accuracy
@@ -157,12 +157,12 @@ lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
 callbacks = [checkpoint, lr_reducer, lr_scheduler]
 
 #Loading pretrained weights
-"""
+
 if isAConnect:
     for m in range(len(Nlayers)):
         model.layers[Nlayers2[m]].set_weights(
             model_base.layers[Nlayers[m]].get_weights()
-        )"""
+        )
 
 # Run training, with or without data augmentation.
 history = model.fit(x_train, y_train,
