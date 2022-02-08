@@ -48,83 +48,83 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
             layers = net.layers #Get the list of layers used in the model
             Nlayers = np.size(layers) #Get the number of layers
 
-                for i in range(Nlayers): #Iterate over the number of layers
-                        if layers[i].count_params() != 0: #If the layer does not have training parameters it is omitted
+            for i in range(Nlayers): #Iterate over the number of layers
+                    if layers[i].count_params() != 0: #If the layer does not have training parameters it is omitted
 
-                                if hasattr(layers[i],'kernel') or hasattr(layers[i],'W'):  #Does the layer have weights or kernel?
+                            if hasattr(layers[i],'kernel') or hasattr(layers[i],'W'):  #Does the layer have weights or kernel?
 
-                                        Wsz = np.shape(layers[i].weights[0]) #Takes the weights/kernel size
-                                        Bsz = np.shape(layers[i].weights[1]) #Takes the bias size
-                                        MBerr_aux = np.random.randn(Bsz[0])
-                                        if hasattr(layers[i],'strides'): #If the layer have the attribute strides means that it is a convolutional layer
-                                                Merr_aux = np.random.randn(Wsz[0],Wsz[1],Wsz[2],Wsz[3]).astype(dtype)
-                                        else:
-                                                Merr_aux = np.random.randn(Wsz[0], Wsz[1]).astype(dtype) #If the layer does not have strides, it is a FC layer
-                                        #Does the layer have Wstd? if it is true is an A-Connect or DropConnect network
-                                        if hasattr(layers[i], 'Wstd'):
-                                                #IF the value it is different from zero, the layer is working with the algorithm
-                                                if(layers[i].Wstd != 0 and layers[i].errDistr=="lognormal"): 
-                                                        Wstd_layer = layers[i].Wstd
-                                                        if force == "no": #Do you want to take the training or simulation Wstd value?
-                                                                Wstd = Wstd_layer
-                                                        else:
-                                                                Wstd = Wstd
-                                                else: #If it is false, it means that is working as a normal FC layer
-                                                        Wstd_layer = 0
-                                                        Wstd = Wstd
-                                        else:
-                                                Wstd = Wstd #If it is false, is a FC layers
-                                                Wstd_layer = 0
-                                        if hasattr(layers[i], 'Bstd'): #The same logic is applied for Bstd
-                                                if(layers[i].Bstd != 0 and layers[i].errDistr=="lognormal"):
-                                                        Bstd_layer = layers[i].Bstd
-                                                        if force == "no":
-                                                                Bstd = Bstd_layer
-                                                        else:
-                                                                Bstd = Bstd
-                                                else:
-                                                        Bstd = Bstd
-                                                        Bstd_layer = 0
-                                        else:
-                                                Bstd = Bstd
-                                                Bstd_layer = 0
+                                    Wsz = np.shape(layers[i].weights[0]) #Takes the weights/kernel size
+                                    Bsz = np.shape(layers[i].weights[1]) #Takes the bias size
+                                    MBerr_aux = np.random.randn(Bsz[0])
+                                    if hasattr(layers[i],'strides'): #If the layer have the attribute strides means that it is a convolutional layer
+                                            Merr_aux = np.random.randn(Wsz[0],Wsz[1],Wsz[2],Wsz[3]).astype(dtype)
+                                    else:
+                                            Merr_aux = np.random.randn(Wsz[0], Wsz[1]).astype(dtype) #If the layer does not have strides, it is a FC layer
+                                    #Does the layer have Wstd? if it is true is an A-Connect or DropConnect network
+                                    if hasattr(layers[i], 'Wstd'):
+                                            #IF the value it is different from zero, the layer is working with the algorithm
+                                            if(layers[i].Wstd != 0 and layers[i].errDistr=="lognormal"): 
+                                                    Wstd_layer = layers[i].Wstd
+                                                    if force == "no": #Do you want to take the training or simulation Wstd value?
+                                                            Wstd = Wstd_layer
+                                                    else:
+                                                            Wstd = Wstd
+                                            else: #If it is false, it means that is working as a normal FC layer
+                                                    Wstd_layer = 0
+                                                    Wstd = Wstd
+                                    else:
+                                            Wstd = Wstd #If it is false, is a FC layers
+                                            Wstd_layer = 0
+                                    if hasattr(layers[i], 'Bstd'): #The same logic is applied for Bstd
+                                            if(layers[i].Bstd != 0 and layers[i].errDistr=="lognormal"):
+                                                    Bstd_layer = layers[i].Bstd
+                                                    if force == "no":
+                                                            Bstd = Bstd_layer
+                                                    else:
+                                                            Bstd = Bstd
+                                            else:
+                                                    Bstd = Bstd
+                                                    Bstd_layer = 0
+                                    else:
+                                            Bstd = Bstd
+                                            Bstd_layer = 0
 
-                                        #Create the error matrix taking into account the Wstd and Bstd
-                                        Werr = Merr_distr(Merr_aux,Wstd,Wstd_layer,errDistr)
-                                        Berr = Merr_distr(MBerr_aux,Bstd,Bstd_layer,errDistr)
-                                        #Now if the layer have Werr or Berr is an A-Conenct or DropConnect layer
-                                        if hasattr(layers[i],'Werr') or hasattr(layers[i],'Berr') or hasattr(layers[i],'infWerr') or hasattr(layers[i],'infBerr'):
-                                                #print(i)#
+                                    #Create the error matrix taking into account the Wstd and Bstd
+                                    Werr = Merr_distr(Merr_aux,Wstd,Wstd_layer,errDistr)
+                                    Berr = Merr_distr(MBerr_aux,Bstd,Bstd_layer,errDistr)
+                                    #Now if the layer have Werr or Berr is an A-Conenct or DropConnect layer
+                                    if hasattr(layers[i],'Werr') or hasattr(layers[i],'Berr') or hasattr(layers[i],'infWerr') or hasattr(layers[i],'infBerr'):
+                                            #print(i)#
 
-                                                if(layers[i].isQuant[0] == 'yes'): 
-                                                        if(Derr != 0): #Introduce the deterministic error when BW are used
-                                                                weights = layers[i].weights[0]
-                                                                wp = weights > 0
-                                                                wn = weights <= 0
-                                                                wn = wn.numpy()
-                                                                wp = wp.numpy()
-                                                                Werr = Derr*wn*Werr + Werr*wp
-                                                if hasattr(layers[i], 'Wstd'):
-                                                        if(layers[i].Wstd != 0):
-                                                                NoisyNet.layers[i].infWerr = Werr #Change the inference error matrix
-                                                        else:
-                                                                #print(layers[i].Werr)
-                                                                NoisyNet.layers[i].Werr = Werr
-                                                else:
-                                                                NoisyNet.layers[i].Werr = Werr
-                                                if hasattr(layers[i], 'Bstd'):
-                                                        if(layers[i].Bstd != 0):
-                                                                NoisyNet.layers[i].infBerr = Berr #Change the inference error matrix
-                                                        else:
-                                                                NoisyNet.layers[i].Berr = Berr
-                                                else:
-                                                        NoisyNet.layers[i].Berr = Berr
-                                        #if the layer is not A-Conenct or DropCOnnect the error must be introduced to the weights because it is a normal FC or normal Conv layer
-                                        else:
-                                                weights = layers[i].weights[0]*Werr #Introduce the mismatch to the weights
-                                                bias = layers[i].weights[1]*Berr #Introduce the mismatch to the bias
-                                                local_weights = [weights,bias] #Create the tuple of modified values
-                                                NoisyNet.layers[i].set_weights(local_weights) #Update the values of the weights
+                                            if(layers[i].isQuant[0] == 'yes'): 
+                                                    if(Derr != 0): #Introduce the deterministic error when BW are used
+                                                            weights = layers[i].weights[0]
+                                                            wp = weights > 0
+                                                            wn = weights <= 0
+                                                            wn = wn.numpy()
+                                                            wp = wp.numpy()
+                                                            Werr = Derr*wn*Werr + Werr*wp
+                                            if hasattr(layers[i], 'Wstd'):
+                                                    if(layers[i].Wstd != 0):
+                                                            NoisyNet.layers[i].infWerr = Werr #Change the inference error matrix
+                                                    else:
+                                                            #print(layers[i].Werr)
+                                                            NoisyNet.layers[i].Werr = Werr
+                                            else:
+                                                            NoisyNet.layers[i].Werr = Werr
+                                            if hasattr(layers[i], 'Bstd'):
+                                                    if(layers[i].Bstd != 0):
+                                                            NoisyNet.layers[i].infBerr = Berr #Change the inference error matrix
+                                                    else:
+                                                            NoisyNet.layers[i].Berr = Berr
+                                            else:
+                                                    NoisyNet.layers[i].Berr = Berr
+                                    #if the layer is not A-Conenct or DropCOnnect the error must be introduced to the weights because it is a normal FC or normal Conv layer
+                                    else:
+                                            weights = layers[i].weights[0]*Werr #Introduce the mismatch to the weights
+                                            bias = layers[i].weights[1]*Berr #Introduce the mismatch to the bias
+                                            local_weights = [weights,bias] #Create the tuple of modified values
+                                            NoisyNet.layers[i].set_weights(local_weights) #Update the values of the weights
 
                 #NoisyNet = tf.keras.Sequential(layers)
                 return NoisyNet,Wstd,Bstd
