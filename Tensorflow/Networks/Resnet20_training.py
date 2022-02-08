@@ -131,7 +131,7 @@ if version == 2:
 else:
     model = resnet_v1(input_shape=input_shape, depth=depth, isAConnect = isAConnect, Wstd=Wstd,Bstd=Bstd, Op=1, pool=pool)
     
-optimizer = tf.optimizers.SGD(learning_rate=0,#lr_schedule(0), 
+optimizer = tf.optimizers.SGD(learning_rate=lr_schedule(0), 
                             momentum=momentum, nesterov= True, decay = lr_decay)  
 #optimizer =   Adam(lr=lr_schedule(0))                          
 
