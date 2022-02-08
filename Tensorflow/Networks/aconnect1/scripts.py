@@ -44,8 +44,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
         This function returns a NoisyNet and the values of Wstd and Bstd used
         """
         def add_Wnoise(net,Wstd,Bstd,errDistr,force,Derr,dtype='float32'):
-            NoisyNet = tf.keras.models.clone_model(net)    
-            layers = net.layers #Get the list of layers used in the model
+            NoisyNet = net    
+            layers = NoisyNet.layers #Get the list of layers used in the model
             Nlayers = np.size(layers) #Get the number of layers
 
             for i in range(Nlayers): #Iterate over the number of layers
