@@ -113,7 +113,7 @@ def lr_schedule(epoch):
         lr (float32): learning rate
     """
     if isAConnect[0]:
-        lr = lrate*0.1
+        lr = lrate
         if epoch > 75:
             lr *= 1e-2
         elif epoch > 50:
