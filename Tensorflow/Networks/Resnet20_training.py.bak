@@ -21,10 +21,11 @@ num_classes = 10
 subtract_pixel_mean = True
 
 # A-Connect model
-isAConnect = True
+isAConnect = False
 Wstd = 0.3
 Bstd = Wstd
 pool = 2
+momentum = 0.0
 Nlayers = [4, 7, 10, 14, 17, 21, 24, 28, 31, 32, 36, 39, 43, 46, 50, 53, 54, 58, 61, 65, 68, 75]
 Nlayers2 = [4, 7, 10, 14, 17, 21, 24, 28, 31, 32, 36, 39, 43, 46, 50, 53, 54, 58, 61, 65, 68, 75]
 net_base = "./Models/ResNet20_CIFAR10/Base.h5"
