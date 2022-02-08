@@ -1,19 +1,41 @@
-"""
-Script for training VGG with A-Connect, DVA, or none (Baseline)
-INSTRUCTIONS:
-Due to the memory usage we recommend to uncomment the first train the model and save it. Then just comment the training stage and then load the model to test it using the Monte Carlo simulation.
-"""
-import numpy as np
+# Based on https://keras.io/zh/examples/cifar10_resnet/
 import tensorflow as tf
-import VGG1 as vgg
-import time
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.utils import to_categorical
+import numpy as np
+import os
+from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
+from tensorflow.keras.callbacks import ReduceLROnPlateau
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.models import Model
+from tensorflow.keras.datasets import cifar10
+from ResNet import resnet_v1, resnet_v2
 from aconnect1 import layers, scripts
 #from aconnect import layers, scripts
-#from keras.callbacks import LearningRateScheduler
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
+# ----------------------------------------------------------------------------
+#           |      | 200-epoch | Orig Paper| 200-epoch | Orig Paper| sec/epoch
+# Model     |  n   | ResNet v1 | ResNet v1 | ResNet v2 | ResNet v2 | GTX1080Ti
+#           |v1(v2)| %Accuracy | %Accuracy | %Accuracy | %Accuracy | v1 (v2)
+# ----------------------------------------------------------------------------
+# ResNet20  | 3 (2)| 92.16     | 91.25     | -----     | -----     | 35 (---)
+# ResNet32  | 5(NA)| 92.46     | 92.49     | NA        | NA        | 50 ( NA)
+# ResNet44  | 7(NA)| 92.50     | 92.83     | NA        | NA        | 70 ( NA)
+# ResNet56  | 9 (6)| 92.71     | 93.03     | 93.01     | NA        | 90 (100)
+# ResNet110 |18(12)| 92.65     | 93.39+-.16| 93.15     | 93.63     | 165(180)
+# ResNet164 |27(18)| -----     | 94.07     | -----     | 94.54     | ---(---)
+# ResNet1001| (111)| -----     | 92.39     | -----     | 95.08+-.14| ---(---)
+# ---------------------------------------------------------------------------
+n = 3
+
+# Model version
+# Orig paper: version = 1 (ResNet v1), Improved ResNet: version = 2 (ResNet v2)
+version = 1
+
+# Computed depth from supplied model parameter n
+if version == 1:
+    depth = n * 6 + 2
+elif version == 2:
+    depth = n * 9 + 2
 tic=time.time()
 start_time = time.time()
 def hms_string(sec_elapsed):
@@ -42,35 +64,12 @@ def get_top_n_score(target, prediction, n):
     #se retorna la precision
     return np.mean(precision)
 
-# LOADING DATASET:
-(X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()    
-X_train, X_test = normalization(X_train,X_test)    
-sL = 3 
-Nlayers_noAC = [1,3,6,8,11,13,15,18,20,22,25,27,29] #wo AC layer numbers
-NlayersBase = [1,2,4,5,7,8,9,11,12,13,15,16,17]
-Nlayers_AC = [1,4,8,11,15,18,21,25,28,31,35,38,41] #AConnect layer numbers
+# Load the CIFAR10 data.
+(x_train, y_train), (x_test, y_test) = cifar10.load_data()
+x_train, x_test = normalization(x_train,x_test)    
+# Input image dimensions.
+input_shape = x_train.shape[1:]
 
-#Shift the layer index due to the preprocessing layers
-for j in range(len(NlayersBase)):
-    #Nlayers_AC[j] = Nlayers_AC[j] + sL 
-    Nlayers_noAC[j] = Nlayers_noAC[j] + sL
-    Nlayers_AC[j] = Nlayers_AC[j]+2
-"""
-# prepare data augmentation configuration
-train_datagen = ImageDataGenerator(
-    rescale=1. / 255,
-    shear_range=0.2,
-    zoom_range=0.2,
-    horizontal_flip=True)
-
-train_datagen.fit(X_train)
-train_generator = train_datagen.flow(X_train, Y_train, batch_size=256)
-
-test_datagen = ImageDataGenerator(rescale=1. / 255)
-validation_generator = test_datagen.flow(X_test, Y_test, batch_size=256)
-"""
-##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-model_aux=tf.keras.applications.VGG16(weights="imagenet", include_top=False,input_shape=(32,32,3))
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
@@ -84,7 +83,7 @@ Bbw = Wbw
 errDistr = ["lognormal"]
 #errDistr = ["normal"]
 saveModel = True
-model_name = 'VGG16_CIFAR10/'
+model_name = 'ResNet20_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 #net = folder_models+'16Werr_Wstd_80_Bstd_80.h5'
@@ -92,32 +91,53 @@ net_base = folder_models+'Base.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
-learning_rate = 0.1
+lrate = 1e-1
+epochs = 200
+num_classes = 10
 momentum = 0.9
 batch_size = 256
-epochs = 50
 lr_decay = 0#1e-4
 lr_drop = 20
-"""
-lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-                initial_learning_rate=0.01,
-                decay_steps=196,
-                decay_rate=0.9,
-                staircase=True)
-optimizer = tf.optimizers.SGD(learning_rate=lr_schedule, 
-                            momentum=momentum) #Define optimizer
-"""
-def lr_scheduler(epoch):
-    if epoch < 50:
-        lr = 0.01 * (0.5 ** (epoch // lr_drop))
-    else:
-        lr = 0.01 * (0.5 ** ((epoch-50) // lr_drop))
+
+def lr_schedule(epoch):
+    """Learning Rate Schedule
+
+    Learning rate is scheduled to be reduced after 80, 120, 160, 180 epochs.
+    Called automatically every epoch as part of callbacks during training.
+
+    # Arguments
+        epoch (int): The number of epochs
+
+    # Returns
+        lr (float32): learning rate
+    """
+    lr = lrate
+    if epoch > 180:
+        lr *= 0.5e-3
+    elif epoch > 160:
+        lr *= 1e-3
+    elif epoch > 120:
+        lr *= 1e-2
+    elif epoch > 80:
+        lr *= 1e-1
+    print('Learning rate: ', lr)
     return lr
 
-reduce_lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)    
+# Prepare callbacks for model saving and for learning rate adjustment.
+lr_scheduler = LearningRateScheduler(lr_schedule)
+
+lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
+                               cooldown=0,
+                               patience=5,
+                               min_lr=0.5e-6)
+
+callbacks = [lr_reducer, lr_scheduler]
+
+#optimizer = tf.keras.optimizers.Adam(lr=0.0)
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum, nesterov= True, decay = lr_decay) #Define optimizer
-            
+
+################################################################
 ### TRAINING
 for d in range(len(isAConnect)): #Iterate over the networks
     if isAConnect[d]: #is a network with A-Connect?
@@ -143,32 +163,18 @@ for d in range(len(isAConnect)): #Iterate over the networks
                     for k in range(len(errDistr)):
                         Err = Wstd_aux[j]
                         # CREATING NN:
-                        model = vgg.model_creation(isAConnect=isAConnect[d],
-                                                    Wstd=Err,Bstd=Err,
-                                                    isQuant=[WisQuant[p],BisQuant[p]],
-                                                    bw=[Wbw_aux[q],Bbw_aux[q]],
-                                                    Conv_pool=Conv_pool_aux[i],
-                                                    FC_pool=FC_pool_aux[i],
-                                                    errDistr=errDistr[k],isBin="no")
-                       
-                        ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                        if isAConnect[d]:
-                            Nlayers = Nlayers_AC
-                            Nlayers0 = Nlayers_noAC
-                            model0 = model_base
+                        if version == 2:
+                            model = resnet_v2(input_shape=input_shape, depth=depth)
                         else:
-                            Nlayers = Nlayers_noAC
-                            Nlayers0 = NlayersBase
-                            model0 = model_aux
+                            model = resnet_v1(input_shape=input_shape, depth=depth, 
+                                            isAConnect = isAConnect[d], 
+                                            Wstd=Err,Bstd=Err,
+                                            isQuant=[WisQuant[p],BisQuant[p]],
+                                            bw=[Wbw_aux[q],Bbw_aux[q]],
+                                            Conv_pool=Conv_pool_aux[i],
+                                            FC_pool=FC_pool_aux[i],
+                                            errDistr=errDistr[k])
                         
-                        net0='./Models/VGG16_CIFAR10/2Werr_Wstd_70_Bstd_70_8bQuant_lognormalDistr.h5'
-                        model0 = tf.keras.models.load_model(net0,custom_objects = custom_objects)
-                        model.set_weights(model0.get_weights())
-                        """
-                        for m in range(len(Nlayers)):
-                            model.layers[Nlayers[m]].set_weights(model0.layers[Nlayers0[m]].get_weights())
-                        """
-
                         # NAME
                         if isAConnect[d]:
                             Werr = str(int(100*Err))
@@ -184,19 +190,19 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         
                         print("*************************TRAINING NETWORK*********************")
                         print("\n\t\t\t", name)
-                            
+                        
                         #TRAINING PARAMETERS
                         model.compile(loss='sparse_categorical_crossentropy',
-                                optimizer=optimizer, 
-                                metrics=['accuracy'])
+                                      optimizer=optimizer,
+                                      metrics=['accuracy'])
 
-                        # TRAINING
-                        history = model.fit(X_train, Y_train,
-                                  batch_size=batch_size,
-                                  epochs=epochs,
-                                  validation_data=(X_test, Y_test),
-                                  callbacks = [reduce_lr],
-                                  shuffle=True)
+                        # Run training, with or without data augmentation.
+                        history = model.fit(x_train, y_train,
+                                      batch_size=batch_size,
+                                      epochs=epochs,
+                                      validation_data=(x_test, y_test),
+                                      shuffle=True,
+                                      callbacks=callbacks)
                         model.evaluate(X_test,Y_test) 
                         string = folder_models + name + '.h5'                                
                         model.save(string,include_optimizer=False)
@@ -208,11 +214,13 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         #Save the accuracy and the validation accuracy
                         acc = history.history['accuracy'] 
                         val_acc = history.history['val_accuracy']
-
+                                      
                         # SAVE MODEL:
                         if saveModel:
                             string = folder_models + name + '.h5'
                             model.save(string,include_optimizer=False)
                             #Save in a txt the accuracy and the validation accuracy for further analysis
+                            if not os.path.isdir(folder_results):
+                                os.makedirs(folder_results)
                             np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.4f") 
-                            np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.4f")
+                            np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.4f")              
