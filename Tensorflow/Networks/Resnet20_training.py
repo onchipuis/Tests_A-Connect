@@ -13,7 +13,7 @@ import numpy as np
 import os
 
 # Training parameters
-batch_size = 128 # orig paper trained all networks with batch_size=128
+batch_size = 256 # orig paper trained all networks with batch_size=128
 epochs = 90
 num_classes = 10
 
@@ -54,8 +54,6 @@ n = 3
 # Orig paper: version = 1 (ResNet v1), Improved ResNet: version = 2 (ResNet v2)
 version = 1
 
-
-
 # Computed depth from supplied model parameter n
 if version == 1:
     depth = n * 6 + 2
@@ -87,8 +85,8 @@ print(x_test.shape[0], 'test samples')
 print('y_train shape:', y_train.shape)
 
 # Convert class vectors to binary class matrices.
-y_train = tf.keras.utils.to_categorical(y_train, num_classes)
-y_test = tf.keras.utils.to_categorical(y_test, num_classes)
+#y_train = tf.keras.utils.to_categorical(y_train, num_classes)
+#y_test = tf.keras.utils.to_categorical(y_test, num_classes)
 
 
 def lr_schedule(epoch):
@@ -103,7 +101,8 @@ def lr_schedule(epoch):
     # Returns
         lr (float32): learning rate
     """
-    lr = 1e-3
+    #lr = 1e-3
+    lr = 1e-1
     if epoch > 180:
         lr *= 0.5e-3
     elif epoch > 160:
@@ -117,60 +116,61 @@ def lr_schedule(epoch):
 
 ################################################################
 
-if version == 2:
-    model = resnet_v2(input_shape=input_shape, depth=depth)
-else:
-    model = resnet_v1(input_shape=input_shape, depth=depth, isAConnect = isAConnect, Wstd=0.3,Bstd=0.3, Op=2, pool=2)
+    if version == 2:
+        model = resnet_v2(input_shape=input_shape, depth=depth)
+    else:
+        model = resnet_v1(input_shape=input_shape, depth=depth, 
+                isAConnect = isAConnect, Wstd=0.3,Bstd=0.3, Op=2, pool=2)
 
-model.compile(loss='categorical_crossentropy',
-              optimizer=Adam(lr=lr_schedule(0)),
-              metrics=['accuracy'])
-model.summary()
-print(model_type)
+    model.compile(loss='sparse_categorical_crossentropy',
+                  optimizer=Adam(lr=lr_schedule(0)),
+                  metrics=['accuracy'])
+    model.summary()
+    print(model_type)
 
-# Prepare model model saving directory.
-save_dir = folder_models
-model_name = 'cifar10_%s_model.{epoch:03d}.h5' % model_type
-if not os.path.isdir(save_dir):
-    os.makedirs(save_dir)
-filepath = os.path.join(save_dir, model_name)
+    # Prepare model model saving directory.
+    save_dir = folder_models
+    model_name = 'cifar10_%s_model.{epoch:03d}.h5' % model_type
+    if not os.path.isdir(save_dir):
+        os.makedirs(save_dir)
+    filepath = os.path.join(save_dir, model_name)
 
-# Prepare callbacks for model saving and for learning rate adjustment.
-checkpoint = ModelCheckpoint(filepath=filepath,
-                             monitor='val_acc',
-                             verbose=1,
-                             save_best_only=True)
+    # Prepare callbacks for model saving and for learning rate adjustment.
+    checkpoint = ModelCheckpoint(filepath=filepath,
+                                 monitor='val_acc',
+                                 verbose=1,
+                                 save_best_only=True)
 
-lr_scheduler = LearningRateScheduler(lr_schedule)
+    lr_scheduler = LearningRateScheduler(lr_schedule)
 
-lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
-                               cooldown=0,
-                               patience=5,
-                               min_lr=0.5e-6)
+    lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
+                                   cooldown=0,
+                                   patience=5,
+                                   min_lr=0.5e-6)
 
-callbacks = [checkpoint, lr_reducer, lr_scheduler]
+    callbacks = [checkpoint, lr_reducer, lr_scheduler]
 
-# Run training, with or without data augmentation.
-history = model.fit(x_train, y_train,
-              batch_size=batch_size,
-              epochs=epochs,
-              validation_data=(x_test, y_test),
-              shuffle=True,
-              callbacks=callbacks)
-              
+    # Run training, with or without data augmentation.
+    history = model.fit(x_train, y_train,
+                  batch_size=batch_size,
+                  epochs=epochs,
+                  validation_data=(x_test, y_test),
+                  shuffle=True,
+                  callbacks=callbacks)
+                  
 
-acc = history.history['accuracy'] 
-val_acc = history.history['val_accuracy']
-              
-# SAVE MODEL:
-string = folder_models + name + '.h5'
-model.save(string,include_optimizer=False)
-#Save in a txt the accuracy and the validation accuracy for further analysis
-np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
-np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")              
+    acc = history.history['accuracy'] 
+    val_acc = history.history['val_accuracy']
+                  
+    # SAVE MODEL:
+    string = folder_models + name + '.h5'
+    model.save(string,include_optimizer=False)
+    #Save in a txt the accuracy and the validation accuracy for further analysis
+    np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.4f") 
+    np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.4f")              
 
 
-# Score trained model.
-scores = model.evaluate(x_test, y_test, verbose=1)
-print('Test loss:', scores[0])
-print('Test accuracy:', scores[1])
+    # Score trained model.
+    scores = model.evaluate(x_test, y_test, verbose=1)
+    print('Test loss:', scores[0])
+    print('Test accuracy:', scores[1])
