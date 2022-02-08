@@ -93,7 +93,7 @@ print('y_train shape:', y_train.shape)
 
 # TRAINING PARAMETERS
 lrate = 1e-1
-epochs = 200
+epochs = 120
 num_classes = 10
 momentum = 0.9
 batch_size = 256
