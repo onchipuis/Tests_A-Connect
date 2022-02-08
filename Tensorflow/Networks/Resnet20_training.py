@@ -121,8 +121,6 @@ def lr_schedule(epoch):
         lr *= 1e-2
     elif epoch > 75:
         lr *= 1e-1
-    elif epoch < 25:
-        lr = 1e-2
     print('Learning rate: ', lr)
     return lr
 
@@ -148,9 +146,9 @@ lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
 
 callbacks = [checkpoint, lr_reducer, lr_scheduler]
 
-optimizer = tf.keras.optimizers.Adam(lr=0.0)
-#optimizer = tf.optimizers.SGD(learning_rate=0.0, 
-#                            momentum=momentum, nesterov= True, decay = lr_decay) #Define optimizer
+#optimizer = tf.keras.optimizers.Adam(lr=0.0)
+optimizer = tf.optimizers.SGD(learning_rate=0.0, 
+                            momentum=momentum, nesterov= True, decay = lr_decay) #Define optimizer
 
 ################################################################
 
