@@ -121,28 +121,10 @@ def lr_schedule(epoch):
         lr *= 1e-2
     elif epoch > 75:
         lr *= 1e-1
-    """
-    elif epoch > 50:
-        lr *= 0.25
-    elif epoch > 25:
-        lr *= 0.5
-    """
+    #elif epoch < 10:
+    #    lr = 1e-2
     print('Learning rate: ', lr)
     return lr
-
-################################################################
-
-if version == 2:
-    model = resnet_v2(input_shape=input_shape, depth=depth)
-else:
-    model = resnet_v1(input_shape=input_shape, depth=depth, 
-            isAConnect = isAConnect, Wstd=0.3,Bstd=0.3, Op=2, pool=2)
-
-model.compile(loss='sparse_categorical_crossentropy',
-              optimizer=Adam(lr=lr_schedule(0)),
-              metrics=['accuracy'])
-model.summary()
-print(model_type)
 
 # Prepare model model saving directory.
 save_dir = folder_models
@@ -165,6 +147,21 @@ lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
                                min_lr=0.5e-6)
 
 callbacks = [checkpoint, lr_reducer, lr_scheduler]
+
+optimizer = Adamax(lr=lr_schedule(0))
+#optimizer = Adam(lr=lr_schedule(0))
+
+################################################################
+
+if version == 2:
+    model = resnet_v2(input_shape=input_shape, depth=depth)
+else:
+    model = resnet_v1(input_shape=input_shape, depth=depth, 
+            isAConnect = isAConnect, Wstd=0.3,Bstd=0.3, Op=2, pool=2)
+
+model.compile(loss='sparse_categorical_crossentropy',
+              optimizer=optimizer,
+              metrics=['accuracy'])
 
 # Run training, with or without data augmentation.
 history = model.fit(x_train, y_train,
