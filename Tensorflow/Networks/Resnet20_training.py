@@ -182,6 +182,8 @@ val_acc = history.history['val_accuracy']
 string = folder_models + name + '.h5'
 model.save(string,include_optimizer=False)
 #Save in a txt the accuracy and the validation accuracy for further analysis
+if not os.path.isdir(folder_results):
+    os.makedirs(folder_results)
 np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.4f") 
 np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.4f")              
 

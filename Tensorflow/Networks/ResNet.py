@@ -105,11 +105,11 @@ def resnet_v1(input_shape, depth, num_classes=10, isAConnect=False, Wstd=0, Bstd
 
     inputs = Input(shape=input_shape)
     Flip = RandomFlip("horizontal")
-    x = ZeroPadding2D(padding=(4, 4))(inputs)
-    x = RandomCrop(32,32)(x)
-    x = Flip(x)
-    #x = RandomTranslation(0.1,0.1)(x)
-    #x = RandomZoom(0.2)(x)
+    #x = ZeroPadding2D(padding=(4, 4))(inputs)
+    #x = RandomCrop(32,32)(x)
+    x = Flip(inputs)
+    x = RandomTranslation(0.1,0.1)(x)
+    x = RandomZoom(0.2)(x)
     x = resnet_layer(inputs=x,isAConnect=isAConnect, Wstd=Wstd, Bstd=Bstd, errDistr=errDistr, Op=Op, Slice=Slice)
 
     # Instantiate the stack of residual units
