@@ -1,3 +1,4 @@
+import tensorflow as tf
 from tensorflow.keras.layers import Dense, Conv2D, BatchNormalization, Activation,RandomTranslation,ZeroPadding2D,RandomCrop
 from tensorflow.keras.layers import AveragePooling2D, Input, Flatten, RandomFlip, RandomZoom, Softmax
 from tensorflow.keras.regularizers import l2
