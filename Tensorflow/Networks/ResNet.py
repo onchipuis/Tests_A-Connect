@@ -98,13 +98,13 @@ def resnet_v1(input_shape, depth, num_classes=10,
     num_res_blocks = int((depth - 2) / 6)
 
     inputs = Input(shape=input_shape)
-    #Flip = RandomFlip("horizontal")
+    Flip = RandomFlip("horizontal")
     #x = ZeroPadding2D(padding=(4, 4))(inputs)
     #x = RandomCrop(32,32)(x)
-    #x = Flip(inputs)
-    #x = RandomTranslation(0.1,0.1)(x)
-    #x = RandomZoom(0.2)(x)
-    x = resnet_layer(inputs=inputs,
+    x = Flip(inputs)
+    x = RandomTranslation(0.1,0.1)(x)
+    x = RandomZoom(0.2)(x)
+    x = resnet_layer(inputs=x,
             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
             pool=Conv_pool,errDistr=errDistr,
             isQuant=isQuant,bw=bw)
@@ -140,7 +140,7 @@ def resnet_v1(input_shape, depth, num_classes=10,
                                 pool=Conv_pool,errDistr=errDistr,
                                 isQuant=isQuant,bw=bw)
             x = tf.keras.layers.add([x, y])
-            x = BatchNormalization()(x) # Added by Luis E. Rueda G. (testing)
+            #x = BatchNormalization()(x) # Added by Luis E. Rueda G. (testing)
             x = Activation('relu')(x)
         num_filters *= 2
 
