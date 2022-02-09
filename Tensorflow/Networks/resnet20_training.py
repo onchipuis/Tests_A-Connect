@@ -74,7 +74,7 @@ input_shape = X_train.shape[1:]
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.7]   # Define the stddev for training
+Wstd_err = [0.5]   # Define the stddev for training
 Conv_pool = [2]
 FC_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
@@ -93,7 +93,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
 lrate = 1e-1
-lrate = 1e-3        # for Adam optimizer
+#lrate = 1e-3        # for Adam optimizer
 epochs = 200
 num_classes = 10
 momentum = 0.9
@@ -145,9 +145,9 @@ lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
 
 callbacks = [lr_reducer, lr_scheduler]
 
-optimizer = tf.keras.optimizers.Adam(learning_rate=0.0)
-#optimizer = tf.optimizers.SGD(learning_rate=0.0, 
-#                            momentum=momentum, nesterov= True, decay = lr_decay) #Define optimizer
+#optimizer = tf.keras.optimizers.Adam(learning_rate=0.0)
+optimizer = tf.optimizers.SGD(learning_rate=0.0, 
+                            momentum=momentum, nesterov= True, decay = lr_decay) #Define optimizer
 
 ################################################################
 ### TRAINING
@@ -188,7 +188,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                             errDistr=errDistr[k])
                         
                         ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                        model.set_weights(model_base.get_weights())
+                        #model.set_weights(model_base.get_weights())
                         
                         # NAME
                         if isAConnect[d]:
