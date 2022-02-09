@@ -93,6 +93,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
 lrate = 1e-1
+lrate = 1e-3        # for Adam optimizer
 epochs = 200
 num_classes = 10
 momentum = 0.9
