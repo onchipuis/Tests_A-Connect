@@ -188,7 +188,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                             errDistr=errDistr[k])
                         
                         ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                        #model.set_weights(model_base.get_weights())
+                        model.set_weights(model_base.get_weights())
                         
                         # NAME
                         if isAConnect[d]:
