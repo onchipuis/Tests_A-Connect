@@ -129,7 +129,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                     NoisyNet = tf.keras.Sequential(layers)
                 else:
                     NoisyNet = tf.keras.Model(layers[0].input,layers[-1].output)
-                
+                del layers,Werr,Berr
+
                 return NoisyNet,Wstd,Bstd
 
         def get_top_n_score(target, prediction, n):
