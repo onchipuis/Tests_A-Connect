@@ -144,9 +144,9 @@ lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
 
 callbacks = [lr_reducer, lr_scheduler]
 
-#optimizer = tf.keras.optimizers.Adam(lr=0.0)
-optimizer = tf.optimizers.SGD(learning_rate=0.0, 
-                            momentum=momentum, nesterov= True, decay = lr_decay) #Define optimizer
+optimizer = tf.keras.optimizers.Adam(lr=0.0)
+#optimizer = tf.optimizers.SGD(learning_rate=0.0, 
+#                            momentum=momentum, nesterov= True, decay = lr_decay) #Define optimizer
 
 ################################################################
 ### TRAINING
