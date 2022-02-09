@@ -47,10 +47,10 @@ X_train, X_test = normalization(X_train,X_test)
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.5]   # Define the stddev for training
+Wstd_err = [0]   # Define the stddev for training
 Sim_err = [0,0.3,0.5,0.7]
 Conv_pool = [2]
-WisQuant = ["yes"]		    # Do you want binary weights?
+WisQuant = ["no"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
 Bbw = Wbw
