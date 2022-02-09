@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 import os
 import time
+from tensorflow.keras.datasets import cifar10
 from ResNet import resnet_v1, resnet_v2
 from aconnect1 import layers, scripts
 #from aconnect import layers, scripts
