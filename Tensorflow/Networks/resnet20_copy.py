@@ -42,9 +42,12 @@ folder_results = '../Results/'+model_name+'Training_data/'
 net_base = folder_models+'Base.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
+# Load the CIFAR10 data.
+(X_train, Y_train), (X_test, Y_test) = cifar10.load_data()
+# Input image dimensions.
+input_shape = X_train.shape[1:]
 ################################################################
 ### TRAINING
-
 model = resnet_v1(input_shape=input_shape, depth=depth, 
                 isAConnect = True, 
                 Wstd=0,Bstd=0,
