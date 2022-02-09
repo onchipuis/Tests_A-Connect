@@ -44,7 +44,7 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
         This function returns a NoisyNet and the values of Wstd and Bstd used
         """
         def add_Wnoise(net,Wstd,Bstd,errDistr,force,Derr,dtype='float32'):
-                NoisyNet = net
+                #NoisyNet = net
                 layers = net.layers #Get the list of layers used in the model
                 Nlayers = np.size(layers) #Get the number of layers
 
@@ -126,8 +126,8 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                                                 local_weights = [weights,bias] #Create the tuple of modified values
                                                 layers[i].set_weights(local_weights) #Update the values of the weights
 
-                #NoisyNet = tf.keras.Sequential(layers)
-                NoisyNet._layers = layers
+                NoisyNet = tf.keras.Sequential(layers)
+                #NoisyNet._layers = layers
                 return NoisyNet,Wstd,Bstd
 
         def get_top_n_score(target, prediction, n):
