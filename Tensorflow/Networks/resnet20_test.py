@@ -153,7 +153,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                         loss='sparse_categorical_crossentropy',
                                         metrics=['accuracy'],top5=False,dtype='float16',
                                         #errDistr="lognormal",evaluate_batch_size=16
-                                        errDistr=errDistr[k],evaluate_batch_size=16
+                                        errDistr=errDistr[k],evaluate_batch_size=batch_size
                                         )
                                 np.savetxt(folder_results+name_sim+'.txt',acc,fmt="%.4f")
                                 np.savetxt(folder_results+name_stats+'.txt',stats,fmt="%.4f")
