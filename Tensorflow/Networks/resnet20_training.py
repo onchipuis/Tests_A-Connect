@@ -73,7 +73,7 @@ input_shape = X_train.shape[1:]
 
 
 # INPUT PARAMTERS:
-isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
+isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.5]   # Define the stddev for training
 Conv_pool = [4]
 FC_pool = [2]
@@ -92,7 +92,7 @@ net_base = folder_models+'2Werr_Wstd_50_Bstd_50_8bQuant_normalDistr.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
-lrate = 0.1e-1
+lrate = 1e-1
 #lrate = 1e-3        # for Adam optimizer
 epochs = 200
 num_classes = 10
@@ -188,7 +188,8 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                             errDistr=errDistr[k])
                         
                         ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                        model.set_weights(model_base.get_weights())
+                        if isAconnect[d]:
+                            model.set_weights(model_base.get_weights())
                         
                         # NAME
                         if isAConnect[d]:

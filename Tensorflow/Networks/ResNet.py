@@ -126,6 +126,7 @@ def resnet_v1(input_shape, depth, num_classes=10,
             y = resnet_layer(inputs=y,
                             num_filters=num_filters,
                             activation=None,
+                            batch_normalization=False, # Added by Luis E. Rueda G. (testing)
                             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                             pool=Conv_pool,errDistr=errDistr,
                             isQuant=isQuant,bw=bw)
@@ -142,7 +143,7 @@ def resnet_v1(input_shape, depth, num_classes=10,
                                 pool=Conv_pool,errDistr=errDistr,
                                 isQuant=isQuant,bw=bw)
             x = tf.keras.layers.add([x, y])
-            #x = BatchNormalization()(x) # Added by Luis E. Rueda G. (testing)
+            x = BatchNormalization()(x) # Added by Luis E. Rueda G. (testing)
             x = Activation('relu')(x)
         num_filters *= 2
 
