@@ -239,22 +239,22 @@ def resnet_v2(input_shape, depth, num_classes=10,
                             num_filters=num_filters_in,
                             kernel_size=(1,1),
                             strides=strides,
-                            activation=activation,
-                            batch_normalization=batch_normalization,
-                            conv_first=False,
+                            #activation=activation, # Removed by Luis Rueda
+                            #batch_normalization=batch_normalization,   # Removed by Luis Rueda
+                            #conv_first=False,           # Removed by Luis Rueda
                             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                             pool=Conv_pool,errDistr=errDistr,
                             isQuant=isQuant,bw=bw)
             y = resnet_layer(inputs=y,
                             num_filters=num_filters_in,
-                            conv_first=False,
+                            #conv_first=False,           # Removed by Luis Rueda
                             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                             pool=Conv_pool,errDistr=errDistr,
                             isQuant=isQuant,bw=bw)
             y = resnet_layer(inputs=y,
                             num_filters=num_filters_out,
                             kernel_size=(1,1),
-                            conv_first=False,
+                            #conv_first=False,           # Removed by Luis Rueda
                             activation=None,            # Added by Luis Rueda
                             batch_normalization=False,  # Added by Luis Rueda
                             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
