@@ -99,13 +99,13 @@ def resnet_v1(input_shape, depth, num_classes=10,
 
     inputs = Input(shape=input_shape)
     Flip = RandomFlip("horizontal")
-    #x = ZeroPadding2D(padding=(4, 4))(inputs)
-    #x = RandomCrop(32,32)(x)
     x = Flip(inputs)
-    #x = RandomTranslation(0.1,0.1)(x)
-    #x = RandomZoom(0.2)(x)
-    x = RandomTranslation(0.0,0.0)(x)
-    x = RandomZoom(0.0)(x)
+    if isAConnect:
+        x = RandomTranslation(0.0,0.0)(x)
+        x = RandomZoom(0.0)(x)
+    else:
+        x = RandomTranslation(0.1,0.1)(x)
+        x = RandomZoom(0.2)(x)
     x = resnet_layer(inputs=x,
             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
             pool=Conv_pool,errDistr=errDistr,
@@ -167,7 +167,10 @@ def resnet_v1(input_shape, depth, num_classes=10,
     return model
 
 
-def resnet_v2(input_shape, depth, num_classes=10):
+def resnet_v2(input_shape, depth, num_classes=10,
+                isAConnect=False,Wstd=0,Bstd=0,
+                Conv_pool=2,FC_pool=2,errDistr="normal",
+                isQuant=['no','no'],bw=[8,8]):
     """ResNet Version 2 Model builder [b]
 
     Stacks of (1 x 1)-(3 x 3)-(1 x 1) BN-ReLU-Conv2D or also known as
@@ -199,8 +202,16 @@ def resnet_v2(input_shape, depth, num_classes=10):
     num_res_blocks = int((depth - 2) / 9)
 
     inputs = Input(shape=input_shape)
+    Flip = RandomFlip("horizontal")
+    x = Flip(inputs)
+    if isAConnect:
+        x = RandomTranslation(0.0,0.0)(x)
+        x = RandomZoom(0.0)(x)
+    else:
+        x = RandomTranslation(0.1,0.1)(x)
+        x = RandomZoom(0.2)(x)
     # v2 performs Conv2D with BN-ReLU on input before splitting into 2 paths
-    x = resnet_layer(inputs=inputs,
+    x = resnet_layer(inputs=x,
                      num_filters=num_filters_in,
                      conv_first=True)
 
@@ -222,28 +233,40 @@ def resnet_v2(input_shape, depth, num_classes=10):
 
             # bottleneck residual unit
             y = resnet_layer(inputs=x,
-                             num_filters=num_filters_in,
-                             kernel_size=1,
-                             strides=strides,
-                             activation=activation,
-                             batch_normalization=batch_normalization,
-                             conv_first=False)
+                            num_filters=num_filters_in,
+                            kernel_size=1,
+                            strides=strides,
+                            activation=activation,
+                            batch_normalization=batch_normalization,
+                            conv_first=False,
+                            isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
+                            pool=Conv_pool,errDistr=errDistr,
+                            isQuant=isQuant,bw=bw)
             y = resnet_layer(inputs=y,
-                             num_filters=num_filters_in,
-                             conv_first=False)
+                            num_filters=num_filters_in,
+                            conv_first=False,
+                            isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
+                            pool=Conv_pool,errDistr=errDistr,
+                            isQuant=isQuant,bw=bw)
             y = resnet_layer(inputs=y,
-                             num_filters=num_filters_out,
-                             kernel_size=1,
-                             conv_first=False)
+                            num_filters=num_filters_out,
+                            kernel_size=1,
+                            conv_first=False,
+                            isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
+                            pool=Conv_pool,errDistr=errDistr,
+                            isQuant=isQuant,bw=bw)
             if res_block == 0:
                 # linear projection residual shortcut connection to match
                 # changed dims
                 x = resnet_layer(inputs=x,
-                                 num_filters=num_filters_out,
-                                 kernel_size=1,
-                                 strides=strides,
-                                 activation=None,
-                                 batch_normalization=False)
+                                num_filters=num_filters_out,
+                                kernel_size=1,
+                                strides=strides,
+                                activation=None,
+                                batch_normalization=False,
+                                isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
+                                pool=Conv_pool,errDistr=errDistr,
+                                isQuant=isQuant,bw=bw)
             x = tf.keras.layers.add([x, y])
 
         num_filters_in = num_filters_out
@@ -254,9 +277,16 @@ def resnet_v2(input_shape, depth, num_classes=10):
     x = Activation('relu')(x)
     x = AveragePooling2D(pool_size=8)(x)
     y = Flatten()(x)
-    outputs = Dense(num_classes,
-                    activation='softmax',
-                    kernel_initializer='he_normal')(y)
+    
+    if isAConnect:
+        y = FC_AConnect(num_classes,Wstd=Wstd,Bstd=Bstd,
+                        pool=FC_pool,errDistr=errDistr,
+                        isQuant=isQuant,bw=bw)(y)
+        outputs = Softmax()(y)
+    else:
+        outputs = Dense(num_classes,
+                        activation='softmax',
+                        kernel_initializer='he_normal')(y)
 
     # Instantiate model.
     model = Model(inputs=inputs, outputs=outputs)

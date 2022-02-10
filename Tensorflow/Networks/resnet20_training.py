@@ -26,17 +26,20 @@ custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_A
 # ResNet164 |27(18)| -----     | 94.07     | -----     | 94.54     | ---(---)
 # ResNet1001| (111)| -----     | 92.39     | -----     | 95.08+-.14| ---(---)
 # ---------------------------------------------------------------------------
-n = 3
 
 # Model version
 # Orig paper: version = 1 (ResNet v1), Improved ResNet: version = 2 (ResNet v2)
-version = 1
+version = 2
 
 # Computed depth from supplied model parameter n
 if version == 1:
+    n = 3
     depth = n * 6 + 2
+    namev = ''
 elif version == 2:
+    n = 2
     depth = n * 9 + 2
+    namev = '_v2'
 tic=time.time()
 start_time = time.time()
 def hms_string(sec_elapsed):
@@ -73,8 +76,8 @@ input_shape = X_train.shape[1:]
 
 
 # INPUT PARAMTERS:
-isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.3,0.5]   # Define the stddev for training
+isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
+Wstd_err = [0.7]   # Define the stddev for training
 Conv_pool = [8]
 FC_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
@@ -88,13 +91,23 @@ model_name = 'ResNet20_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 #net_base = folder_models+'8Werr_Wstd_70_Bstd_70_8bQuant_normalDistr.h5'
-net_base = folder_models+'Base.h5'
-model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
+if isAConnect[0]:
+    net_base = folder_models+'Base'+namev+'.h5'
+    model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
 lrate = 1e-1
 #lrate = 1e-3        # for Adam optimizer
-epochs = 120
+if isAConnect[0]:
+    epochs = 120
+    epoch1 = 30
+    epoch2 = 60
+    epoch3 = 100
+else:
+    epochs = 200
+    epoch1 = 80
+    epoch2 = 120
+    epoch3 = 160
 num_classes = 10
 momentum = 0.9
 batch_size = 256
@@ -113,26 +126,14 @@ def lr_schedule(epoch):
     # Returns
         lr (float32): learning rate
     """
-    """
-    if isAConnect[0]:
-        lr = lrate
-        if epoch > 75:
-            lr *= 1e-2
-        elif epoch > 50:
-            lr *= 1e-1
-    else:
-    """
     lr = lrate
     if epoch > 180:
         lr *= 0.5e-3
-    #elif epoch > 160:
-    elif epoch > 100:
+    elif epoch > epoch3:
         lr *= 1e-3
-    #elif epoch > 120:
-    elif epoch > 60:
+    elif epoch > epoch2:
         lr *= 1e-2
-    #elif epoch > 80:
-    elif epoch > 30:
+    elif epoch > epoch1:
         lr *= 1e-1
     
     print('Learning rate: ', lr)
@@ -159,14 +160,20 @@ for d in range(len(isAConnect)): #Iterate over the networks
         Wstd_aux = Wstd_err
         FC_pool_aux = FC_pool
         Conv_pool_aux = Conv_pool
+        WisQuant_aux = WisQuant
+        BisQuant_aux = BisQuant
+        errDistr_aux = errDistr
     else:
         Wstd_aux = [0]
         FC_pool_aux = [0]
         Conv_pool_aux = [0]
+        WisQuant_aux = ["no"]
+        BisQuant_aux = ["no"]
+        errDistr_aux = ["normal"]
         
     for i in range(len(Conv_pool_aux)):
-        for p in range (len(WisQuant)):
-            if WisQuant[p]=="yes":
+        for p in range (len(WisQuant_aux)):
+            if WisQuant_aux[p]=="yes":
                 Wbw_aux = Wbw
                 Bbw_aux = Bbw
             else:
@@ -175,20 +182,27 @@ for d in range(len(isAConnect)): #Iterate over the networks
 
             for q in range (len(Wbw_aux)):
                 for j in range(len(Wstd_aux)):
-                    for k in range(len(errDistr)):
+                    for k in range(len(errDistr_aux)):
                         Err = Wstd_aux[j]
                         # CREATING NN:
                         if version == 2:
-                            model = resnet_v2(input_shape=input_shape, depth=depth)
+                            model = resnet_v2(input_shape=input_shape, depth=depth,
+                                            isAConnect = isAConnect[d], 
+                                            Wstd=Err,Bstd=Err,
+                                            isQuant=[WisQuant_aux[p],BisQuant_aux[p]],
+                                            bw=[Wbw_aux[q],Bbw_aux[q]],
+                                            Conv_pool=Conv_pool_aux[i],
+                                            FC_pool=FC_pool_aux[i],
+                                            errDistr=errDistr_aux[k])
                         else:
                             model = resnet_v1(input_shape=input_shape, depth=depth, 
                                             isAConnect = isAConnect[d], 
                                             Wstd=Err,Bstd=Err,
-                                            isQuant=[WisQuant[p],BisQuant[p]],
+                                            isQuant=[WisQuant_aux[p],BisQuant_aux[p]],
                                             bw=[Wbw_aux[q],Bbw_aux[q]],
                                             Conv_pool=Conv_pool_aux[i],
                                             FC_pool=FC_pool_aux[i],
-                                            errDistr=errDistr[k])
+                                            errDistr=errDistr_aux[k])
                         
                         ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                         if isAConnect[d]:
@@ -198,14 +212,15 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         if isAConnect[d]:
                             Werr = str(int(100*Err))
                             Nm = str(int(Conv_pool_aux[i]))
-                            if WisQuant[p] == "yes":
+                            if WisQuant_aux[p] == "yes":
                                 bws = str(int(Wbw_aux[q]))
                                 quant = bws+'bQuant_'
                             else:
                                 quant = ''
-                            name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'
+                            name
+                            = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr_aux[k]+'Distr'+namev
                         else:
-                            name = 'Base'
+                            name = 'Base'+namev
                         
                         print("*************************TRAINING NETWORK*********************")
                         print("\n\t\t\t", name)
