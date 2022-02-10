@@ -226,10 +226,9 @@ def resnet_v2(input_shape, depth, num_classes=10,
             strides = 1
             if stage == 0:
                 num_filters_out = num_filters_in * 4
-                # Removed by Luis E. Rueda G.:
-                #if res_block == 0:  # first layer and first stage
-                #    activation = None
-                #    batch_normalization = False
+                if res_block == 0:  # first layer and first stage
+                    activation = None
+                    batch_normalization = False
             else:
                 num_filters_out = num_filters_in * 2
                 if res_block == 0:  # first layer but not first stage
