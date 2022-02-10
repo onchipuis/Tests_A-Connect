@@ -92,7 +92,7 @@ net_base = folder_models+'8Werr_Wstd_70_Bstd_70_8bQuant_normalDistr.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
-lrate = 0.1e-1
+lrate = 1e-1
 #lrate = 1e-3        # for Adam optimizer
 epochs = 60
 num_classes = 10
