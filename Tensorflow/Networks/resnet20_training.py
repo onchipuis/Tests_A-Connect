@@ -76,7 +76,7 @@ input_shape = X_train.shape[1:]
 
 
 # INPUT PARAMTERS:
-isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
+isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.7]   # Define the stddev for training
 Conv_pool = [8]
 FC_pool = [2]
@@ -99,13 +99,13 @@ if isAConnect[0]:
 lrate = 1e-1
 #lrate = 1e-3        # for Adam optimizer
 if isAConnect[0]:
-    epochs = 150
-    #epoch1 = 30
-    #epoch2 = 60
-    #epoch3 = 100
-    epoch1 = 60
-    epoch2 = 90
-    epoch3 = 120
+    epochs = 120
+    epoch1 = 30
+    epoch2 = 60
+    epoch3 = 100
+    #epoch1 = 60
+    #epoch2 = 90
+    #epoch3 = 120
 else:
     epochs = 200
     epoch1 = 80
