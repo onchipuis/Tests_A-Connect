@@ -213,7 +213,7 @@ def resnet_v2(input_shape, depth, num_classes=10,
     # v2 performs Conv2D with BN-ReLU on input before splitting into 2 paths
     x = resnet_layer(inputs=x,
                     num_filters=num_filters_in,
-                    conv_first=True,
+                    #conv_first=True,
                     isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                     pool=Conv_pool,errDistr=errDistr,
                     isQuant=isQuant,bw=bw)
@@ -226,9 +226,10 @@ def resnet_v2(input_shape, depth, num_classes=10,
             strides = 1
             if stage == 0:
                 num_filters_out = num_filters_in * 4
-                if res_block == 0:  # first layer and first stage
-                    activation = None
-                    batch_normalization = False
+                # Removed by Luis E. Rueda G.:
+                #if res_block == 0:  # first layer and first stage
+                #    activation = None
+                #    batch_normalization = False
             else:
                 num_filters_out = num_filters_in * 2
                 if res_block == 0:  # first layer but not first stage
@@ -239,8 +240,8 @@ def resnet_v2(input_shape, depth, num_classes=10,
                             num_filters=num_filters_in,
                             kernel_size=(1,1),
                             strides=strides,
-                            #activation=activation, # Removed by Luis Rueda
-                            #batch_normalization=batch_normalization,   # Removed by Luis Rueda
+                            activation=activation,
+                            batch_normalization=batch_normalization,
                             #conv_first=False,           # Removed by Luis Rueda
                             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                             pool=Conv_pool,errDistr=errDistr,
