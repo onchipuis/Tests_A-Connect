@@ -94,7 +94,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 # TRAINING PARAMETERS
 lrate = 1e-1
 #lrate = 1e-3        # for Adam optimizer
-epochs = 120
+epochs = 200
 num_classes = 10
 momentum = 0.9
 batch_size = 256
@@ -125,14 +125,14 @@ def lr_schedule(epoch):
     lr = lrate
     if epoch > 180:
         lr *= 0.5e-3
-    #elif epoch > 160:
-    elif epoch > 100:
+    elif epoch > 160:
+    #elif epoch > 100:
         lr *= 1e-3
-    #elif epoch > 120:
-    elif epoch > 60:
+    elif epoch > 120:
+    #elif epoch > 60:
         lr *= 1e-2
-    #elif epoch > 80:
-    elif epoch > 30:
+    elif epoch > 80:
+    #elif epoch > 30:
         lr *= 1e-1
     
     print('Learning rate: ', lr)
