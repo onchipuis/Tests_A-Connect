@@ -263,7 +263,7 @@ def resnet_v2(input_shape, depth, num_classes=10,
                 # changed dims
                 x = resnet_layer(inputs=x,
                                 num_filters=num_filters_out,
-                                kernel_size=1,
+                                kernel_size=(1,1),
                                 strides=strides,
                                 activation=None,
                                 batch_normalization=False,
