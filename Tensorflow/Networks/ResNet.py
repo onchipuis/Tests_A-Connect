@@ -255,6 +255,8 @@ def resnet_v2(input_shape, depth, num_classes=10,
                             num_filters=num_filters_out,
                             kernel_size=(1,1),
                             conv_first=False,
+                            activation=None,            # Added by Luis Rueda
+                            batch_normalization=False,  # Added by Luis Rueda
                             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                             pool=Conv_pool,errDistr=errDistr,
                             isQuant=isQuant,bw=bw)
@@ -271,13 +273,16 @@ def resnet_v2(input_shape, depth, num_classes=10,
                                 pool=Conv_pool,errDistr=errDistr,
                                 isQuant=isQuant,bw=bw)
             x = tf.keras.layers.add([x, y])
+            x = BatchNormalization()(x) # Added by Luis Rueda
+            x = Activation('relu')(x)   # Added by Luis Rueda
 
         num_filters_in = num_filters_out
 
     # Add classifier on top.
-    # v2 has BN-ReLU before Pooling
-    x = BatchNormalization()(x)
-    x = Activation('relu')(x)
+    # v2 has BN-ReLU before Pooling (removed by Luis Rueda since it was added
+    # in the previous blocks)
+    #x = BatchNormalization()(x)
+    #x = Activation('relu')(x)
     x = AveragePooling2D(pool_size=8)(x)
     y = Flatten()(x)
     
