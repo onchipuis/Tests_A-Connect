@@ -212,8 +212,11 @@ def resnet_v2(input_shape, depth, num_classes=10,
         x = RandomZoom(0.2)(x)
     # v2 performs Conv2D with BN-ReLU on input before splitting into 2 paths
     x = resnet_layer(inputs=x,
-                     num_filters=num_filters_in,
-                     conv_first=True)
+                    num_filters=num_filters_in,
+                    conv_first=True,
+                    isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
+                    pool=Conv_pool,errDistr=errDistr,
+                    isQuant=isQuant,bw=bw)
 
     # Instantiate the stack of residual units
     for stage in range(3):
