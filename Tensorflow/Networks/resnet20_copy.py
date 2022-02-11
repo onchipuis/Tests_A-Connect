@@ -54,5 +54,5 @@ for j in range(len(Wstd)):
     Werr = str(int(100*Wstd[j]))
     name = '8Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+'8bQuant_lognormalDistr.h5'
     model = tf.keras.models.load_model(folder_models+name,custom_objects=custom_objects)
-    model.set_weights(model.get_weights()*np.exp(0.5*np.power(stddev,2)))
+    model.set_weights(model.get_weights()*np.exp(0.5*np.power(Wstd[j],2)))
     model.save(name,include_optimizer=False)
