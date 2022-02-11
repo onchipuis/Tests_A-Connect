@@ -41,7 +41,7 @@ folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 #net_base = folder_models+'2Werr_Wstd_50_Bstd_50_8bQuant_normalDistr.h5'
 net_base = folder_models+'Base.h5'
-model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
+Wstd = [0.3,0.5,0.7]   # Define the stddev for training
 
 # Load the CIFAR10 data.
 (X_train, Y_train), (X_test, Y_test) = cifar10.load_data()
@@ -49,17 +49,10 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 input_shape = X_train.shape[1:]
 ################################################################
 ### TRAINING
-model = resnet_v1(input_shape=input_shape, depth=depth, 
-                isAConnect = True, 
-                Wstd=0,Bstd=0,
-                isQuant=['no','no'],
-                Conv_pool=0,
-                FC_pool=0,
-                errDistr="normal")
-                        
+for j in range(len(Wstd)):
 
-model.set_weights(model_base.get_weights())
-
-name = '2Werr_Wstd_0_Bstd_0_normalDistr.h5'
-string = folder_models + name + '.h5'                                
-model.save(string,include_optimizer=False)
+    Werr = str(int(100*Wstd[j]))
+    name = '8Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+'8bQuant_lognormalDistr.h5'
+    model = tf.keras.models.load_model(folder_models+name,custom_objects=custom_objects)
+    model.set_weights(model.get_weights()*np.exp(0.5*np.power(stddev,2)))
+    model.save(name,include_optimizer=False)
