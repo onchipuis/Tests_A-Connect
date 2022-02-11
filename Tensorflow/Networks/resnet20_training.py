@@ -92,12 +92,12 @@ folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 if isAConnect[0]:
     #net_base = folder_models+'Base'+namev+'.h5'
-    #net_base = folder_models+'8Werr_Wstd_70_Bstd_70_8bQuant_normalDistr.h5'
-    net_base = folder_models+'8Werr_Wstd_50_Bstd_50_8bQuant_lognormalDistr.h5'
+    net_base = folder_models+'8Werr_Wstd_70_Bstd_70_8bQuant_normalDistr.h5'
+    #net_base = folder_models+'8Werr_Wstd_50_Bstd_50_8bQuant_lognormalDistr.h5'
     model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
-lrate = 1e-1
+lrate = 1e-2
 #lrate = 1e-3        # for Adam optimizer
 if isAConnect[0]:
     #epochs = 120
