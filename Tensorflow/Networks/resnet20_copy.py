@@ -44,9 +44,9 @@ net_base = folder_models+'Base.h5'
 Wstd = [0.3,0.5,0.7]   # Define the stddev for training
 
 # Load the CIFAR10 data.
-(X_train, Y_train), (X_test, Y_test) = cifar10.load_data()
+#(X_train, Y_train), (X_test, Y_test) = cifar10.load_data()
 # Input image dimensions.
-input_shape = X_train.shape[1:]
+#input_shape = X_train.shape[1:]
 ################################################################
 ### TRAINING
 for j in range(len(Wstd)):
