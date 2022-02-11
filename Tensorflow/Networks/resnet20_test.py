@@ -119,7 +119,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                     quant = bws+'bQuant_'
                                 else:
                                     quant = ''
-                                if Werr == 0:
+                                if Werr == '0':
                                     name = 'Wstd_'+Werr+'_Bstd_'+Werr
                                 else:
                                     name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'
