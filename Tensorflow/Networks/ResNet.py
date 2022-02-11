@@ -202,12 +202,13 @@ def resnet_v2(input_shape, depth, num_classes=10,
     num_res_blocks = int((depth - 2) / 9)
 
     inputs = Input(shape=input_shape)
-    Flip = RandomFlip("horizontal")
-    x = Flip(inputs)
     if isAConnect:
+        x = RandomZoom(0.0)(inputs)
         x = RandomTranslation(0.0,0.0)(x)
         x = RandomZoom(0.0)(x)
     else:
+        Flip = RandomFlip("horizontal")
+        x = Flip(inputs)
         x = RandomTranslation(0.1,0.1)(x)
         x = RandomZoom(0.2)(x)
     # v2 performs Conv2D with BN-ReLU on input before splitting into 2 paths
