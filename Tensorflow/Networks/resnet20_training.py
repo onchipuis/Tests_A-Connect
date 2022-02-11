@@ -97,11 +97,11 @@ if isAConnect[0]:
     model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
-lrate = 1e-2
+lrate = 1e-1
 #lrate = 1e-3        # for Adam optimizer
 if isAConnect[0]:
-    #epochs = 120
-    epochs = 60
+    epochs = 120
+    #epochs = 60
     epoch1 = 30
     epoch2 = 60
     epoch3 = 100
