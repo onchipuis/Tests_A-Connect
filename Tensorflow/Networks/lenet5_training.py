@@ -52,7 +52,7 @@ learning_rate = 0.01
 momentum = 0.9
 optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum) #Define optimizer
 batch_size = 256
-epochs = 5
+epochs = 20
 
 ### TRAINING
 for d in range(len(isAConnect)): #Iterate over the networks
