@@ -652,7 +652,7 @@ def Merr_distr(shape,stddev,dtype,errDistr): #Used to reshape the output of the 
       Merr = tf.math.exp(-N)
     return Merr
 
-def Quant_custom(x,bwidth,dtype)
+def Quant_custom(x,bwidth,dtype):
     if (bwidth==1):
         y = tf.math.sign(x)
     else:
