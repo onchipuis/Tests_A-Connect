@@ -171,11 +171,11 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         Z = tf.concat([Z,Z1],axis=0)
 
                         else:
-                                if(self.isQuant[0]==['yes']):
+                                if(self.isQuant[0]==["yes"]):
                                     self.memW = self.LQuant(self.W)*self.Werr
                                 else:
                                     self.memW = self.W*self.Werr
-                                if(self.isQuant[1]==['yes']):
+                                if(self.isQuant[1]==["yes"]):
                                     self.membias = self.LQuant(self.bias)*self.Berr
                                 else:
                                     self.membias = self.bias*self.Berr
@@ -198,11 +198,11 @@ class FC_AConnect(tf.keras.layers.Layer):
                                 Werr = self.Werr
                                 Berr = self.Berr
                         
-                        if(self.isQuant[0]==['yes']):
+                        if(self.isQuant[0]==["yes"]):
                             weights = self.LQuant(self.W)*Werr
                         else:
                             weights = self.W*Werr
-                        if(self.isQuant[1]==['yes']):
+                        if(self.isQuant[1]==["yes"]):
                             bias = self.LQuant(self.bias)*Berr
                         else:
                             bias = self.bias*Berr
