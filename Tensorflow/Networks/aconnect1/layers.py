@@ -172,10 +172,10 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         Z = tf.concat([Z,Z1],axis=0)
 
                         else:
-                                
+                                #Custom FC layer operation when we don't have Wstd or Bstd.
                                 w = weights*self.Werr
                                 b = bias*self.Berr
-                                Z = tf.add(tf.matmul(self.X,w),b) #Custom FC layer operation when we don't have Wstd or Bstd.
+                                Z = tf.add(tf.matmul(self.X,w),b) 
 
                 else:
                     #This part of the code will be executed during the inference
@@ -191,7 +191,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                         else:
                                 Werr = self.Werr
                                 Berr = self.Berr
-                        
+                        #Custom FC layer operation
                         w = weights*Werr
                         b = bias*Berr
                         Z = tf.add(tf.matmul(self.X, w), b)
@@ -370,17 +370,17 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 self.shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters)) ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Ch] RGB
 
                 self.W = self.add_weight('kernel',
-                                                                  shape = self.shape,
-                                                                  initializer = "glorot_uniform",
-                                  dtype=self.d_type,
-                                  regularizer = self.weights_regularizer,
-                                                                  trainable=True)
+                                          shape = self.shape,
+                                          initializer = "glorot_uniform",
+                                          dtype=self.d_type,
+                                          regularizer = self.weights_regularizer,
+                                          trainable=True)
                 self.bias = self.add_weight('bias',
-                                                                        shape=(self.filters,),
-                                                                        initializer = 'zeros',
-                                    dtype=self.d_type,
-                                    regularizer = self.bias_regularizer,
-                                                                        trainable=True)
+                                            shape=(self.filters,),
+                                            initializer = 'zeros',
+                                            dtype=self.d_type,
+                                            regularizer = self.bias_regularizer,
+                                            trainable=True)
                 if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
                         if(self.Bstd != 0):
                                 self.infBerr = Merr_distr([self.filters,],self.Bstd,self.d_type,self.errDistr)
@@ -402,20 +402,22 @@ class Conv_AConnect(tf.keras.layers.Layer):
         def call(self,X,training):
                 self.X = tf.cast(X, dtype=self.d_type)
                 self.batch_size = tf.shape(self.X)[0]
+                
+                if(self.isQuant==['yes','yes']):
+                    weights = self.LQuant(self.W)
+                    bias = self.LQuant(self.bias)
+                elif(self.isQuant==['yes','no']):
+                    weights = self.LQuant(self.W)
+                    bias = self.bias
+                elif(self.isQuant==['no','yes']):
+                    weights = self.W
+                    bias = self.LQuant(self.bias)
+                else:
+                    weights=self.W
+                    bias=self.bias
+                
                 if(training):
                         if(self.Wstd != 0 or self.Bstd != 0):
-                                if(self.isQuant==['yes','yes']):
-                                    weights = self.LQuant(self.W)
-                                    bias = self.LQuant(self.bias)
-                                elif(self.isQuant==['yes','no']):
-                                    weights = self.LQuant(self.W)
-                                    bias = self.bias
-                                elif(self.isQuant==['no','yes']):
-                                    weights = self.W
-                                    bias = self.LQuant(self.bias)
-                                else:
-                                    weights=self.W
-                                    bias=self.bias
                                 if(self.pool is None):
                                     if(self.Op == 1):
                                         if(self.Slice == 2): #Slice the batch into 2 minibatches of size batch/2
@@ -516,19 +518,9 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                         Z1 = tf.add(Z1,self.bias*Berr[i+1])
                                         Z = tf.concat([Z,Z1],axis=0)
                         else:
-                                if(self.isQuant==['yes','yes']):
-                                        weights = self.LQuant(self.W)*self.Werr
-                                        self.membias = self.LQuant(self.bias)*self.Berr
-                                elif(self.isQuant==['yes','no']):
-                                        weights = self.LQuant(self.W)*self.Werr
-                                        self.membias = self.bias*self.Berr
-                                elif(self.isQuant==['no','yes']):
-                                        weights = self.W*self.Werr
-                                        self.membias = self.LQuant(self.bias)*self.Berr
-                                else:
-                                        weights=self.W*self.Werr
-                                        self.membias = self.bias*self.Berr
-                                Z = self.membias*self.Berr+tf.nn.conv2d(self.X,weights,self.strides,self.padding)
+                                w = weights*self.Werr
+                                b = bias*self.Berr
+                                Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
                 else:
                         if(self.Wstd != 0 or self.Bstd !=0):
                                 if(self.Wstd !=0):
@@ -542,19 +534,10 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         else:
                                 Werr = self.Werr
                                 Berr = self.Berr
-                        if(self.isQuant==['yes','yes']):
-                                weights= self.LQuant(self.W)*Werr
-                                bias= self.LQuant(self.bias)*Berr
-                        elif(self.isQuant==['yes','no']):
-                                weights= self.LQuant(self.W)*Werr
-                                bias =self.bias*Berr
-                        elif(self.isQuant==['no','yes']):
-                                weights=self.W*Werr
-                                bias= self.LQuant(self.bias)*Berr
-                        else:
-                                weights=self.W*Werr
-                                bias = self.bias*Berr
-                        Z = bias+tf.nn.conv2d(self.X,weights,self.strides,self.padding)
+                        
+                        w = weights*Werr
+                        b = bias*Berr
+                        Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
                 return Z
         def slice_batch(self,weights,miniBatch,N,strides):
                 if(self.Wstd != 0):
