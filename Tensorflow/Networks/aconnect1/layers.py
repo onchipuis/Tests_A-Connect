@@ -252,7 +252,7 @@ class FC_AConnect(tf.keras.layers.Layer):
             
             return y,grad
 
-        def Quant_custom(x,bwidth,dtype)
+        def Quant_custom(x,bwidth,dtype):
             if (bwidth==1):
                 y = tf.math.sign(x)
             else:
