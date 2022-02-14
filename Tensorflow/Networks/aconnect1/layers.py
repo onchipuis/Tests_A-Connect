@@ -256,8 +256,7 @@ class FC_AConnect(tf.keras.layers.Layer):
             else:
                 bwidth = self.bw[0]
 
-            y, grad = Quant_custom(x,bwidth,dtype=self.d_type)
-            """
+            #y, grad = Quant_custom(x,bwidth,dtype=self.d_type)
             if (bwidth==1):
                 y = tf.math.sign(x)
             else:
@@ -273,7 +272,6 @@ class FC_AConnect(tf.keras.layers.Layer):
                     xe = tf.divide(y,x+1e-5)
                     dydx = tf.multiply(dy,xe)
                 return dydx
-            """
             return y,grad
             
 
