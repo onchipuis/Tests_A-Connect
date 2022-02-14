@@ -45,176 +45,160 @@ class FC_AConnect(tf.keras.layers.Layer):
                 self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
                 self.validate_init()
         
-        def build(self,input_shape):                                                             #This method is used for initialize the layer variables that depend on input_shape
-                                                                                                    #input_shape is automatically computed by tensorflow
-                self.W = self.add_weight("W",
-                                        shape = [int(input_shape[-1]),self.output_size], #Weights matrix
-                                        initializer = "glorot_uniform",
-                                        dtype = self.d_type,
-                                        regularizer = self.weights_regularizer,
-                                        trainable=True)
-
-                self.bias = self.add_weight("bias",
-                                        shape = [self.output_size,],                                    #Bias vector
-                                        initializer = "zeros",
-                                        dtype = self.d_type,
-                                        regularizer = self.bias_regularizer,
-                                        trainable=True)
-
-                if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
-                        if(self.Bstd != 0):
-                                self.infBerr = Merr_distr([self.output_size],self.Bstd,self.d_type,self.errDistr)
-                                self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
-                                                                                                         #This was necessary to change the error matrix/array when Monte Carlo was running.
-                        else:
-                                self.Berr = tf.constant(1,dtype=self.d_type)
-                        if(self.Wstd != 0):
-                                self.infWerr = Merr_distr([int(input_shape[-1]),self.output_size],self.Wstd,self.d_type,self.errDistr)
-                                self.infWerr = self.infWerr.numpy()
-                        else:
-                                self.Werr = tf.constant(1,dtype=self.d_type)
+        #This method is used for initialize the layer variables that depend on input_shape
+        #input_shape is automatically computed by tensorflow
+        def build(self,input_shape):    
+                
+            #Weights matrix                        
+            self.W = self.add_weight("W",
+                                    shape = [int(input_shape[-1]),self.output_size], 
+                                    initializer = "glorot_uniform",
+                                    dtype = self.d_type,
+                                    regularizer = self.weights_regularizer,
+                                    trainable=True)
+            #Bias vector
+            self.bias = self.add_weight("bias",
+                                    shape = [self.output_size,],                                    
+                                    initializer = "zeros",
+                                    dtype = self.d_type,
+                                    regularizer = self.bias_regularizer,
+                                    trainable=True)
+            
+            #If the layer will take into account the standard deviation of the weights or 
+            #the std of the bias or both
+            if(self.Wstd != 0 or self.Bstd != 0): 
+                if(self.Bstd != 0):
+                    self.infBerr = Merr_distr([self.output_size],self.Bstd,self.d_type,self.errDistr)
+                    self.infBerr = self.infBerr.numpy() #It is necessary to convert the tensor to a numpy array, because tensors are 
+                                                        #constant and therefore cannot be changed. This was necessary to change the 
+                                                        #error matrix/array when Monte Carlo was running.
                 else:
-                        self.Werr = tf.constant(1,dtype=self.d_type) #We need to define the number 1 as a float32.
-                        self.Berr = tf.constant(1,dtype=self.d_type)
-                super(FC_AConnect, self).build(input_shape)
-
-        def call(self, X, training=None): #With call we can define all the operations that the layer do in the forward propagation.
+                    self.Berr = tf.constant(1,dtype=self.d_type)
+                if(self.Wstd != 0):
+                    self.infWerr = Merr_distr([int(input_shape[-1]),self.output_size],self.Wstd,self.d_type,self.errDistr)
+                    self.infWerr = self.infWerr.numpy()
+                else:
+                    self.Werr = tf.constant(1,dtype=self.d_type)
+            else:
+                self.Werr = tf.constant(1,dtype=self.d_type) #We need to define the number 1 as a float32.
+                self.Berr = tf.constant(1,dtype=self.d_type)
+            super(FC_AConnect, self).build(input_shape)
+        
+        #With call we can define all the operations that the layer do in the forward propagation.
+        def call(self, X, training=None): 
                 self.X = tf.cast(X, dtype=self.d_type)
                 row = tf.shape(self.X)[-1]
-                self.batch_size = tf.shape(self.X)[0] #Numpy arrays and tensors have the number of array/tensor in the first dimension.
-                                                                                          #i.e. a tensor with this shape [1000,784,128] are 1000 matrix of [784,128].
-                                                                                          #Then the batch_size of the input data also is the first dimension.
-
+                self.batch_size = tf.shape(self.X)[0]   #Numpy arrays and tensors have the number of array/tensor in the first dimension.
+                                                        #i.e. a tensor with this shape [1000,784,128] are 1000 matrix of [784,128].
+                                                        #Then the batch_size of the input data also is the first dimension.
+                #Quantize the weights
+                if(self.isQuant[0]==["yes"]):
+                    weights = self.LQuant(self.W)    
+                else:
+                    weights = self.W
+                
+                #Quantize the bias
+                if(self.isQuant[1]==["yes"]):
+                    bias = self.LQuant(self.bias)
+                else:
+                    bias = self.bias
+                
                 #This code will train the network. For inference, please go to the else part
                 if(training):
-                        if(self.Wstd != 0 or self.Bstd != 0):
-                                if(self.isQuant==["yes","yes"]):
-                                        weights = self.LQuant(self.W)    #Quantize the weights and multiply them element wise with Werr mask
-                                        bias = self.LQuant(self.bias)    #Quantize the bias and multiply them element wise with Werr mask
-                                elif(self.isQuant==["yes","no"]):
-                                        weights = self.LQuant(self.W)
-                                        bias = self.bias
-                                elif(self.isQuant==["no","yes"]):
-                                        weights = self.W
-                                        bias = self.LQuant(self.bias)
-                                else:
-                                    weights = self.W
-                                    bias = self.bias
-                                if(self.pool is None):
-                                    if(self.Slice == 2): #Slice the batch into 2 minibatches of size batch/2
-                                        miniBatch = tf.cast(self.batch_size/2,dtype=tf.int32)
-                                        Z1 = self.slice_batch(weights,miniBatch,0,row) #Takes a portion from 0:minibatch
-                                        Z2 = self.slice_batch(weights,miniBatch,1,row) #Takes a portion from minibatch:2*minibatch
-                                        Z = tf.concat([Z1,Z2],axis=0)
-                                    elif(self.Slice == 4):
-                                        miniBatch = tf.cast(self.batch_size/4,dtype=tf.int32) #Slice the batch into 4 minibatches of size batch/4
-                                        Z = self.slice_batch(weights,miniBatch,0,row) #Takes a portion from 0:minibatch
-                                        for i in range(3):
-                                            Z1 = self.slice_batch(weights,miniBatch,i+1,row) #Takes a portion from minibatch:2*minibatch
-                                            Z = tf.concat([Z,Z1],axis=0)
-                                    elif(self.Slice == 8):
-                                        miniBatch = tf.cast(self.batch_size/8,dtype=tf.int32) #Slice the batch into 8 minibatches of size batch/8
-                                        Z = self.slice_batch(miniBatch,0,row) #Takes a portion from 0:minibatch
-                                        for i in range(7):
-                                            Z1 = self.slice_batch(miniBatch,i+1,row) #Takes a portion from minibatch:2*minibatch
-                                            Z = tf.concat([Z,Z1],axis=0)
-                                    else:
-                                        if(self.Wstd !=0):
-                                            #Werr = tf.gather(self.Werr,[loc_id])               #Finally, this line will take only N matrices from the "Pool" of error matrices. Where N is the batch size.
-                                            Werr = Merr_distr([self.batch_size,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
-                                                                        #That means, with a weights shape of [784,128] and a batch size of 256. Werr should be a tensor with shape
-                                                                        #[256,784,128], but gather return us a tensor with shape [1,256,784,128], so we remove that 1 with squeeze.
-                                        else:
-                                            Werr = self.Werr
-                                        memW = tf.multiply(weights,Werr)                                        #Finally we multiply element-wise the error matrix with the weights.
-
-                                        if(self.Bstd !=0):                                                              #For the bias is exactly the same situation
-                                            #Berr = tf.gather(self.Berr, [loc_id])
-                                            Berr = Merr_distr([self.batch_size,self.output_size],self.Bstd,self.d_type,self.errDistr)
-                                        else:
-                                            Berr = self.Berr
-                                        membias = tf.multiply(Berr,self.bias)
-
-                                        Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[-1]]) #We need this reshape, beacuse the input data is a column vector with
-                                                                                            # 2 dimension, e.g. in the first layer using MNIST we will have a vector with
-                                                                                            #shape [batchsize,784], and we need to do a matrix multiplication.
-                                                                                            #Which means the last dimension of the first matrix and the first dimension of the
-                                                                                            #second matrix must be equal. In this case, with a FC layer with 128 neurons we will have this dimensions
-                                                                                            #[batchsize,784] for the input and for the weights mask [batchsize,784,128]
-                                                                                            #And the function tf.matmul will not recognize the first dimension of X as the batchsize, so the multiplication will return a wrong result.
-                                                                                            #Thats why we add an extra dimension, and transpose the vector. At the end we will have a vector with shape [batchsize,1,784].
-                                                                                            #And the multiplication result will be correct.
-
-                                        Z = tf.matmul(Xaux, memW)       #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
-                                        Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
-                                        Z = tf.add(Z,membias) #FInally, we add the bias error mask
-                                        #Z = self.forward(self.W,self.bias,self.Xaux)
-                                else: #if we have pool attribute the layer will train with a pool of error matrices created during the forward propagation.
-                                    if(self.Wstd !=0):
-                                        Werr = Merr_distr([self.pool,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
-                                                                        #That means, with a weights shape of [784,128] and a batch size of 256. Werr should be a tensor with shape
-                                                                        #[256,784,128], but gather return us a tensor with shape [1,256,784,128], so we remove that 1 with squeeze.
-                                    else:
-                                        Werr = self.Werr
-
-                                    if(self.Bstd !=0):                                                          #For the bias is exactly the same situation
-                                        Berr = Merr_distr([self.pool,self.output_size],self.Bstd,self.d_type,self.errDistr)
-                                    else:
-                                        Berr = self.Berr
-
-                                    newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
-                                    Z = tf.matmul(self.X[0:newBatch], weights*Werr[0])  #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
-                                    Z = tf.reshape(Z,[newBatch,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
-                                    Z = tf.add(Z,self.bias*Berr[0]) #FInally, we add the bias error mask
-                                    for i in range(self.pool-1):
-                                        Z1 = tf.matmul(self.X[(i+1)*newBatch:(i+2)*newBatch], weights*Werr[i+1])
-                                        Z1 = tf.add(Z1,self.bias*Berr[i+1])
-                                        Z = tf.concat([Z,Z1],axis=0)
-
-                        else:
-                                if(self.isQuant==['yes','yes']):
-                                        self.memW = self.LQuant(self.W)*self.Werr
-                                        self.membias = self.LQuant(self.bias)*self.Berr
-                                elif(self.isQuant==['yes','no']):
-                                        self.memW = self.LQuant(self.W)*self.Werr
-                                        self.membias = self.bias*self.Berr
-                                elif(self.isQuant==['no','yes']):
-                                        self.memW = self.W*self.Werr
-                                        self.membias = self.LQuant(self.bias)*self.Berr
-                                else:
-                                        self.memW = self.W*self.Werr
-                                        self.membias = self.bias*self.Berr
-                                Z = tf.add(tf.matmul(self.X,self.memW),self.membias) #Custom FC layer operation when we don't have Wstd or Bstd.
-
-                else:
-                    #This part of the code will be executed during the inference
-                        if(self.Wstd != 0 or self.Bstd !=0):
+                    if(self.Wstd != 0 or self.Bstd != 0):
+                        if(self.pool is None):
+                            if(self.Slice == 2): #Slice the batch into 2 minibatches of size batch/2
+                                miniBatch = tf.cast(self.batch_size/2,dtype=tf.int32)
+                                Z1 = self.slice_batch(weights,miniBatch,0,row) #Takes a portion from 0:minibatch
+                                Z2 = self.slice_batch(weights,miniBatch,1,row) #Takes a portion from minibatch:2*minibatch
+                                Z = tf.concat([Z1,Z2],axis=0)
+                            elif(self.Slice == 4):
+                                miniBatch = tf.cast(self.batch_size/4,dtype=tf.int32) #Slice the batch into 4 minibatches of size batch/4
+                                Z = self.slice_batch(weights,miniBatch,0,row) #Takes a portion from 0:minibatch
+                                for i in range(3):
+                                    Z1 = self.slice_batch(weights,miniBatch,i+1,row) #Takes a portion from minibatch:2*minibatch
+                                    Z = tf.concat([Z,Z1],axis=0)
+                            elif(self.Slice == 8):
+                                miniBatch = tf.cast(self.batch_size/8,dtype=tf.int32) #Slice the batch into 8 minibatches of size batch/8
+                                Z = self.slice_batch(miniBatch,0,row) #Takes a portion from 0:minibatch
+                                for i in range(7):
+                                    Z1 = self.slice_batch(miniBatch,i+1,row) #Takes a portion from minibatch:2*minibatch
+                                    Z = tf.concat([Z,Z1],axis=0)
+                            else:
                                 if(self.Wstd !=0):
-                                        Werr = self.infWerr
+                                    Werr = Merr_distr([self.batch_size,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
                                 else:
-                                        Werr = self.Werr
-                                if(self.Bstd != 0):
-                                        Berr = self.infBerr
-                                else:
-                                        Berr = self.Berr
-                        else:
-                                Werr = self.Werr
-                                Berr = self.Berr
-                        if(self.isQuant==['yes','yes']):
-                                weights = self.LQuant(self.W)*Werr
-                                bias = self.LQuant(self.bias)*Berr
-                        elif(self.isQuant==['yes','no']):
-                                weights = self.LQuant(self.W)*Werr
-                                bias =self.bias*Berr
-                        elif(self.isQuant==['no','yes']):
-                                weights =self.W*Werr
-                                bias = self.LQuant(self.bias)*Berr
-                        else:
-                                weights = self.W*Werr
-                                bias = self.bias*Berr
-                        Z = tf.add(tf.matmul(self.X, weights), bias)
+                                    Werr = self.Werr
+                                #Finally we multiply element-wise the error matrix with the weights.
+                                memW = tf.multiply(weights,Werr)                                        
 
+                                if(self.Bstd !=0):                                                              #For the bias is exactly the same situation
+                                    Berr = Merr_distr([self.batch_size,self.output_size],self.Bstd,self.d_type,self.errDistr)
+                                else:
+                                    Berr = self.Berr
+                                membias = tf.multiply(Berr,self.bias)
+                                
+                                #We need this reshape, beacuse the input data is a column vector with
+                                #2 dimension, e.g. in the first layer using MNIST we will have a vector with
+                                #shape [batchsize,784], and we need to do a matrix multiplication.
+                                #Which means the last dimension of the first matrix and the first dimension of the
+                                #second matrix must be equal. In this case, with a FC layer with 128 neurons we will have this dimensions
+                                #[batchsize,784] for the input and for the weights mask [batchsize,784,128]
+                                #And the function tf.matmul will not recognize the first dimension of X as the batchsize, so the multiplication will return a wrong result.
+                                #Thats why we add an extra dimension, and transpose the vector. At the end we will have a vector with shape [batchsize,1,784].
+                                #And the multiplication result will be correct.
+                                Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[-1]]) 
+
+                                Z = tf.matmul(Xaux, memW)       #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
+                                Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
+                                Z = tf.add(Z,membias) #FInally, we add the bias error mask
+                        else: #if we have pool attribute the layer will train with a pool of error matrices created during the forward propagation.
+                            if(self.Wstd !=0):
+                                Werr = Merr_distr([self.pool,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
+                            else:
+                                Werr = self.Werr
+
+                            if(self.Bstd !=0):                                                          
+                                Berr = Merr_distr([self.pool,self.output_size],self.Bstd,self.d_type,self.errDistr)
+                            else:
+                                Berr = self.Berr
+
+                            newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
+                            Z = tf.matmul(self.X[0:newBatch], weights*Werr[0])  #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
+                            Z = tf.reshape(Z,[newBatch,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
+                            Z = tf.add(Z,self.bias*Berr[0]) #FInally, we add the bias error mask
+                            for i in range(self.pool-1):
+                                Z1 = tf.matmul(self.X[(i+1)*newBatch:(i+2)*newBatch], weights*Werr[i+1])
+                                Z1 = tf.add(Z1,self.bias*Berr[i+1])
+                                Z = tf.concat([Z,Z1],axis=0)
+
+                    else:
+                        #Custom FC layer operation when we don't have Wstd or Bstd.
+                        weights = weights*self.Werr
+                        bias = bias*self.Berr
+                        Z = tf.add(tf.matmul(self.X,weights),bias) 
+
+                #This part of the code will be executed during the inference
+                else:
+                    if(self.Wstd != 0 or self.Bstd !=0):
+                        if(self.Wstd !=0):
+                            Werr = self.infWerr
+                        else:
+                            Werr = self.Werr
+                        if(self.Bstd != 0):
+                            Berr = self.infBerr
+                        else:
+                            Berr = self.Berr
+                    else:
+                        Werr = self.Werr
+                        Berr = self.Berr
+                    
+                    #Custom FC layer operation
+                    weights = weights*Werr
+                    bias = bias*Berr
+                    Z = tf.add(tf.matmul(self.X, weights), bias)
                 return Z
+
         def slice_batch(self,miniBatch,N,row):
                 if(self.Wstd != 0):
                         Werr = Merr_distr([miniBatch,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
@@ -231,8 +215,6 @@ class FC_AConnect(tf.keras.layers.Layer):
                 Z = tf.matmul(Xaux, memW)       #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
                 Z = tf.reshape(Z,[miniBatch,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
                 Z = tf.add(Z,membias) #FInally, we add the bias error mask
-                #Z = self.forward(self.W,self.bias,Xaux)
-                #tf.print('Z dims: ',tf.shape(Z))
                 return Z
 
         #THis is only for saving purposes. Does not affect the layer performance.
@@ -291,47 +273,6 @@ class FC_AConnect(tf.keras.layers.Layer):
             return y,grad
             
 
-        
-###HOW TO IMPLEMENT MANUALLY THE BACKPROPAGATION###
-"""
-        @tf.custom_gradient
-        def forward(self,W,bias,X):
-                if(self.Wstd != 0):
-                        mWerr = Merr_distr([self.miniBatch,tf.cast(self.row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
-                else:
-                        mWerr = self.Werr
-                if(self.Bstd != 0):
-                        Berr = Merr_distr([self.miniBatch,self.output_size],self.Bstd,self.d_type,self.errDistr)
-                else:
-                        Berr = self.Berr
-                if(self.isBin=='yes'):
-                        weights = tf.math.sign(W)                       #Binarize the weights
-                else:
-                        weights = W
-                weights = tf.expand_dims(weights, axis=0)
-                loc_W = weights*mWerr                           #Get the weights with the error matrix included. Also takes the binarization error when isBin=yes
-                bias = tf.expand_dims(bias, axis=0)
-                loc_bias = bias*Berr
-                Z = tf.matmul(X,loc_W)
-                Z = tf.reshape(Z, [self.miniBatch,tf.shape(Z)[-1]]) #Reshape Z to column vector
-                Z = tf.add(Z, loc_bias) # Add the bias error mask
-                def grad(dy):
-                        if(self.isBin=="yes"):
-                                layerW = tf.expand_dims(W, axis=0)
-                                Werr = loc_W/layerW             #If the layer is binary we use Werr as W*/layer.W as algorithm 3 describes.
-                        else:
-                                Werr = mWerr  #If not, Werr will be the same matrices that we multiplied before
-                        dy = tf.reshape(dy, [self.miniBatch,1,tf.shape(dy)[-1]]) #Reshape dy to [batch,1,outputsize]
-                        dX = tf.matmul(dy,loc_W, transpose_b=True) #Activations gradient
-                        dX = tf.reshape(dX, [self.miniBatch, tf.shape(dX)[-1]])
-                        dWerr = tf.matmul(X,dy,transpose_a=True) #Gradient for the error mask of weights
-                        dBerr = tf.reshape(dy, [self.miniBatch,tf.shape(dy)[-1] ]) #Get the gradient of the error mask of bias with property shape
-                        dW = dWerr*Werr #Get the property weights gradient
-                        dW = tf.reduce_sum(dW, axis=0)
-                        dB = dBerr*Berr #Get the property bias gradient
-                        dB = tf.reduce_sum(dB, axis=0)
-                        return dW,dB,dX
-                return Z, grad """
 ###########################################################################################################3
 """
 Convolutional layer with A-Connect
