@@ -172,19 +172,10 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         Z = tf.concat([Z,Z1],axis=0)
 
                         else:
-                                if(self.isQuant==['yes','yes']):
-                                        self.memW = self.LQuant(self.W)*self.Werr
-                                        self.membias = self.LQuant(self.bias)*self.Berr
-                                elif(self.isQuant==['yes','no']):
-                                        self.memW = self.LQuant(self.W)*self.Werr
-                                        self.membias = self.bias*self.Berr
-                                elif(self.isQuant==['no','yes']):
-                                        self.memW = self.W*self.Werr
-                                        self.membias = self.LQuant(self.bias)*self.Berr
-                                else:
-                                        self.memW = self.W*self.Werr
-                                        self.membias = self.bias*self.Berr
-                                Z = tf.add(tf.matmul(self.X,self.memW),self.membias) #Custom FC layer operation when we don't have Wstd or Bstd.
+                                
+                                w = weights*self.Werr
+                                b = bias*self.Berr
+                                Z = tf.add(tf.matmul(self.X,w),b) #Custom FC layer operation when we don't have Wstd or Bstd.
 
                 else:
                     #This part of the code will be executed during the inference
@@ -200,18 +191,9 @@ class FC_AConnect(tf.keras.layers.Layer):
                         else:
                                 Werr = self.Werr
                                 Berr = self.Berr
-                        if(self.isQuant==['yes','yes']):
-                                weights = self.LQuant(self.W)*Werr
-                                bias = self.LQuant(self.bias)*Berr
-                        elif(self.isQuant==['yes','no']):
-                                weights = self.LQuant(self.W)*Werr
-                                bias =self.bias*Berr
-                        elif(self.isQuant==['no','yes']):
-                                weights =self.W*Werr
-                                bias = self.LQuant(self.bias)*Berr
-                        else:
-                                weights = self.W*Werr
-                                bias = self.bias*Berr
+                        
+                        w = weights*Werr
+                        b = bias*Berr
                         Z = tf.add(tf.matmul(self.X, weights), bias)
 
                 return Z
