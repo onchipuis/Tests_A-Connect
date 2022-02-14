@@ -82,8 +82,8 @@ class FC_AConnect(tf.keras.layers.Layer):
                 self.X = tf.cast(X, dtype=self.d_type)
                 row = tf.shape(self.X)[-1]
                 self.batch_size = tf.shape(self.X)[0] #Numpy arrays and tensors have the number of array/tensor in the first dimension.
-                                                                                          #i.e. a tensor with this shape [1000,784,128] are 1000 matrix of [784,128].
-                                                                                          #Then the batch_size of the input data also is the first dimension.
+                                                      #i.e. a tensor with this shape [1000,784,128] are 1000 matrix of [784,128].
+                                                      #Then the batch_size of the input data also is the first dimension.
                 #Quantize the weights
                 if(self.isQuant[0]=="yes"):
                     weights = self.LQuant(self.W)    
@@ -118,16 +118,14 @@ class FC_AConnect(tf.keras.layers.Layer):
                                             Z = tf.concat([Z,Z1],axis=0)
                                     else:
                                         if(self.Wstd !=0):
-                                            #Werr = tf.gather(self.Werr,[loc_id])               #Finally, this line will take only N matrices from the "Pool" of error matrices. Where N is the batch size.
                                             Werr = Merr_distr([self.batch_size,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
-                                                                        #That means, with a weights shape of [784,128] and a batch size of 256. Werr should be a tensor with shape
-                                                                        #[256,784,128], but gather return us a tensor with shape [1,256,784,128], so we remove that 1 with squeeze.
                                         else:
                                             Werr = self.Werr
-                                        memW = tf.multiply(weights,Werr)                                        #Finally we multiply element-wise the error matrix with the weights.
-
-                                        if(self.Bstd !=0):                                                              #For the bias is exactly the same situation
-                                            #Berr = tf.gather(self.Berr, [loc_id])
+                                        #Finally we multiply element-wise the error matrix with the weights.
+                                        memW = tf.multiply(weights,Werr)                                        
+                                        
+                                        #For the bias is exactly the same situation
+                                        if(self.Bstd !=0):                                                              
                                             Berr = Merr_distr([self.batch_size,self.output_size],self.Bstd,self.d_type,self.errDistr)
                                         else:
                                             Berr = self.Berr
@@ -146,16 +144,13 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         Z = tf.matmul(Xaux, memW)       #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
                                         Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
                                         Z = tf.add(Z,membias) #FInally, we add the bias error mask
-                                        #Z = self.forward(self.W,self.bias,self.Xaux)
                                 else: #if we have pool attribute the layer will train with a pool of error matrices created during the forward propagation.
                                     if(self.Wstd !=0):
                                         Werr = Merr_distr([self.pool,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
-                                                                        #That means, with a weights shape of [784,128] and a batch size of 256. Werr should be a tensor with shape
-                                                                        #[256,784,128], but gather return us a tensor with shape [1,256,784,128], so we remove that 1 with squeeze.
                                     else:
                                         Werr = self.Werr
 
-                                    if(self.Bstd !=0):                                                          #For the bias is exactly the same situation
+                                    if(self.Bstd !=0):  
                                         Berr = Merr_distr([self.pool,self.output_size],self.Bstd,self.d_type,self.errDistr)
                                     else:
                                         Berr = self.Berr
@@ -253,22 +248,24 @@ class FC_AConnect(tf.keras.layers.Layer):
             else:
                 bwidth = self.bw[0]
 
+            y, grad = Quant_custom(x,bwidth,self.d_type)
+            
+            return y,grad
+
+        def Quant_custom(x,bwidth,dtype)
             if (bwidth==1):
                 y = tf.math.sign(x)
-                def grad(dy):
-                    dydx = tf.divide(dy,abs(x)+1e-5)
-                    return dydx
             else:
                 xi = tf.cast(x,tf.dtypes.float32)
                 limit = 1
                 xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=bwidth)
-                y = tf.cast(xq,self.d_type)
-                def grad(dy):
-                    xe = tf.divide(y,x+1e-5)
-                    dydx = tf.multiply(dy,xe)
-                    return dydx
-            return y,grad
+                y = tf.cast(xq,dtype)
             
+            def grad(dy):
+                xe = tf.divide(y,x+1e-5)
+                dydx = tf.multiply(dy,xe)
+                return dydx
+            return y,grad
 
         
 ###HOW TO IMPLEMENT MANUALLY THE BACKPROPAGATION###
