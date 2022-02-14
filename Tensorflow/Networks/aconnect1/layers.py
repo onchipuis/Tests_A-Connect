@@ -84,17 +84,15 @@ class FC_AConnect(tf.keras.layers.Layer):
                 self.batch_size = tf.shape(self.X)[0] #Numpy arrays and tensors have the number of array/tensor in the first dimension.
                                                                                           #i.e. a tensor with this shape [1000,784,128] are 1000 matrix of [784,128].
                                                                                           #Then the batch_size of the input data also is the first dimension.
-                if(self.isQuant==["yes","yes"]):
-                        weights = self.LQuant(self.W)    #Quantize the weights and multiply them element wise with Werr mask
-                        bias = self.LQuant(self.bias)    #Quantize the bias and multiply them element wise with Werr mask
-                elif(self.isQuant==["yes","no"]):
-                        weights = self.LQuant(self.W)
-                        bias = self.bias
-                elif(self.isQuant==["no","yes"]):
-                        weights = self.W
-                        bias = self.LQuant(self.bias)
+                #Quantize the weights
+                if(self.isQuant[0]=="yes"):
+                    weights = self.LQuant(self.W)    
                 else:
                     weights = self.W
+                #Quantize the biases
+                if(self.isQuant[1]=="yes"):
+                    bias = self.LQuant(self.bias)
+                else:
                     bias = self.bias
                 #This code will train the network. For inference, please go to the else part
                 if(training):
@@ -197,6 +195,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                         Z = tf.add(tf.matmul(self.X, w), b)
 
                 return Z
+        
         def slice_batch(self,miniBatch,N,row):
                 if(self.Wstd != 0):
                         Werr = Merr_distr([miniBatch,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
@@ -213,8 +212,6 @@ class FC_AConnect(tf.keras.layers.Layer):
                 Z = tf.matmul(Xaux, memW)       #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
                 Z = tf.reshape(Z,[miniBatch,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
                 Z = tf.add(Z,membias) #FInally, we add the bias error mask
-                #Z = self.forward(self.W,self.bias,Xaux)
-                #tf.print('Z dims: ',tf.shape(Z))
                 return Z
 
         #THis is only for saving purposes. Does not affect the layer performance.
@@ -403,18 +400,16 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 self.X = tf.cast(X, dtype=self.d_type)
                 self.batch_size = tf.shape(self.X)[0]
                 
-                if(self.isQuant==['yes','yes']):
-                    weights = self.LQuant(self.W)
-                    bias = self.LQuant(self.bias)
-                elif(self.isQuant==['yes','no']):
-                    weights = self.LQuant(self.W)
-                    bias = self.bias
-                elif(self.isQuant==['no','yes']):
+                #Quantize the weights
+                if(self.isQuant[0]=="yes"):
+                    weights = self.LQuant(self.W)    
+                else:
                     weights = self.W
+                #Quantize the biases
+                if(self.isQuant[1]=="yes"):
                     bias = self.LQuant(self.bias)
                 else:
-                    weights=self.W
-                    bias=self.bias
+                    bias = self.bias
                 
                 if(training):
                         if(self.Wstd != 0 or self.Bstd != 0):
@@ -518,6 +513,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                         Z1 = tf.add(Z1,self.bias*Berr[i+1])
                                         Z = tf.concat([Z,Z1],axis=0)
                         else:
+                                #Custom Conv layer operation
                                 w = weights*self.Werr
                                 b = bias*self.Berr
                                 Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
@@ -535,6 +531,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                 Werr = self.Werr
                                 Berr = self.Berr
                         
+                        #Custom Conv layer operation
                         w = weights*Werr
                         b = bias*Berr
                         Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
