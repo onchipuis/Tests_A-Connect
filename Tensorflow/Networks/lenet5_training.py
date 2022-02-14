@@ -38,7 +38,7 @@ Conv_pool = [2]
 FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
-Wbw = [2]
+Wbw = [8]
 Bbw = Wbw
 #errDistr = "lognormal"
 saveModel = False
@@ -52,7 +52,7 @@ learning_rate = 0.01
 momentum = 0.9
 optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum) #Define optimizer
 batch_size = 256
-epochs = 20
+epochs = 5
 
 ### TRAINING
 for d in range(len(isAConnect)): #Iterate over the networks
