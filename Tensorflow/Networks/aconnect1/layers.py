@@ -256,20 +256,24 @@ class FC_AConnect(tf.keras.layers.Layer):
             else:
                 bwidth = self.bw[0]
 
+            y, grad = Quant_custom(x,bwidth,dtype=self.d_type)
+            """
             if (bwidth==1):
                 y = tf.math.sign(x)
-                def grad(dy):
-                    dydx = tf.divide(dy,abs(x)+1e-5)
-                    return dydx
             else:
                 xi = tf.cast(x,tf.dtypes.float32)
                 limit = 1
                 xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=bwidth)
                 y = tf.cast(xq,self.d_type)
-                def grad(dy):
+               
+            def grad(dy):
+                if (bwidth==1):
+                    dydx = tf.divide(dy,abs(x)+1e-5)
+                else:
                     xe = tf.divide(y,x+1e-5)
                     dydx = tf.multiply(dy,xe)
-                    return dydx
+                return dydx
+            """
             return y,grad
             
 
@@ -648,4 +652,20 @@ def Merr_distr(shape,stddev,dtype,errDistr): #Used to reshape the output of the 
       Merr = tf.math.exp(-N)
     return Merr
 
-
+def Quant_custom(x,bwidth,dtype)
+    if (bwidth==1):
+        y = tf.math.sign(x)
+    else:
+        xi = tf.cast(x,tf.dtypes.float32)
+        limit = 1
+        xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=bwidth)
+        y = tf.cast(xq,dtype)
+       
+    def grad(dy):
+        if (bwidth==1):
+            dydx = tf.divide(dy,abs(x)+1e-5)
+        else:
+            xe = tf.divide(y,x+1e-5)
+            dydx = tf.multiply(dy,xe)
+        return dydx
+    return y,grad
