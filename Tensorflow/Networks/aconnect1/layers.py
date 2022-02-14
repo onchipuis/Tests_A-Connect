@@ -596,20 +596,8 @@ class Conv_AConnect(tf.keras.layers.Layer):
             else:
                 bwidth = self.bw[0]
             
-            if (bwidth==1):
-                y = tf.math.sign(x)
-                def grad(dy):
-                    dydx = tf.divide(dy,abs(x)+1e-5)
-                    return dydx
-            else:
-                xi = tf.cast(x,tf.dtypes.float32)
-                limit = 1
-                xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=bwidth)
-                y = tf.cast(xq,self.d_type)
-                def grad(dy):
-                    xe = tf.divide(y,x+1e-5)
-                    dydx = tf.multiply(dy,xe)
-                    return dydx
+            y, grad = Quant_custom(x,bwidth,self.d_type)
+           
             return y,grad
             
             """
