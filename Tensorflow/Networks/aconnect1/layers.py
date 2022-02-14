@@ -84,22 +84,22 @@ class FC_AConnect(tf.keras.layers.Layer):
                 self.batch_size = tf.shape(self.X)[0] #Numpy arrays and tensors have the number of array/tensor in the first dimension.
                                                                                           #i.e. a tensor with this shape [1000,784,128] are 1000 matrix of [784,128].
                                                                                           #Then the batch_size of the input data also is the first dimension.
-
+                if(self.isQuant==["yes","yes"]):
+                        weights = self.LQuant(self.W)    #Quantize the weights and multiply them element wise with Werr mask
+                        bias = self.LQuant(self.bias)    #Quantize the bias and multiply them element wise with Werr mask
+                elif(self.isQuant==["yes","no"]):
+                        weights = self.LQuant(self.W)
+                        bias = self.bias
+                elif(self.isQuant==["no","yes"]):
+                        weights = self.W
+                        bias = self.LQuant(self.bias)
+                else:
+                    weights = self.W
+                    bias = self.bias
                 #This code will train the network. For inference, please go to the else part
                 if(training):
                         if(self.Wstd != 0 or self.Bstd != 0):
-                                if(self.isQuant==["yes","yes"]):
-                                        weights = self.LQuant(self.W)    #Quantize the weights and multiply them element wise with Werr mask
-                                        bias = self.LQuant(self.bias)    #Quantize the bias and multiply them element wise with Werr mask
-                                elif(self.isQuant==["yes","no"]):
-                                        weights = self.LQuant(self.W)
-                                        bias = self.bias
-                                elif(self.isQuant==["no","yes"]):
-                                        weights = self.W
-                                        bias = self.LQuant(self.bias)
-                                else:
-                                    weights = self.W
-                                    bias = self.bias
+                                
                                 if(self.pool is None):
                                     if(self.Slice == 2): #Slice the batch into 2 minibatches of size batch/2
                                         miniBatch = tf.cast(self.batch_size/2,dtype=tf.int32)
