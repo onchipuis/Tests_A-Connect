@@ -98,12 +98,17 @@ def resnet_v1(input_shape, depth, num_classes=10,
     num_res_blocks = int((depth - 2) / 6)
 
     inputs = Input(shape=input_shape)
-    Flip = RandomFlip("horizontal")
-    x = Flip(inputs)
     if isAConnect and Wstd!=0:
+        x = RandomZoom(0.0)(inputs)
         x = RandomTranslation(0.0,0.0)(x)
         x = RandomZoom(0.0)(x)
+    elif isAConnect and Wstd==0:
+        x = RandomZoom(0.0)(inputs)
+        x = RandomTranslation(0.1,0.1)(x)
+        x = RandomZoom(0.2)(x)
     else:
+        Flip = RandomFlip("horizontal")
+        x = Flip(inputs)
         x = RandomTranslation(0.1,0.1)(x)
         x = RandomZoom(0.2)(x)
     x = resnet_layer(inputs=x,
