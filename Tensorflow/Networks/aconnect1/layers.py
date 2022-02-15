@@ -675,11 +675,12 @@ def Quant_custom(x,bwidth,dtype):
             limit = math.sqrt(6/(x.get_shape()[0]+x.get_shape()[1]))
         xFS = 2*limit
         xStd = tf.math.reduce_std(x)
+        xMean = tf.math.reduce_mean(x)
         xFS = 2*xStd
         xFS = 2
         Nlevels = 2**bwidth
         xLSB = xFS/Nlevels
-        xq = tf.floor(x/xLSB+1)
+        xq = tf.floor(x0/xLSB+1)
         xq = tf.clip_by_value(xq,-Nlevels/2+1,Nlevels/2-1)-0.5
         y = xq*xLSB
     
