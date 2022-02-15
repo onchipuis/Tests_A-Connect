@@ -647,7 +647,7 @@ def Z_reshape(Z,F,X,padding,strides): #Used to reshape the output of the layer
         return tf.reshape(Z, [tf.floor(tf.cast((H-fh)/strides,dtype=tf.float16))+1, tf.floor(tf.cast((W-fw)/strides,dtype=tf.float16))+1, batch_size, channels, out_channels])
     #return out
 
-def Merr_distr(shape,stddev,dtype,errDistr): #Used to reshape the output of the layer
+def Merr_distr(shape,stddev,dtype,errDistr):
     N =  tf.random.normal(shape=shape,
                         stddev=stddev,
                         dtype=dtype)
