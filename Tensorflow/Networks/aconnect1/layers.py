@@ -667,7 +667,7 @@ def Quant_custom(x,bwidth,dtype):
             limit = math.sqrt(6/x.get_shape()[0])
         else:
             limit = math.sqrt(6/(x.get_shape()[0]+x.get_shape()[1]))
-        #limit = 1
+        limit = 1
         """
         xStd = tf.math.reduce_std(x)
         xMean = tf.math.reduce_mean(x)
