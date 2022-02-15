@@ -677,13 +677,16 @@ def Quant_custom(x,bwidth,dtype):
         else:
             limit = math.sqrt(6/(x.get_shape()[0]+x.get_shape()[1]))
         """
-        xStd = tf.math.reduce_std(x)
-        xMean = tf.math.reduce_mean(x)
-        limit = 3*xStd
+        #xStd = tf.math.reduce_std(x)
+        #xMean = tf.math.reduce_mean(x)
+        #limit = 3*xStd
+        #limit = tf.cast(limit,tf.dtypes.float32)
         #limit = 1
-        limit = tf.cast(limit,tf.dtypes.float32)
         xi = tf.cast(x,tf.dtypes.float32)
-        xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=bwidth)
+        xMin = tf.math.reduce_min(xi)
+        xMax = tf.math.reduce_max(xi)
+        #xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=bwidth)
+        xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=xMin,max=xMax,num_bits=bwidth)
         y = tf.cast(xq,dtype)
         """
         xFS = 2*limit
