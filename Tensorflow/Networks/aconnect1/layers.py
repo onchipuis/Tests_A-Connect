@@ -677,7 +677,7 @@ def Quant_custom(x,bwidth,dtype):
         xStd = tf.math.reduce_std(x)
         xMean = tf.math.reduce_mean(x)
         xMax = tf.math.reduce_max(x)
-        xMin tf.math.reduce_min(x)
+        xMin = tf.math.reduce_min(x)
         xFS = xMax-xMin
         xFS = 2
         Nlevels = 2**bwidth
