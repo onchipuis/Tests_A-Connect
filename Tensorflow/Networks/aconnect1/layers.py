@@ -679,7 +679,7 @@ def Quant_custom(x,bwidth,dtype):
         """
         xStd = tf.math.reduce_std(x)
         xMean = tf.math.reduce_mean(x)
-        limit = 2*xStd
+        limit = 3*xStd
         #limit = 1
         limit = tf.cast(limit,tf.dtypes.float32)
         xi = tf.cast(x,tf.dtypes.float32)
