@@ -77,12 +77,12 @@ input_shape = X_train.shape[1:]
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.7]   # Define the stddev for training
+Wstd_err = [0]   # Define the stddev for training
 Conv_pool = [8]
 FC_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
-Wbw = [8]
+Wbw = [4]
 Bbw = [8]
 errDistr = ["lognormal"]
 #errDistr = ["normal"]
@@ -91,15 +91,15 @@ model_name = 'ResNet20_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 if isAConnect[0]:
-    #net_base = folder_models+'Base'+namev+'.h5'
-    net_base = folder_models+'8Werr_Wstd_70_Bstd_70_8bQuant_normalDistr.h5'
+    net_base = folder_models+'Base'+namev+'.h5'
+    #net_base = folder_models+'8Werr_Wstd_70_Bstd_70_8bQuant_normalDistr.h5'
     #net_base = folder_models+'8Werr_Wstd_50_Bstd_50_8bQuant_lognormalDistr.h5'
     model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
-lrate = 1e-2
+lrate = 1e-1
 #lrate = 1e-3        # for Adam optimizer
-if isAConnect[0]:
+if not(isAConnect[0]):
     #epochs = 120
     epochs = 60
     epoch1 = 30
