@@ -663,10 +663,17 @@ def Quant_custom(x,bwidth,dtype):
     if (bwidth==1):
         y = tf.math.sign(x)
     else:
+        """
         xi = tf.cast(x,tf.dtypes.float32)
         limit = 1
         xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=bwidth)
         y = tf.cast(xq,dtype)
+        """
+        limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
+        xFS = 2**(bwidth-1)
+        xq = tf.floor((x/limit)*xFS+1)
+        xq = tf.clip_by_value(xq,-xFS+1,xFS-1) -0.5
+        y = xq*(2/(xFS-1))*limit
     
     def grad(dy):
         xe = tf.divide(y,x+1e-5)
