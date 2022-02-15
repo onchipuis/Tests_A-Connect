@@ -99,6 +99,7 @@ if isAConnect[0]:
 # TRAINING PARAMETERS
 lrate = 1e-1
 #lrate = 1e-3        # for Adam optimizer
+"""
 if isAConnect[0]:
     epochs = 120
     #epochs = 60
@@ -109,10 +110,11 @@ if isAConnect[0]:
     #epoch2 = 90
     #epoch3 = 120
 else:
-    epochs = 200
-    epoch1 = 80
-    epoch2 = 120
-    epoch3 = 160
+"""
+epochs = 200
+epoch1 = 80
+epoch2 = 120
+epoch3 = 160
 num_classes = 10
 momentum = 0.9
 batch_size = 256
