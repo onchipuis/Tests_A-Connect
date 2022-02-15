@@ -676,10 +676,10 @@ def Quant_custom(x,bwidth,dtype):
         xFS = 2*limit
         xStd = tf.math.reduce_std(x)
         xMean = tf.math.reduce_mean(x)
+        xFS = 2
         xMax = tf.math.reduce_max(x)
         xMin = tf.math.reduce_min(x)
         xFS = xMax-xMin
-        xFS = 2
         Nlevels = 2**bwidth
         xLSB = xFS/Nlevels
         xq = tf.floor((x-xMin)/xLSB+1)
