@@ -669,7 +669,10 @@ def Quant_custom(x,bwidth,dtype):
         xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=bwidth)
         y = tf.cast(xq,dtype)
         """
-        limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
+        if len(x.get_shape())<2:
+            limit = math.sqrt(6/x.get_shape()[0])
+        else:
+            limit = math.sqrt(6/(x.get_shape()[0]+x.get_shape()[1]))
         xFS = 2**(bwidth-1)
         xq = tf.floor((x/limit)*xFS+1)
         xq = tf.clip_by_value(xq,-xFS+1,xFS-1) -0.5
