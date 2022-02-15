@@ -682,7 +682,7 @@ def Quant_custom(x,bwidth,dtype):
         xFS = xMax-xMin
         Nlevels = 2**bwidth
         xLSB = xFS/Nlevels
-        xq = tf.floor((x-xMin)/xLSB+1)
+        xq = tf.floor((x-xMin)/xLSB)#+1)
         #xq = tf.clip_by_value(xq,-Nlevels/2+1,Nlevels/2-1)#-0.5
         xq = tf.clip_by_value(xq,0,Nlevels-1)#-0.5
         y = xq*xLSB+xMin
