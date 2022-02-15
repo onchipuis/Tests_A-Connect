@@ -101,8 +101,10 @@ def resnet_v1(input_shape, depth, num_classes=10,
     Flip = RandomFlip("horizontal")
     x = Flip(inputs)
     if isAConnect:
-        x = RandomTranslation(0.0,0.0)(x)
-        x = RandomZoom(0.0)(x)
+        #x = RandomTranslation(0.0,0.0)(x)
+        #x = RandomZoom(0.0)(x)
+        x = RandomTranslation(0.1,0.1)(x)
+        x = RandomZoom(0.2)(x)
     else:
         x = RandomTranslation(0.1,0.1)(x)
         x = RandomZoom(0.2)(x)
