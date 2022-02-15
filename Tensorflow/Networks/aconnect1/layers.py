@@ -189,7 +189,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                         b = bias*Berr
                         Z = tf.add(tf.matmul(self.X, w), b)
 
-                return Z
+                return self.LQuant(Z)
         
         def slice_batch(self,miniBatch,N,row):
                 if(self.Wstd != 0):
@@ -243,8 +243,12 @@ class FC_AConnect(tf.keras.layers.Layer):
         
         @tf.custom_gradient
         def LQuant(self,x):      # Gradient function for weights quantization
-            if x.name == "bias":
-                bwidth = self.bw[1]
+            
+            if hasattr(x,'name'):
+                if x.name == "bias":
+                    bwidth = self.bw[1]
+                else:
+                    bwidth = self.bw[0]
             else:
                 bwidth = self.bw[0]
 
@@ -591,8 +595,12 @@ class Conv_AConnect(tf.keras.layers.Layer):
         
         @tf.custom_gradient
         def LQuant(self,x):      # Gradient function for weights quantization
-            if x.name == "bias":
-                bwidth = self.bw[1]
+            
+            if hasattr(x,'name'):
+                if x.name == "bias":
+                    bwidth = self.bw[1]
+                else:
+                    bwidth = self.bw[0]
             else:
                 bwidth = self.bw[0]
             
