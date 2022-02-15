@@ -681,7 +681,7 @@ def Quant_custom(x,bwidth,dtype):
         xMean = tf.math.reduce_mean(x)
         limit = 2*xStd
         #limit = 1
-        limit = limit.astype('float32')
+        limit = tf.cast(limit,tf.dtypes.float32)
         xi = tf.cast(x,tf.dtypes.float32)
         xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=-limit,max=limit,num_bits=bwidth)
         y = tf.cast(xq,dtype)
