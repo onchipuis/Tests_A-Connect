@@ -77,16 +77,16 @@ input_shape = X_train.shape[1:]
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.7]   # Define the stddev for training
+Wstd_err = [0]   # Define the stddev for training
 Conv_pool = [8]
 FC_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
-Wbw = [8]
-Bbw = Wbw
+Wbw = [1]
+Bbw = [8]
 errDistr = ["lognormal"]
 #errDistr = ["normal"]
-saveModel = True
+saveModel = False
 model_name = 'ResNet20_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
