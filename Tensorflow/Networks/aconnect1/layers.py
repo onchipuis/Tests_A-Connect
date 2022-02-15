@@ -677,17 +677,14 @@ def Quant_custom(x,bwidth,dtype):
         xStd = tf.math.reduce_std(x)
         xMean = tf.math.reduce_mean(x)
         xFS = 2
-        xMax = tf.math.reduce_max(x)
-        xMin = tf.math.reduce_min(x)
-        xFS = xMax-xMin
         Nlevels = 2**bwidth
         xLSB = xFS/Nlevels
-        xq = tf.floor(x/xLSB+1)
-        xq = tf.clip_by_value(xq,-Nlevels/2+1,Nlevels/2-1)-0.5
+        xq = tf.floor(x/xLSB)#+1)
+        xq = tf.clip_by_value(xq,-Nlevels/2+1,Nlevels/2-1)#-0.5
         y = xq*xLSB
     
     def grad(dy):
         xe = tf.divide(y,x+1e-5)
-        dydx = tf.multiply(dy,xe)
+        dydx = 10*tf.multiply(dy,xe)
         return dydx
     return y,grad
