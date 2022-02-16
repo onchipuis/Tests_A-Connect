@@ -169,7 +169,6 @@ class FC_AConnect(tf.keras.layers.Layer):
                                 w = weights*self.Werr
                                 b = bias*self.Berr
                                 Z = tf.add(tf.matmul(self.X,w),b) 
-                        Z = self.LQuant(Z)
 
                 else:
                     #This part of the code will be executed during the inference
@@ -525,7 +524,10 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         w = weights*Werr
                         b = bias*Berr
                         Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
+                        Z = self.LQuant(Z)
+                
                 return Z
+        
         def slice_batch(self,weights,miniBatch,N,strides):
                 if(self.Wstd != 0):
                         Werr = Merr_distr(list((miniBatch,))+self.shape,self.Wstd,self.d_type,self.errDistr)
