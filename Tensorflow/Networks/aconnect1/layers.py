@@ -169,6 +169,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                 w = weights*self.Werr
                                 b = bias*self.Berr
                                 Z = tf.add(tf.matmul(self.X,w),b) 
+                        Z = self.LQuant(Z)
 
                 else:
                     #This part of the code will be executed during the inference
