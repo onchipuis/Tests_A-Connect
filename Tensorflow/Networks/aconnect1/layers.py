@@ -634,14 +634,14 @@ def Merr_distr(shape,stddev,dtype,errDistr):
     return Merr
 
 def Quant_custom(x,self):
-    if hasattr(x,'name'):
-        if x.name == "bias":
-            bwidth = self.bw[1]
-        else:
-            bwidth = self.bw[0]
+    #if hasattr(x,'name'):
+    if x.name == "bias":
+        bwidth = self.bw[1]
     else:
+        bwidth = self.bw[0]
+    #else:
         #bwidth = self.bw[0]
-        bwidth = 4
+    #    bwidth = 4
     
     
     if (bwidth==1):
