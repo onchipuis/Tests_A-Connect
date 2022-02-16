@@ -640,7 +640,8 @@ def Quant_custom(x,self):
         else:
             bwidth = self.bw[0]
     else:
-        bwidth = self.bw[0]
+        #bwidth = self.bw[0]
+        bwidth = 4
     
     
     if (bwidth==1):
@@ -675,6 +676,5 @@ def Quant_custom(x,self):
     def grad(dy):
         xe = tf.divide(y,x+1e-9)
         dydx = tf.multiply(dy,xe)
-        #return dydx
         return dydx
     return y,grad
