@@ -188,7 +188,8 @@ class FC_AConnect(tf.keras.layers.Layer):
                         w = weights*Werr
                         b = bias*Berr
                         Z = tf.add(tf.matmul(self.X, w), b)
-
+                
+                Z = self.LQuant(Z)
                 return Z
         
         def slice_batch(self,miniBatch,N,row):
