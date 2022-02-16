@@ -676,7 +676,7 @@ def Quant_custom(x,self):
         """
     
     def grad(dy):
-        xe = tf.divide(y,x+1e-5)
+        xe = tf.divide(y,x+1e-7)
         dydx = tf.multiply(dy,xe)
         return dydx
     
