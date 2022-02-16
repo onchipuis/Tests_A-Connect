@@ -169,6 +169,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                 w = weights*self.Werr
                                 b = bias*self.Berr
                                 Z = tf.add(tf.matmul(self.X,w),b) 
+                        Z = self.LQuant(Z)
 
                 else:
                     #This part of the code will be executed during the inference
@@ -640,9 +641,7 @@ def Quant_custom(x,self):
     elif x.name == "W" or x.name == "kernel":
         bwidth = self.bw[0]
     else:
-        #bwidth = self.bw[0]
-        bwidth = 4
-    
+        bwidth = self.bw[0]
     
     if (bwidth==1):
         y = tf.math.sign(x)
@@ -676,5 +675,6 @@ def Quant_custom(x,self):
     def grad(dy):
         xe = tf.divide(y,x+1e-9)
         dydx = tf.multiply(dy,xe)
-        return dydx
+        #return dydx
+        return dy
     return y,grad
