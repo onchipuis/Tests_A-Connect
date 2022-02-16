@@ -109,6 +109,7 @@ if not(isAConnect[0]):
     #epoch2 = 90
     #epoch3 = 120
 else:
+    #epochs = 200
     epochs = 10
     epoch1 = 80
     epoch2 = 120
