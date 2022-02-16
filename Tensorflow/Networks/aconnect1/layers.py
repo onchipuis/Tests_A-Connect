@@ -189,8 +189,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                         b = bias*Berr
                         Z = tf.add(tf.matmul(self.X, w), b)
                 
-                Z = self.LQuant(Z)
-                return Z
+                return self.LQuant(Z)
         
         def slice_batch(self,miniBatch,N,row):
                 if(self.Wstd != 0):
@@ -251,7 +250,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                 else:
                     bwidth = self.bw[0]
             else:
-                bwidth = self.bw[0]
+                bwidth = 16
 
             y, grad = Quant_custom(x,bwidth,self.d_type)
             
