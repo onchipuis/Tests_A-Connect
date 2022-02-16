@@ -637,14 +637,12 @@ def Merr_distr(shape,stddev,dtype,errDistr):
 
 def Quant_custom(x,self):
     
-    """
     if x.name == "bias":
         bwidth = self.bw[1]
     elif x.name == "W" or x.name == "kernel":
         bwidth = self.bw[0]
     else:
         bwidth = self.bw[0]
-    """
     
     if (bwidth==1):
         y = tf.math.sign(x)
