@@ -169,7 +169,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                 w = weights*self.Werr
                                 b = bias*self.Berr
                                 Z = tf.add(tf.matmul(self.X,w),b) 
-                        Z = self.LQuant(Z)
+                        #Z = self.LQuant(Z)
 
                 else:
                     #This part of the code will be executed during the inference
@@ -189,8 +189,9 @@ class FC_AConnect(tf.keras.layers.Layer):
                         w = weights*Werr
                         b = bias*Berr
                         Z = tf.add(tf.matmul(self.X, w), b)
-                        Z = self.LQuant(Z)
-                
+                        #Z = self.LQuant(Z)
+                        
+                Z = self.LQuant(Z)
                 return Z
         
         def slice_batch(self,miniBatch,N,row):
@@ -678,5 +679,5 @@ def Quant_custom(x,self):
         xe = tf.divide(y,x+1e-6)
         dydx = tf.multiply(dy,xe)
         return dydx
-        #return dy
+    
     return y,grad
