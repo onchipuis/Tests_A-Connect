@@ -663,20 +663,21 @@ def Quant_custom(x,self):
         xi = tf.cast(x,tf.dtypes.float32)
         xMin = tf.math.reduce_min(xi)
         xMax = tf.math.reduce_max(xi)
+        xFS = xMax-xMin
+        Nlevels = 2**bwidth
+        xLSB = xFS/Nlevels
         xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=xMin,max=xMax,num_bits=bwidth)
         y = tf.cast(xq,self.d_type)
     
         """
-        xFS = 2*limit
-        Nlevels = 2**bwidth
-        xLSB = xFS/Nlevels
         xq = tf.floor(x/xLSB+1)
         xq = tf.clip_by_value(xq,-Nlevels/2+1,Nlevels/2-1)-0.5
         y = xq*xLSB
         """
     
     def grad(dy):
-        xe = tf.divide(y,x+1e-6)
+        e = tf.cast(xLSB,self.d_type)/8
+        xe = tf.divide(y,x+e)
         dydx = tf.multiply(dy,xe)
         return dydx
     
