@@ -46,9 +46,9 @@ X_train, X_test = normalization(X_train,X_test)
 
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
-isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.7]   # Define the stddev for training
-Sim_err = [0,0.7]
+isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
+Wstd_err = [0.0]   # Define the stddev for training
+Sim_err = [0]
 Conv_pool = [8]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
@@ -157,7 +157,6 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                         optimizer=optimizer,
                                         loss='sparse_categorical_crossentropy',
                                         metrics=['accuracy'],top5=False,dtype='float16',
-                                        #errDistr="lognormal",evaluate_batch_size=16
                                         errDistr=errDistr[k],evaluate_batch_size=batch_size
                                         )
                                 np.savetxt(folder_results+name_sim+'.txt',acc,fmt="%.4f")
