@@ -56,8 +56,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         dtype = self.d_type,
                                         regularizer = self.weights_regularizer,
                                         trainable=True)
-                wa_init = tf.constant_initializer(tf.math.reduce_max(tf.math.abs(self.W)),
-                                                dtype=self.d_type)
+                wa_init = tf.constant_initializer(tf.math.reduce_max(tf.math.abs(self.W)))
                 self.wa = self.add_weight("wa",
                                         shape = [1,1], 
                                         initializer = wa_init,
@@ -71,7 +70,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         dtype = self.d_type,
                                         regularizer = self.bias_regularizer,
                                         trainable=True)
-                ba_init = tf.constant_initializer(1,dtype=self.d_type)
+                ba_init = tf.constant_initializer(1)
                 self.ba = self.add_weight("ba",
                                         shape = [1,1], 
                                         initializer = ba_init,
@@ -368,8 +367,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                           dtype=self.d_type,
                                           regularizer = self.weights_regularizer,
                                           trainable=True)
-                wa_init = tf.constant_initializer(tf.math.reduce_max(tf.math.abs(self.W)),
-                                                dtype=self.d_type)
+                wa_init = tf.constant_initializer(tf.math.reduce_max(tf.math.abs(self.W)))
                 self.wa = self.add_weight("wa",
                                         shape = [1,1], 
                                         initializer = wa_init,
@@ -382,7 +380,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                             dtype=self.d_type,
                                             regularizer = self.bias_regularizer,
                                             trainable=True)
-                ba_init = tf.constant_initializer(1,dtype=self.d_type)
+                ba_init = tf.constant_initializer(1)
                 self.ba = self.add_weight("ba",
                                         shape = [1,1], 
                                         initializer = ba_init,
