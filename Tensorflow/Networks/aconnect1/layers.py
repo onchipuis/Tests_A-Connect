@@ -65,7 +65,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         regularizer = self.weights_regularizer,
                                         trainable=True)
                 #Bias vector
-                elfelf.bias = self.add_weight("bias",
+                self.bias = self.add_weight("bias",
                                         shape = [self.output_size,],                                    
                                         initializer = "zeros",
                                         dtype = self.d_type,
