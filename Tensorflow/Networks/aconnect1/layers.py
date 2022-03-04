@@ -59,7 +59,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                 wi = tf.math.reduce_max(tf.math.abs(self.W)).numpy()
                 wa_init = tf.constant_initializer(wi)
                 self.wa = self.add_weight("wa",
-                                        shape = [1,1], 
+                                        shape = [1,], 
                                         initializer = wa_init,
                                         dtype = self.d_type,
                                         regularizer = self.weights_regularizer,
@@ -73,7 +73,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         trainable=True)
                 ba_init = tf.constant_initializer(1)
                 self.ba = self.add_weight("ba",
-                                        shape = [1,1], 
+                                        shape = [1,], 
                                         initializer = ba_init,
                                         dtype = self.d_type,
                                         regularizer = self.bias_regularizer,
@@ -371,7 +371,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 wi = tf.math.reduce_max(tf.math.abs(self.W)).numpy()
                 wa_init = tf.constant_initializer(wi)
                 self.wa = self.add_weight("wa",
-                                        shape = [1,1], 
+                                        shape = [1,], 
                                         initializer = wa_init,
                                         dtype = self.d_type,
                                         regularizer = self.weights_regularizer,
@@ -384,7 +384,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                             trainable=True)
                 ba_init = tf.constant_initializer(1)
                 self.ba = self.add_weight("ba",
-                                        shape = [1,1], 
+                                        shape = [1,], 
                                         initializer = ba_init,
                                         dtype = self.d_type,
                                         regularizer = self.bias_regularizer,
