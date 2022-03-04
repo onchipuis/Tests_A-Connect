@@ -57,7 +57,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         regularizer = self.weights_regularizer,
                                         trainable=True)
                 self.wa = self.add_weight("wa",
-                                        shape = [,], 
+                                        shape = [1,1], 
                                         initializer = tf.math.reduce_max(tf.math.abs(self.W)),
                                         dtype = self.d_type,
                                         regularizer = self.weights_regularizer,
@@ -70,7 +70,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         regularizer = self.bias_regularizer,
                                         trainable=True)
                 self.ba = self.add_weight("ba",
-                                        shape = [,], 
+                                        shape = [1,1], 
                                         initializer = tf.math.reduce_max(tf.math.abs(self.bias)),
                                         dtype = self.d_type,
                                         regularizer = self.bias_regularizer,
@@ -366,7 +366,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                           regularizer = self.weights_regularizer,
                                           trainable=True)
                 self.wa = self.add_weight("wa",
-                                        shape = [,], 
+                                        shape = [1,1], 
                                         initializer = tf.math.reduce_max(tf.math.abs(self.W)),
                                         dtype = self.d_type,
                                         regularizer = self.weights_regularizer,
@@ -378,7 +378,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                             regularizer = self.bias_regularizer,
                                             trainable=True)
                 self.ba = self.add_weight("ba",
-                                        shape = [,], 
+                                        shape = [1,1], 
                                         initializer = tf.math.reduce_max(tf.math.abs(self.bias)),
                                         dtype = self.d_type,
                                         regularizer = self.bias_regularizer,
