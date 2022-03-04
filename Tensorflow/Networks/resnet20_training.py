@@ -82,7 +82,7 @@ Conv_pool = [8]
 FC_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
-Wbw = [2]
+Wbw = [8]
 Bbw = [8]
 #errDistr = ["lognormal"]
 errDistr = ["normal"]
@@ -98,7 +98,7 @@ if isAConnect[0]:
 
 # TRAINING PARAMETERS
 #lrate = 1e-3        # for Adam optimizer
-lrate = 1e-1
+lrate = 1e-3
 if isAConnect[0]:
     #epochs = 120
     epochs = 30
