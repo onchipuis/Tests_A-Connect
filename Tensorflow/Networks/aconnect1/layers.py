@@ -56,7 +56,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         dtype = self.d_type,
                                         regularizer = self.weights_regularizer,
                                         trainable=True)
-                wi = tf.constant(tf.math.reduce_max(tf.math.abs(self.W)))
+                wi = tf.math.reduce_max(tf.math.abs(self.W)).numpy()
                 wa_init = tf.constant_initializer(wi)
                 self.wa = self.add_weight("wa",
                                         shape = [1,1], 
@@ -368,7 +368,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                           dtype=self.d_type,
                                           regularizer = self.weights_regularizer,
                                           trainable=True)
-                wi = tf.constant(tf.math.reduce_max(tf.math.abs(self.W)))
+                wi = tf.math.reduce_max(tf.math.abs(self.W)).numpy()
                 wa_init = tf.constant_initializer(wi)
                 self.wa = self.add_weight("wa",
                                         shape = [1,1], 
