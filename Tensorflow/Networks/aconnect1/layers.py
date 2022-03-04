@@ -716,7 +716,7 @@ def Quant_custom(x,a,self):
         e = 1e-5
         xe = tf.divide(xq,x+e)
         dydx = tf.multiply(dy,xe)
-        dyda = 1-2*xq/XFs
+        dyda = 1-2*xq/xFS
         return dydx,dyda
     
     return y,grad
