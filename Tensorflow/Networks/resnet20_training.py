@@ -98,7 +98,7 @@ if isAConnect[0]:
 
 # TRAINING PARAMETERS
 #lrate = 1e-3        # for Adam optimizer
-lrate = 1e-2
+lrate = 1e-1
 if isAConnect[0]:
     #epochs = 120
     epochs = 30
