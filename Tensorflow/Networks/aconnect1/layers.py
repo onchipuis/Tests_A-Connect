@@ -71,7 +71,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         trainable=True)
                 self.ba = self.add_weight("ba",
                                         shape = [1,1], 
-                                        initializer = tf.math.reduce_max(tf.math.abs(self.bias)),
+                                        initializer = 1,
                                         dtype = self.d_type,
                                         regularizer = self.bias_regularizer,
                                         trainable=True)
@@ -379,7 +379,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                             trainable=True)
                 self.ba = self.add_weight("ba",
                                         shape = [1,1], 
-                                        initializer = tf.math.reduce_max(tf.math.abs(self.bias)),
+                                        initializer = 1,
                                         dtype = self.d_type,
                                         regularizer = self.bias_regularizer,
                                         trainable=True)
