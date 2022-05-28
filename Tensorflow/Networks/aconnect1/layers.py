@@ -640,7 +640,7 @@ def Quant_custom(x,self):
     elif x.name == "W" or x.name == "kernel":
         bwidth = self.bw[0]
     else:
-        bwidth = 8
+        bwidth = self.bw[0]
     
     if (bwidth==1):
         y = tf.math.sign(x)
