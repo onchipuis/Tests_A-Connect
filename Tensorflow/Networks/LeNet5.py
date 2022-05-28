@@ -55,7 +55,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,
 			Activation('tanh'),                       
 			FC_AConnect(84,Wstd,Bstd,errDistr=errDistr,isQuant=isQuant,bw=bw,pool=FC_pool,d_type=tf.dtypes.float16),
                         BatchNormalization(),           
-			Activation('tanh'),                       
+			Activation('relu'),                       
 			FC_AConnect(10,Wstd,Bstd,errDistr=errDistr,isQuant=isQuant,bw=bw,pool=FC_pool,d_type=tf.dtypes.float16),
 			Softmax()							
 		])		
