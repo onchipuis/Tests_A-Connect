@@ -189,7 +189,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                         b = bias*Berr
                         Z = tf.add(tf.matmul(self.X, w), b)
                         
-                Z = self.LQuant(Z)
+                #Z = self.LQuant(Z)
                 return Z
         
         def slice_batch(self,miniBatch,N,row):
@@ -512,7 +512,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         b = bias*Berr
                         Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
                 
-                Z = self.LQuant(Z)
+                #Z = self.LQuant(Z)
                 return Z
         
         def slice_batch(self,weights,miniBatch,N,strides):
