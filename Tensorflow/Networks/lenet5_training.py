@@ -33,13 +33,13 @@ X_test = np.float32(X_test) #Convert it to float32
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 #Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-Wstd_err = [0.0]	    # Define the stddev for training
+Wstd_err = [0.5]	    # Define the stddev for training
 Conv_pool = [2]
 FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [1]
-Bbw = [8]
+Bbw = [4]
 #errDistr = "lognormal"
 saveModel = False
 errDistr = ["normal"]
