@@ -51,6 +51,19 @@ print("top-1 score:",get_top_n_score(Y_test, Y2, 1))
 
 # Save the input of the last FC layer as the new database to be used in the ML
 # accelerator spice simulation.
-Yaux = np.zeros(shape=[10000,128],dtype=int)# Create a matrix with 128 columns
+Yaux = np.zeros(shape=[10000,121],dtype=int)# Create a matrix with 121 columns (11x11 image)
 Yaux[:,0:84] = Y1int.astype('int')          # Save the database (of size 84) 
 np.savetxt("Database/LeNet5_LastFC_allData.txt", Yaux, fmt='%i', delimiter =",")
+
+# Save weights and biases of the last FC layer:
+param=model.layers[-2].get_weights()
+w=(np.sign(param[0]).astype(int)+1)/2
+#bint=np.round(param[1]/Y1lsb).astype(int)+2**3
+b=np.ones(shape=[4,10],dtype=int)
+b[3,:] = np.zeros(shape=[1,10],dtype=int)
+
+param_all = np.zeros(shape=[136,128],dtype=int)
+param_all[0:84,0:10] = w
+param_all[85:107,0:10] = np.ones(shape=[22,10],dtype=int)
+param_all[128:132,0:10] = b
+np.savetxt("Networks/LeNet5_LastLayer_Wstd_50_1bQuant_normalDistr.txt",param_all.transpose(), fmt='%i', delimiter =" ")
