@@ -77,8 +77,8 @@ input_shape = X_train.shape[1:]
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect
-Wstd_err = [0]   # Define the stddev for training
-Conv_pool = [8]
+Wstd_err = [70]   # Define the stddev for training
+Conv_pool = [1,4,16]
 FC_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
@@ -98,10 +98,9 @@ if isAConnect[0]:
 
 # TRAINING PARAMETERS
 #lrate = 1e-3        # for Adam optimizer
-lrate = 1e-3
 if isAConnect[0]:
-    #epochs = 120
-    epochs = 30
+    lrate = 1e-1
+    epochs = 120
     epoch1 = 30
     epoch2 = 60
     epoch3 = 100
