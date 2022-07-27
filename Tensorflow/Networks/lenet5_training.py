@@ -32,17 +32,17 @@ X_test = np.float32(X_test) #Convert it to float32
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-#Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-Wstd_err = [0.5]	    # Define the stddev for training
+Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
+#Wstd_err = [0.5]	    # Define the stddev for training
 Conv_pool = [2]
 FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
-Wbw = [1]
-Bbw = [4]
+Wbw = [8]
+Bbw = [8]
 saveModel = True
-#errDistr = "lognormal"
-errDistr = ["normal"]
+errDistr = ["lognormal"]
+#errDistr = ["normal"]
 model_name = 'LeNet5_MNIST/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
@@ -52,7 +52,7 @@ learning_rate = 0.01
 momentum = 0.9
 optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum) #Define optimizer
 batch_size = 256
-epochs = 30
+epochs = 20
 
 ### TRAINING
 for d in range(len(isAConnect)): #Iterate over the networks

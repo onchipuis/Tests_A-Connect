@@ -48,7 +48,7 @@ for d in range(3,N): #Iterate over all the error matrices
 	                if Err == 0: #IF the sim error is 0, takes only 1 sample
 	                    N = 1
 	                else:
-	                    N = 1000
+	                    N = 100
 	                now = datetime.now()
 	                starttime = now.time()
 	                #####
@@ -80,7 +80,7 @@ for d in range(3,N): #Iterate over all the error matrices
 	            if Err == 0:
 	                N = 1
 	            else:
-	                N = 1000
+	                N = 100
 	            now = datetime.now()
 	            starttime = now.time()
 	            #####
