@@ -31,7 +31,7 @@ X_test = np.pad(X_test, ((0,0),(2,2),(2,2)), 'constant')
 X_test = np.float32(X_test) #Convert it to float32
 
 # INPUT PARAMTERS:
-isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
+isAConnect = [False]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
 #Wstd_err = [0.5]	    # Define the stddev for training
 Conv_pool = [2]
@@ -86,14 +86,18 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                         Conv_pool=Conv_pool_aux[i],
                                                         FC_pool=FC_pool_aux[i],
                                                         errDistr=errDistr[k])
-                        Werr = str(int(100*Err))
-                        Nm = str(int(FC_pool_aux[i]))
-                        if WisQuant[p] == "yes":
-                            bws = str(int(Wbw_aux[q]))
-                            quant = bws+'bQuant_'
+                        # NAME
+                        if isAConnect[d]:
+                            Werr = str(int(100*Err))
+                            Nm = str(int(FC_pool_aux[i]))
+                            if WisQuant[p] == "yes":
+                                bws = str(int(Wbw_aux[q]))
+                                quant = bws+'bQuant_'
+                            else:
+                                quant = ''
+                            name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'
                         else:
-                            quant = ''
-                        name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'
+                            name = 'Base'
 
                         print("*************************TRAINING NETWORK*********************")
                         print("\n\t\t\t", name)

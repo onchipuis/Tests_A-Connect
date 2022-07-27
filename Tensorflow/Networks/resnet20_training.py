@@ -246,8 +246,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                       shuffle=True,
                                       callbacks=callbacks)
                         model.evaluate(X_test,Y_test) 
-                        string = folder_models + name + '.h5'                                
-                        model.save(string,include_optimizer=False)
+                        
                         y_predict =model.predict(X_test)
                         elapsed_time = time.time() - start_time
                         print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
