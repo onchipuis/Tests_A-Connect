@@ -1,99 +1,152 @@
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
+import LeNet5 as lenet5
 import time
-import LeNet5
-from datetime import datetime
-import aconnect.layers as layers
-import aconnect.scripts as scripts
-from tensorflow.python.client import device_lib
+from aconnect1 import layers, scripts
 
-device_lib.list_local_devices()
+#from keras.callbacks import LearningRateScheduler
+custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
-identifier = [False,True]				#Which network you want to train/test True for A-Connect false for normal LeNet
-Sim_err = [0,0.3,0.5,0.7]	#Define all the simulation errors
-Wstd = [0.3,0.5,0.7]			#Define the stddev for training
-Bstd = Wstd
-isBin = ["no"]					#Do you want binary weights?
-(x_train, y_train), (x_test, y_test) = scripts.load_ds() #Load dataset
-_,x_train,x_test=LeNet5.LeNet5(x_train,x_test)	#Load x_train, x_test with augmented dimensions. i.e. 32x32
-x_test = np.float32(x_test) #Convert it to float32
-epochs = 2
+tic=time.time()
+start_time = time.time()
+def hms_string(sec_elapsed):
+    h = int(sec_elapsed / (60 * 60))
+    m = int((sec_elapsed % (60 * 60)) / 60)
+    s = sec_elapsed % 60
+    return f"{h}:{m:>02}:{s:>05.2f}"
+
+#### TRAINING STAGE #########3
+def get_top_n_score(target, prediction, n):
+    #ordeno los indices de menor a mayor probabilidad
+    pre_sort_index = np.argsort(prediction)
+    #ordeno de mayor probabilidad a menor
+    pre_sort_index = pre_sort_index[:,::-1]
+    #cojo las n-top predicciones
+    pre_top_n = pre_sort_index[:,:n]
+    #obtengo el conteo de acierto
+    precision = [1 if target[i] in pre_top_n[i] else 0 for i in range(target.shape[0])]
+    #se retorna la precision
+    return np.mean(precision)
+
+# LOADING DATASET:
+(X_train, Y_train), (X_test, Y_test) = scripts.load_ds() #Load dataset
+X_train = np.pad(X_train, ((0,0),(2,2),(2,2)), 'constant')
+X_test = np.pad(X_test, ((0,0),(2,2),(2,2)), 'constant')
+X_test = np.float32(X_test) #Convert it to float32
+
+#### MODEL TESTING WITH MONTE CARLO STAGE ####
+# INPUT PARAMTERS:
+isAConnect = [False,True]   # Which network you want to train/test True for A-Connect false for normal LeNet
+Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
+Sim_err = [0.3,0.5,0.7]
+Conv_pool = [2]
+WisQuant = ["yes"]		    # Do you want binary weights?
+BisQuant = WisQuant 
+Wbw = [8]
+Bbw = Wbw
+errDistr = ["lognormal"]
+#errDistr = ["normal"]
+MCsims = 100
+acc=np.zeros([500,1])
+force = "yes"
+
+model_name = 'LeNet5_MNIST/'
+folder_models = './Models/'+model_name
+folder_results = '../Results/'+model_name
+
+# TRAINING PARAMETERS
 learning_rate = 0.01
 momentum = 0.9
+optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum) #Define optimizer
 batch_size = 256
-N = 1 #Number of error matrices to test, only 2^(n-1) size
+epochs = 30
 
-#This part is for inference. During the following lines the MCSim will be executed.
-for d in range(3,N): #Iterate over all the error matrices
+for d in range(len(isAConnect)): #Iterate over the networks
+    if isAConnect[d]: #is a network with A-Connect?
+        Wstd_aux = Wstd_err
+        Conv_pool_aux = Conv_pool
+    else:
+        Wstd_aux = [0]
+        Conv_pool_aux = [0]
+        
+    for i in range(len(Conv_pool_aux)):
+        for p in range (len(WisQuant)):
+            if WisQuant[p]=="yes":
+                Wbw_aux = Wbw
+                Bbw_aux = Bbw
+            else:
+                Wbw_aux = [8]
+                Bbw_aux = [8]
 
-	M = 2**(d)
-	nMatriz = str(M)
-	for k in range(len(identifier)): #Iterate over the networks
-	    isAConnect = identifier[k] #Select the network
-	    if isAConnect:
-	        for m in range(len(Wstd)): #Iterate over the training Wstd and Bstd
-	            wstd = str(int(100*Wstd[m]))
-	            bstd = str(int(100*Bstd[m]))
-	            name = 'LeNet5_'+nMatriz+'Werr'+'_Wstd_'+wstd+'_Bstd_'+bstd
-	            if isBin == "yes":
-	                name = name+'_BW'
-	            string = './Models/LeNet5_MNIST/'+name+'.h5'
-	            custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect} #Custom objects for model loading purposes
-	            for j in range(len(Sim_err)): #Iterate over the sim error vector
-	                Err = Sim_err[j]
-	                if Err != Wstd[m]: #If the sim error is different from the training error, do not force the error
-	                    force = "yes"
-	                else:
-	                    force = "no"
-	                if Err == 0: #IF the sim error is 0, takes only 1 sample
-	                    N = 1
-	                else:
-	                    N = 100
-	                now = datetime.now()
-	                starttime = now.time()
-	                #####
-	                print('\n\n*******************************************************************************************\n\n')
-	                print('TESTING NETWORK: ', name)
-	                print('With simulation error: ', Err)
-	                print('\n\n*******************************************************************************************')
-	                acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,'../Results/LeNet5_MNIST/Matrices_Test/'+name,custom_objects,
-	                optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum),loss=['sparse_categorical_crossentropy'],metrics=['accuracy']
-                    ,run_model_eagerly=True,evaluate_batch_size=10000) #Perform the simulation
-	                #For more information about MCSim please go to Scripts/MCsim.py
-	                #####
-	                now = datetime.now()
-	                endtime = now.time()
+            for q in range (len(Wbw_aux)):
+                for j in range(len(Wstd_aux)):
+                    for k in range(len(errDistr)):
+                        for m in range(len(Sim_err)):
 
-	                print('\n\n*******************************************************************************************')
-	                print('\n Simulation started at: ',starttime)
-	                print('Simulation finished at: ', endtime)
+                            Werr = Wstd_aux[j]
+                            Err = Sim_err[m]
+                            # NAME
+                            if isAConnect[d]:
+                                Werr = str(int(100*Werr))
+                                Nm = str(int(Conv_pool_aux[i]))
+                                if WisQuant[p] == "yes":
+                                    bws = str(int(Wbw_aux[q]))
+                                    quant = bws+'bQuant_'
+                                else:
+                                    quant = ''
+                                if Werr == '0':
+                                    name = 'Wstd_'+Werr+'_Bstd_'+Werr
+                                else:
+                                    name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'
 
-	    else:
-	        name = 'LeNet5'
-	        if isBin == "yes":
-	            name = name+'_BW'
-	        string = './Models/'+name+'.h5'
-	#        custom_objects = {'Conv':Conv.Conv,'FC_quant':FC_quant.FC_quant} #Custom objects for model loading purposes
-	        for j in range(len(Sim_err)):
-	            Err = Sim_err[j]
-	            force = "yes"
-	            if Err == 0:
-	                N = 1
-	            else:
-	                N = 100
-	            now = datetime.now()
-	            starttime = now.time()
-	            #####
-	            print('\n\n*******************************************************************************************\n\n')
-	            print('TESTING NETWORK: ', name)
-	            print('With simulation error: ', Err)
-	            print('\n\n*******************************************************************************************')
-	            acc_noisy, media = scripts.MonteCarlo(string,x_test,y_test,N,Err,Err,force,0,'../Results/LeNet5_MNIST/'+name,
-	            optimizer=tf.keras.optimizers.SGD(learning_rate=0.1,momentum=0.9),loss=['sparse_categorical_crossentropy'],metrics=['accuracy'])
-	            #####
-	            now = datetime.now()
-	            endtime = now.time()
+                            else:
+                                name = 'Base'
+                            string = folder_models + name + '.h5'
+                            name_sim = name+'_simErr_'+str(int(100*Err))                      
+                            name_stats = name+'_stats_simErr_'+str(int(100*Err))                      
+                       
+                            if not os.path.exists(folder_results+name_sim+'.txt'): 
+                            #if os.path.exists(folder_results+name_sim+'.txt'): 
+                                if Err == 0:
+                                    N = 1
+                                else:
+                                    N = MCsims
+                                        #####
+                                
+                                elapsed_time = time.time() - start_time
+                                print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                                now = datetime.now()
+                                starttime = now.time()
+                                print('\n\n******************************************************************\n\n')
+                                print('TESTING NETWORK: ', name)
+                                print('With simulation error: ', Err)
+                                print('\n\n**********************************************************************')
+                                
+                                #Load the trained model
+                                #net = tf.keras.models.load_model(string,custom_objects = custom_objects) 
+                                net = string
+                                #MC sim
+                                acc, stats = scripts.MonteCarlo(net=net,Xtest=X_test,Ytest=Y_test,M=N,
+                                        Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
+                                        custom_objects=custom_objects,
+                                        optimizer=optimizer,
+                                        loss='sparse_categorical_crossentropy',
+                                        metrics=['accuracy'],top5=False,dtype='float16',
+                                        errDistr=errDistr[k],evaluate_batch_size=batch_size
+                                        )
+                                np.savetxt(folder_results+name_sim+'.txt',acc,fmt="%.4f")
+                                np.savetxt(folder_results+name_stats+'.txt',stats,fmt="%.4f")
 
-	            print('\n\n*******************************************************************************************')
-	            print('\n Simulation started at: ',starttime)
-	            print('Simulation finished at: ', endtime)
+                                now = datetime.now()
+                                endtime = now.time()
+                                elapsed_time = time.time() - start_time
+                                print("Elapsed time: {}".format(hms_string(elapsed_time)))
+
+                                print('\n\n*********************************************************************')
+                                print('\n Simulation started at: ',starttime)
+                                print('Simulation finished at: ', endtime)
+                                del net,acc,stats
+                                gc.collect()
+                                tf.keras.backend.clear_session()
+                                tf.compat.v1.reset_default_graph()
+                                #exit()
