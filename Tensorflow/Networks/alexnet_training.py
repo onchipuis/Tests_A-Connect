@@ -56,7 +56,7 @@ Wbw = [8]
 Bbw = [8]
 errDistr = ["lognormal"]
 #errDistr = ["normal"]
-saveModel = False
+saveModel = True
 Nlayers = [1,5,9,12,15,20,24,27,30]
 Nlayers_base = Nlayers
 
@@ -70,7 +70,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 lr_init = 0.01
 momentum = 0.9
 batch_size = 256
-epochs = 100
+epochs = 70
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
 
