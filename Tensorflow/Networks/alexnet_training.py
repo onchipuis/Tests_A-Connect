@@ -123,6 +123,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                         )
                         """
                         # NAME
+                        print("Err: ",Err)
                         if isAConnect[d]:
                             Werr = str(int(100*Err))
                             Nm = str(int(Conv_pool_aux[i]))
