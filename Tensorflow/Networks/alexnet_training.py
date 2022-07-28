@@ -58,7 +58,7 @@ Wbw = [8]
 Bbw = [8]
 errDistr = "lognormal"
 #errDistr = ["normal"]
-saveModel = True
+saveModel = False
 Nlayers = [1,5,9,12,15,20,24,27,30]
 Nlayers_base = Nlayers
 
@@ -72,7 +72,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 lr_init = 0.01
 momentum = 0.9
 batch_size = 256
-epochs = 100
+epochs = 1#100
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
 
@@ -107,9 +107,9 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         Err = Wstd_aux[j]
                         ### TRAINING STAGE ###
                         # CREATING NN:
-                        model = alexnet.model_creation(isAConnect=isAConnect,
+                        model = alexnet.model_creation(isAConnect=isAConnect[d],
                                                         Wstd=Err,Bstd=Err,
-                                                        isQuant=[WisQuant[p],BisQuant[p]],
+                                                        isQuant=[WisQuant_aux[p],BisQuant_aux[p]],
                                                         bw=[Wbw_aux[q],Bbw_aux[q]],
                                                         Conv_pool=Conv_pool_aux[i],
                                                         FC_pool=FC_pool_aux[i],
