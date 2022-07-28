@@ -677,7 +677,7 @@ def Quant_custom(x,self):
         #e = tf.cast(xLSB,self.d_type)*1e-5
         e = 1e-12
         xe = tf.divide(y,x)
-        dydx = 1#tf.multiply(dy,xe)
+        dydx = dy#tf.multiply(dy,xe)
         return dydx
     
     return y,grad
