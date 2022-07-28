@@ -49,16 +49,16 @@ def normalization(train_images, test_images):
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.3]   # Define the stddev for training
-Conv_pool = [2]
-FC_pool = Conv_pool
+Wstd_err = [0,0.3,0.5,0.7]   # Define the stddev for training
+Conv_pool = [8]
+FC_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = ["yes"] 
-Wbw = [1]
+Wbw = [8]
 Bbw = [8]
-#errDistr = "lognormal"
-errDistr = ["normal"]
-saveModel = False
+errDistr = "lognormal"
+#errDistr = ["normal"]
+saveModel = True
 Nlayers = [1,5,9,12,15,20,24,27,30]
 Nlayers_base = Nlayers
 
@@ -81,30 +81,29 @@ for d in range(len(isAConnect)): #Iterate over the networks
         Wstd_aux = Wstd_err
         FC_pool_aux = FC_pool
         Conv_pool_aux = Conv_pool
+        WisQuant_aux = WisQuant
+        BisQuant_aux = BisQuant
+        errDistr_aux = errDistr
     else:
         Wstd_aux = [0]
         FC_pool_aux = [0]
         Conv_pool_aux = [0]
+        WisQuant_aux = ["no"]
+        BisQuant_aux = ["no"]
+        errDistr_aux = ["normal"]
         
-    for j in range(len(Wstd_aux)):
-        if Wstd_aux[j]==0: #is a network with A-Connect?
-            FC_pool_aux = [0]
-            Conv_pool_aux = [0]
-        else:
-            FC_pool_aux = FC_pool
-            Conv_pool_aux = Conv_pool
-        
-        for p in range (len(WisQuant)):
+    for i in range(len(Conv_pool_aux)):
+        for p in range (len(WisQuant_aux)):
             if WisQuant[p]=="yes":
                 Wbw_aux = Wbw
                 Bbw_aux = Bbw
             else:
                 Wbw_aux = [8]
                 Bbw_aux = [8]
-
+            
             for q in range (len(Wbw_aux)):
-                for i in range(len(Conv_pool_aux)):
-                    for k in range(len(errDistr)):
+                for j in range(len(Wstd_aux)):
+                    for k in range(len(errDistr_aux)):
                         Err = Wstd_aux[j]
                         ### TRAINING STAGE ###
                         # CREATING NN:
@@ -114,7 +113,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                         bw=[Wbw_aux[q],Bbw_aux[q]],
                                                         Conv_pool=Conv_pool_aux[i],
                                                         FC_pool=FC_pool_aux[i],
-                                                        errDistr=errDistr[k])
+                                                        errDistr=errDistr_aux[k])
                         ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                         """
                         if isAConnect[d]:
@@ -132,7 +131,11 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                 quant = bws+'bQuant_'
                             else:
                                 quant = ''
-                            name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'
+                            
+                            if Werr == '0':
+                                name = 'Wstd_'+Werr+'_Bstd_'+Werr
+                            else:
+                                name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'
                         else:
                             name = 'Base'
                         
