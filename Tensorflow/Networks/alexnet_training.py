@@ -47,7 +47,7 @@ def normalization(train_images, test_images):
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
+Wstd_err = [0.5,0.7]   # Define the stddev for training
 Conv_pool = [8]
 FC_pool = [8]
 WisQuant = ["yes"]		    # Do you want binary weights?
@@ -70,7 +70,7 @@ model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 lr_init = 0.01
 momentum = 0.9
 batch_size = 256
-epochs = 70
+epochs = 100
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
 
