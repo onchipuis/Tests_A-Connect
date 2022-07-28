@@ -32,8 +32,8 @@ X_test = np.float32(X_test) #Convert it to float32
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-#Wstd_err = [0.5]	    # Define the stddev for training
+#Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
+Wstd_err = [0]	    # Define the stddev for training
 Conv_pool = [2]
 FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
@@ -60,13 +60,19 @@ for d in range(len(isAConnect)): #Iterate over the networks
         Wstd_aux = Wstd_err
         FC_pool_aux = FC_pool
         Conv_pool_aux = Conv_pool
+        WisQuant_aux = WisQuant
+        BisQuant_aux = BisQuant
+        errDistr_aux = errDistr
     else:
         Wstd_aux = [0]
         FC_pool_aux = [0]
         Conv_pool_aux = [0]
+        WisQuant_aux = ["no"]
+        BisQuant_aux = ["no"]
+        errDistr_aux = ["normal"]
     
-    for i in range(len(FC_pool_aux)):
-        for p in range (len(WisQuant)):
+    for i in range(len(FC_pool_aux_aux)):
+        for p in range (len(WisQuant_aux)):
             if WisQuant[p]=="yes":
                 Wbw_aux = Wbw
                 Bbw_aux = Bbw
@@ -76,26 +82,31 @@ for d in range(len(isAConnect)): #Iterate over the networks
 
             for q in range (len(Wbw_aux)):
                 for j in range(len(Wstd_aux)): #Iterate over the Wstd and Bstd for training
-                    for k in range(len(errDistr)):
+                    for k in range(len(errDistr_aux)):
                         Err = Wstd_aux[j]
                         # CREATING NN:
                         model = lenet5.model_creation(isAConnect=isAConnect[d],
                                                         Wstd=Err,Bstd=Err,
-                                                        isQuant=[WisQuant[p],BisQuant[p]],
+                                                        isQuant=[WisQuant_aux[p],BisQuant_aux[p]],
                                                         bw=[Wbw_aux[q],Bbw_aux[q]],
                                                         Conv_pool=Conv_pool_aux[i],
                                                         FC_pool=FC_pool_aux[i],
-                                                        errDistr=errDistr[k])
+                                                        errDistr=errDistr_aux[k])
                         # NAME
                         if isAConnect[d]:
                             Werr = str(int(100*Err))
                             Nm = str(int(FC_pool_aux[i]))
-                            if WisQuant[p] == "yes":
+                            if WisQuant_aux[p] == "yes":
                                 bws = str(int(Wbw_aux[q]))
                                 quant = bws+'bQuant_'
                             else:
                                 quant = ''
-                            name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'
+                            
+                            if Werr == '0':
+                                name = 'Wstd_'+Werr+'_Bstd_'+Werr
+                            else:
+                                name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr_aux[k]+'Distr'
+                        
                         else:
                             name = 'Base'
 
