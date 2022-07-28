@@ -680,7 +680,6 @@ def Quant_custom(x,self):
             dydx = tf.divide(dy,abs(x)+e)
         else:
             xe = tf.divide(xq,xi+e)
-            xe = tf.cast(xe,self.d_type)
             dydx = tf.multiply(dy,xe)
         return dydx
     
