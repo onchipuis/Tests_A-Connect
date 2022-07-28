@@ -680,7 +680,6 @@ def Quant_custom(x,self):
             dydx = tf.divide(dy,abs(x)+e)
         else:
             e = 1e-18
-            e = tf.math.reduce_min(abs(x))/1e3
             xi = tf.cast(x,tf.dtypes.float32)
             xMin = tf.math.reduce_min(xi)
             xMax = tf.math.reduce_max(xi)
