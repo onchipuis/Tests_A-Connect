@@ -679,9 +679,12 @@ def Quant_custom(x,self):
             e = 1e-18
             dydx = tf.divide(dy,abs(x)+e)
         else:
-            e = 1e-18
-            xe = tf.divide(abs(y),abs(x)+e)
+            #e = 1e-18
+            e = tf.math.reduce_min(abs(x))/1e3
+            xe = tf.divide(y,x+tf.math.sign(x)*e)
             dydx = tf.multiply(dy,xe)
+            #ydy = tf.multiply(dy,abs(y))
+            #dydx = tf.divide(ydy,abs(x)+e)
         return dydx
     
     return y,grad
