@@ -35,7 +35,15 @@ def get_top_n_score(target, prediction, n):
     return np.mean(precision)
 
 # LOADING DATASET:
+def normalization(train_images, test_images):
+    mean = np.mean(train_images, axis=(0, 1, 2, 3))
+    std = np.std(train_images, axis=(0, 1, 2, 3))
+    train_images = (train_images - mean) / (std + 1e-7)
+    test_images = (test_images - mean) / (std + 1e-7)
+    return train_images, test_images
+
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()	
+(X_train,X_test) = normalization(X_train,X_test)
 
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:

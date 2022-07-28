@@ -43,8 +43,6 @@ def normalization(train_images, test_images):
     return train_images, test_images
 
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()
-#X_train = X_train/255
-#X_test = X_test/255
 (X_train,X_test) = normalization(X_train,X_test)
 
 # INPUT PARAMTERS:
