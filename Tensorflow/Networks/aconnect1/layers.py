@@ -672,12 +672,12 @@ def Quant_custom(x,self):
         xq = tf.clip_by_value(xq,-Nlevels/2+1,Nlevels/2-1)-0.5
         y = xq*xLSB
         """
-                """
-                limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
-                y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))+1),-(2**(self.bw[0]-1)-1), 2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit
-                def grad(dy):
-                        dydx = tf.multiply(dy,tf.divide(y,x+1e-5))
-                """
+        """
+        limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
+        y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))+1),-(2**(self.bw[0]-1)-1), 2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit
+        def grad(dy):
+                dydx = tf.multiply(dy,tf.divide(y,x+1e-5))
+        """
     
     def grad(dy):
         #e = tf.cast(xLSB,self.d_type)*1e-2
