@@ -71,7 +71,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
         BisQuant_aux = ["no"]
         errDistr_aux = ["normal"]
     
-    for i in range(len(FC_pool_aux_aux)):
+    for i in range(len(FC_pool_aux)):
         for p in range (len(WisQuant_aux)):
             if WisQuant[p]=="yes":
                 Wbw_aux = Wbw
