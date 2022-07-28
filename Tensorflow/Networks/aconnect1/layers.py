@@ -685,8 +685,9 @@ def Quant_custom(x,self):
         if (bwidth==1):
             dydx = tf.divide(dy,abs(x)+e)
         else:
-            xe = tf.divide(y,x+1e-23)
-            dydx = tf.multiply(dy,xe)
+            #xe = tf.divide(y,x+1e-23)  # Not working
+            #dydx = tf.multiply(dy,xe)
+            dydx = dy
         return dydx
     
     return y,grad
