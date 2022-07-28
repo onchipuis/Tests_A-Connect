@@ -1,7 +1,9 @@
 import numpy as np
 import tensorflow as tf
-import LeNet5 as lenet5
 import time
+import gc
+import os
+from datetime import datetime
 from aconnect1 import layers, scripts
 
 #from keras.callbacks import LearningRateScheduler
