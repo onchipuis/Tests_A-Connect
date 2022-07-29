@@ -47,7 +47,7 @@ def normalization(train_images, test_images):
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.5,0.7]   # Define the stddev for training
+Wstd_err = [0.7]   # Define the stddev for training
 Conv_pool = [8]
 FC_pool = [8]
 WisQuant = ["yes"]		    # Do you want binary weights?
@@ -63,14 +63,15 @@ Nlayers_base = Nlayers
 model_name = 'AlexNet_CIFAR10/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
-net_base = folder_models+'Base.h5'
+#net_base = folder_models+'Base.h5'
+net_base = folder_models+'Wstd_0_Bstd_0.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 
 # TRAINING PARAMETERS
 lr_init = 0.01
 momentum = 0.9
 batch_size = 256
-epochs = 100
+epochs = 30#100
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
 
@@ -120,6 +121,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                         model_base.layers[Nlayers_base[m]].get_weights()
                                         )
                         """
+                        model.set_weights(model_base.get_weights())
                         # NAME
                         print("Err: ",Err)
                         if isAConnect[d]:
