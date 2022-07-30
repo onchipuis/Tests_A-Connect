@@ -46,8 +46,7 @@ def general_training (model_int=None,isAConnect=[True],
                         epochs=100,
                         callbacks=None,
                         saveModel=False,folder_models=None,
-                        folder_results=None,
-                        **kwargs)
+                        folder_results=None,**kwargs)
 
     for d in range(len(isAConnect)): #Iterate over the networks
         if isAConnect[d]: #is a network with A-Connect?
