@@ -74,6 +74,14 @@ batch_size = 256
 epochs = 50#100
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum) #Define optimizer
+def step_decay (epoch): 
+    initial_lrate = lr_init 
+    drop = 0.5 
+    epochs_drop = 30.0 
+    lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
+    return lrate
+lrate = LearningRateScheduler(step_decay)
+callbacks = [lrate]
 
 for d in range(len(isAConnect)): #Iterate over the networks
     if isAConnect[d]: #is a network with A-Connect?
@@ -146,23 +154,13 @@ for d in range(len(isAConnect)): #Iterate over the networks
                         #TRAINING PARAMETERS
                         model.compile(loss='sparse_categorical_crossentropy', 
                                 optimizer=optimizer, 
-                                metrics=['accuracy'])
-
-                        # TRAINING
-                        def step_decay (epoch): 
-                            initial_lrate = lr_init 
-                            drop = 0.5 
-                            epochs_drop = 30.0 
-                            lrate = initial_lrate * math.pow (drop,  math.floor ((1 + epoch) / epochs_drop)) 
-                            return lrate
-                        lrate = LearningRateScheduler(step_decay)
-                        callbacks_list = [lrate]
+                                metrics=['accuracy']) 
                         
                         history = model.fit(X_train, Y_train,
                                     batch_size=batch_size,
                                     epochs=epochs,
                                     validation_data=(X_test, Y_test),
-                                    callbacks=callbacks_list,
+                                    callbacks=callbacks,
                                     shuffle=True)
                         model.evaluate(X_test,Y_test)    
 
