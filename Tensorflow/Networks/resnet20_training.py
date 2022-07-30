@@ -165,7 +165,7 @@ optimizer = tf.optimizers.SGD(learning_rate=0.0,
 ################################################################
 # TRAINING THE MODEL:
 
-general_training((if(version==1) model_int=resnet_v1 else model_int=resnet_v2),isAConnect=isAConnect,
+general_training(model_int=resnet_v1 if(version==1) else resnet_v2,isAConnect=isAConnect,
                         model_base=model_base,transferLearn=transferLearn,
                         Wstd_err=Wstd_err,
                         WisQuant=WisQuant,BisQuant=BisQuant,
