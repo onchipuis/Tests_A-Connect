@@ -34,6 +34,7 @@ optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentu
 batch_size = 256
 epochs = 20
 
+# TRAINING THE MODEL:
 general_training(model_int=lenet5.model_creation,isAConnect=isAConnect,
                         model_base=None,transferLearn=False,
                         Wstd_err=Wstd_err,
