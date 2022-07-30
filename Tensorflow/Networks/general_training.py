@@ -38,7 +38,7 @@ def general_training (model_int=None,isAConnect=[True],
                         Conv_pool=[2],
                         FC_pool=[2],
                         errDistr=["normal"],
-                        input_shape=None,depth=None,
+                        input_shape=None,depth=None,namev=None, # Use for ResNet only
                         optimizer=None,
                         X_train=None, Y_train=None,
                         X_test=None, Y_test=None,
