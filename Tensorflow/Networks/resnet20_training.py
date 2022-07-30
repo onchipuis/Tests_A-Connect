@@ -142,7 +142,7 @@ optimizer = tf.optimizers.SGD(learning_rate=0.0,
 
 ################################################################
 # TRAINING THE MODEL:
-
+"""
 general_training(model_int=resnet_v1 if(version==1) else resnet_v2,isAConnect=isAConnect,
                         model_base=model_base,transferLearn=transferLearn,
                         Wstd_err=Wstd_err,
@@ -264,4 +264,3 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.4f") 
                             np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.4f")              
 
-"""
