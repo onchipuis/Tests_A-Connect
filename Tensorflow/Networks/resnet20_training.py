@@ -1,14 +1,11 @@
 # Based on https://keras.io/zh/examples/cifar10_resnet/
 import tensorflow as tf
 import numpy as np
-import os
-import time
+from ResNet import resnet_v1, resnet_v2
+from general_training import general_training
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from tensorflow.keras.callbacks import ReduceLROnPlateau
-from tensorflow.keras.regularizers import l2
-from tensorflow.keras.models import Model
 from tensorflow.keras.datasets import cifar10
-from ResNet import resnet_v1, resnet_v2
 from aconnect1 import layers, scripts
 #from aconnect import layers, scripts
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
@@ -40,13 +37,7 @@ elif version == 2:
     n = 2
     depth = n * 9 + 2
     namev = '_v2'
-tic=time.time()
-start_time = time.time()
-def hms_string(sec_elapsed):
-    h = int(sec_elapsed / (60 * 60))
-    m = int((sec_elapsed % (60 * 60)) / 60)
-    s = sec_elapsed % 60
-    return f"{h}:{m:>02}:{s:>05.2f}"
+
 #Extra code to improve model accuracy
 def normalization(train_images, test_images):
     mean = np.mean(train_images, axis=(0, 1, 2, 3))
@@ -55,25 +46,11 @@ def normalization(train_images, test_images):
     test_images = (test_images - mean) / (std + 1e-7)
     return train_images, test_images
 
-#### TRAINING STAGE #########3
-def get_top_n_score(target, prediction, n):
-    #ordeno los indices de menor a mayor probabilidad
-    pre_sort_index = np.argsort(prediction)
-    #ordeno de mayor probabilidad a menor
-    pre_sort_index = pre_sort_index[:,::-1]
-    #cojo las n-top predicciones
-    pre_top_n = pre_sort_index[:,:n]
-    #obtengo el conteo de acierto
-    precision = [1 if target[i] in pre_top_n[i] else 0 for i in range(target.shape[0])]
-    #se retorna la precision
-    return np.mean(precision)
-
 # Load the CIFAR10 data.
 (X_train, Y_train), (X_test, Y_test) = cifar10.load_data()
 X_train, X_test = normalization(X_train,X_test)    
 # Input image dimensions.
 input_shape = X_train.shape[1:]
-
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect

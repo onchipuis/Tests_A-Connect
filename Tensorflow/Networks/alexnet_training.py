@@ -7,7 +7,6 @@ import numpy as np
 import math
 import tensorflow as tf
 import AlexNet as alexnet
-import time
 from general_training import general_training
 from keras.callbacks import LearningRateScheduler
 from aconnect1 import layers, scripts
