@@ -32,7 +32,7 @@ def get_top_n_score(target, prediction, n):
 ### TRAINING
 def general_training (model_int=None,isAConnect=[True],
                         model_base=None,transferLearn=False,
-                        Wstd_err=[0],Bstd_err=[0],
+                        Wstd_err=[0],
                         WisQuant=["no"],BisQuant=["no"],
                         Wbw=[8],Bbw=[8],
                         Conv_pool=[2],

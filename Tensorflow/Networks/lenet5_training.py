@@ -57,7 +57,7 @@ epochs = 20
 
 general_training(model_int=lenet5.model_creation,isAConnect=isAConnect,
                         model_base=None,transferLearn=False,
-                        Wstd_err=Wstd_err,Bstd_err=Bstd_err,
+                        Wstd_err=Wstd_err,
                         WisQuant=WisQuant,BisQuant=BisQuant,
                         Wbw=Bbw,Bbw=Bbw,
                         Conv_pool=Conv_pool,
