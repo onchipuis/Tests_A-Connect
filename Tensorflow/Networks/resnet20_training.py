@@ -163,7 +163,26 @@ optimizer = tf.optimizers.SGD(learning_rate=0.0,
                             momentum=momentum, nesterov= True, decay = lr_decay) #Define optimizer
 
 ################################################################
-### TRAINING
+# TRAINING THE MODEL:
+general_training(model_int=(if(version==1):resnet_v1 else:resnet_v2),isAConnect=isAConnect,
+                        model_base=model_base,transferLearn=transferLearn,
+                        Wstd_err=Wstd_err,
+                        WisQuant=WisQuant,BisQuant=BisQuant,
+                        Wbw=Bbw,Bbw=Bbw,
+                        Conv_pool=Conv_pool,
+                        FC_pool=FC_pool,
+                        errDistr=errDistr,
+                        input_shape=input_shape,depth=depth,namev=namev,
+                        optimizer=optimizer,
+                        X_train=X_train, Y_train=Y_train,
+                        X_test=X_test, Y_test=Y_test,
+                        batch_size=batch_size,
+                        epochs=epochs,
+                        callbacks=callbacks,
+                        saveModel=saveModel,folder_models=folder_models,
+                        folder_results=folder_results)
+
+"""
 for d in range(len(isAConnect)): #Iterate over the networks
     if isAConnect[d]: #is a network with A-Connect?
         Wstd_aux = Wstd_err
