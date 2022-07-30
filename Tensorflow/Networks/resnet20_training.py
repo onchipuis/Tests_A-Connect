@@ -77,8 +77,8 @@ input_shape = X_train.shape[1:]
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect
-Wstd_err = [0.7]   # Define the stddev for training
-Conv_pool = [2]
+Wstd_err = [0.3]   # Define the stddev for training
+Conv_pool = [8]
 FC_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
@@ -164,7 +164,8 @@ optimizer = tf.optimizers.SGD(learning_rate=0.0,
 
 ################################################################
 # TRAINING THE MODEL:
-general_training(model_int=(if(version==1):resnet_v1 else:resnet_v2),isAConnect=isAConnect,
+if(version==1):model_int=resnet_v1 else:model_int=resnet_v2
+general_training(model_int=model_int,isAConnect=isAConnect,
                         model_base=model_base,transferLearn=transferLearn,
                         Wstd_err=Wstd_err,
                         WisQuant=WisQuant,BisQuant=BisQuant,
