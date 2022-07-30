@@ -78,14 +78,14 @@ if isAConnect[0]:
 #lrate = 1e-3        # for Adam optimizer
 if isAConnect[0]:
     lrate = 1e-1
-    #epochs = 120
-    #epoch1 = 30
-    #epoch2 = 60
-    #epoch3 = 100
-    epochs = 60
-    epoch1 = 25
-    epoch2 = 40
-    epoch3 = 50
+    epochs = 120
+    epoch1 = 30
+    epoch2 = 60
+    epoch3 = 100
+    #epochs = 60
+    #epoch1 = 25
+    #epoch2 = 40
+    #epoch3 = 50
     #epoch1 = 60
     #epoch2 = 90
     #epoch3 = 120
