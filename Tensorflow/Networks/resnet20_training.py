@@ -54,15 +54,15 @@ input_shape = X_train.shape[1:]
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect
-Wstd_err = [0.3]   # Define the stddev for training
+Wstd_err = [0]   # Define the stddev for training
 Conv_pool = [8]
 FC_pool = [2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
 Bbw = [8]
-#errDistr = ["lognormal"]
-errDistr = ["normal"]
+errDistr = ["lognormal"]
+#errDistr = ["normal"]
 saveModel = True
 model_name = 'ResNet20_CIFAR10/'
 folder_models = './Models/'+model_name
@@ -142,7 +142,6 @@ optimizer = tf.optimizers.SGD(learning_rate=0.0,
 
 ################################################################
 # TRAINING THE MODEL:
-"""
 general_training(model_int=resnet_v1 if(version==1) else resnet_v2,isAConnect=isAConnect,
                         model_base=model_base,transferLearn=transferLearn,
                         Wstd_err=Wstd_err,
@@ -160,107 +159,4 @@ general_training(model_int=resnet_v1 if(version==1) else resnet_v2,isAConnect=is
                         callbacks=callbacks,
                         saveModel=saveModel,folder_models=folder_models,
                         folder_results=folder_results)
-
-"""
-for d in range(len(isAConnect)): #Iterate over the networks
-    if isAConnect[d]: #is a network with A-Connect?
-        Wstd_aux = Wstd_err
-        FC_pool_aux = FC_pool
-        Conv_pool_aux = Conv_pool
-        WisQuant_aux = WisQuant
-        BisQuant_aux = BisQuant
-        errDistr_aux = errDistr
-    else:
-        Wstd_aux = [0]
-        FC_pool_aux = [0]
-        Conv_pool_aux = [0]
-        WisQuant_aux = ["no"]
-        BisQuant_aux = ["no"]
-        errDistr_aux = ["normal"]
-        
-    for i in range(len(Conv_pool_aux)):
-        for p in range (len(WisQuant_aux)):
-            if WisQuant_aux[p]=="yes":
-                Wbw_aux = Wbw
-                Bbw_aux = Bbw
-            else:
-                Wbw_aux = [8]
-                Bbw_aux = [8]
-
-            for q in range (len(Wbw_aux)):
-                for j in range(len(Wstd_aux)):
-                    for k in range(len(errDistr_aux)):
-                        Err = Wstd_aux[j]
-                        # CREATING NN:
-                        if version == 2:
-                            model = resnet_v2(input_shape=input_shape, depth=depth,
-                                            isAConnect = isAConnect[d], 
-                                            Wstd=Err,Bstd=Err,
-                                            isQuant=[WisQuant_aux[p],BisQuant_aux[p]],
-                                            bw=[Wbw_aux[q],Bbw_aux[q]],
-                                            Conv_pool=Conv_pool_aux[i],
-                                            FC_pool=FC_pool_aux[i],
-                                            errDistr=errDistr_aux[k])
-                        else:
-                            model = resnet_v1(input_shape=input_shape, depth=depth, 
-                                            isAConnect = isAConnect[d], 
-                                            Wstd=Err,Bstd=Err,
-                                            isQuant=[WisQuant_aux[p],BisQuant_aux[p]],
-                                            bw=[Wbw_aux[q],Bbw_aux[q]],
-                                            Conv_pool=Conv_pool_aux[i],
-                                            FC_pool=FC_pool_aux[i],
-                                            errDistr=errDistr_aux[k])
-                        
-                        ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                        if isAConnect[d]:
-                            model.set_weights(model_base.get_weights())
-                        
-                        # NAME
-                        if isAConnect[d]:
-                            Werr = str(int(100*Err))
-                            Nm = str(int(Conv_pool_aux[i]))
-                            if WisQuant_aux[p] == "yes":
-                                bws = str(int(Wbw_aux[q]))
-                                quant = bws+'bQuant_'
-                            else:
-                                quant = ''
-                            name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr_aux[k]+'Distr'+namev
-                        else:
-                            name = 'Base'+namev
-                        
-                        print("*************************TRAINING NETWORK*********************")
-                        print("\n\t\t\t", name)
-                        
-                        #TRAINING PARAMETERS
-                        model.compile(loss='sparse_categorical_crossentropy',
-                                      optimizer=optimizer,
-                                      metrics=['accuracy'])
-
-                        # Run training, with or without data augmentation.
-                        history = model.fit(X_train, Y_train,
-                                      batch_size=batch_size,
-                                      epochs=epochs,
-                                      validation_data=(X_test, Y_test),
-                                      shuffle=True,
-                                      callbacks=callbacks)
-                        model.evaluate(X_test,Y_test) 
-                        
-                        y_predict =model.predict(X_test)
-                        elapsed_time = time.time() - start_time
-                        print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
-                        print("Elapsed time: {}".format(hms_string(elapsed_time)))
-                        print('Tiempo de procesamiento (secs): ', time.time()-tic)
-                        #Save the accuracy and the validation accuracy
-                        acc = history.history['accuracy'] 
-                        val_acc = history.history['val_accuracy']
-                                      
-                        # SAVE MODEL:
-                        if saveModel:
-                            string = folder_models + name + '.h5'
-                            model.save(string,include_optimizer=False)
-                            #Save in a txt the accuracy and the validation accuracy for further analysis
-                            if not os.path.isdir(folder_results):
-                                os.makedirs(folder_results)
-                            np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.4f") 
-                            np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.4f")              
 
