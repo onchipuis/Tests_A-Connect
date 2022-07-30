@@ -8,7 +8,6 @@ import math
 import tensorflow as tf
 import AlexNet as alexnet
 import time
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import LearningRateScheduler
 from aconnect1 import layers, scripts
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
@@ -66,6 +65,7 @@ folder_results = '../Results/'+model_name+'Training_data/'
 #net_base = folder_models+'Base.h5'
 net_base = folder_models+'Wstd_0_Bstd_0.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
+transferLearn = True
 
 # TRAINING PARAMETERS
 lr_init = 0.01
@@ -83,6 +83,29 @@ def step_decay (epoch):
 lrate = LearningRateScheduler(step_decay)
 callbacks = [lrate]
 
+
+# TRAINING THE MODEL:
+general_training(model_int=alexnet.model_creation,isAConnect=isAConnect,
+                        model_base=model_base,transferLearn=transferLearn,
+                        Wstd_err=Wstd_err,
+                        WisQuant=WisQuant,BisQuant=BisQuant,
+                        Wbw=Bbw,Bbw=Bbw,
+                        Conv_pool=Conv_pool,
+                        FC_pool=FC_pool,
+                        errDistr=errDistr,
+                        input_shape=None,depth=None,namev='',
+                        optimizer=optimizer,
+                        X_train=X_train, Y_train=Y_train,
+                        X_test=X_test, Y_test=Y_test,
+                        batch_size=batch_size,
+                        epochs=epochs,
+                        callbacks=callbacks,
+                        saveModel=saveModel,folder_models=folder_models,
+                        folder_results=folder_results)
+
+
+
+"""
 for d in range(len(isAConnect)): #Iterate over the networks
     if isAConnect[d]: #is a network with A-Connect?
         Wstd_aux = Wstd_err
@@ -122,13 +145,11 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                                         FC_pool=FC_pool_aux[i],
                                                         errDistr=errDistr_aux[k])
                         ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                        """
-                        if isAConnect[d]:
-                            for m in range(len(Nlayers_base)):
-                                model.layers[Nlayers[m]].set_weights(
-                                        model_base.layers[Nlayers_base[m]].get_weights()
-                                        )
-                        """
+                        #if isAConnect[d]:
+                        #    for m in range(len(Nlayers_base)):
+                        #        model.layers[Nlayers[m]].set_weights(
+                        #                model_base.layers[Nlayers_base[m]].get_weights()
+                        #                )
                         model.set_weights(model_base.get_weights())
                         # NAME
                         print("Err: ",Err)
@@ -180,3 +201,4 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             #Save in a txt the accuracy and the validation accuracy for further analysis
                             np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
                             np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
+"""

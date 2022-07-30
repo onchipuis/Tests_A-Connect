@@ -2,28 +2,7 @@ import numpy as np
 import tensorflow as tf
 import LeNet5 as lenet5
 import time
-from aconnect1 import layers, scripts
 from general_training import general_training
-tic=time.time()
-start_time = time.time()
-def hms_string(sec_elapsed):
-    h = int(sec_elapsed / (60 * 60))
-    m = int((sec_elapsed % (60 * 60)) / 60)
-    s = sec_elapsed % 60
-    return f"{h}:{m:>02}:{s:>05.2f}"
-
-#### TRAINING STAGE #########3
-def get_top_n_score(target, prediction, n):
-    #ordeno los indices de menor a mayor probabilidad
-    pre_sort_index = np.argsort(prediction)
-    #ordeno de mayor probabilidad a menor
-    pre_sort_index = pre_sort_index[:,::-1]
-    #cojo las n-top predicciones
-    pre_top_n = pre_sort_index[:,:n]
-    #obtengo el conteo de acierto
-    precision = [1 if target[i] in pre_top_n[i] else 0 for i in range(target.shape[0])]
-    #se retorna la precision
-    return np.mean(precision)
 
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = scripts.load_ds() #Load dataset
