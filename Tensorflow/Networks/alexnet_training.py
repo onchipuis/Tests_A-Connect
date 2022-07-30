@@ -10,6 +10,9 @@ import AlexNet as alexnet
 import time
 from general_training import general_training
 from keras.callbacks import LearningRateScheduler
+from aconnect1 import layers, scripts
+#from aconnect import layers, scripts
+custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
 # LOADING DATASET:
 def normalization(train_images, test_images):
