@@ -13,7 +13,7 @@ Xsz = 32
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,
         Conv_pool=16,FC_pool=16,errDistr="normal",
-        isQuant=['no','no'],bw=[8,8],isBin="yes"):
+        isQuant=['no','no'],bw=[8,8],isBin="yes",**kwargs):
         
         if(not(isAConnect)):
                 model = tf.keras.models.Sequential([

@@ -13,7 +13,7 @@ from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax, 
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,
         isQuant=["no","no"],bw=[8,8],
-        Conv_pool=8,FC_pool=8,errDistr="normal"):
+        Conv_pool=8,FC_pool=8,errDistr="normal",**kwargs):
 		
 	if(not(isAConnect)):
 		model = tf.keras.Sequential([

@@ -3,6 +3,7 @@ import tensorflow as tf
 import LeNet5 as lenet5
 import time
 from aconnect1 import layers, scripts
+import general_training.general_training as training
 tic=time.time()
 start_time = time.time()
 def hms_string(sec_elapsed):
@@ -54,6 +55,25 @@ optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentu
 batch_size = 256
 epochs = 20
 
+general_training (model_int=lenet5.model_creation,isAConnect=isAConnect,
+                        model_base=None,transferLearn=False,
+                        Wstd_err=Wstd_err,Bstd_err=Bstd_err,
+                        WisQuant=WisQuant,BisQuant=BisQuant,
+                        Wbw=Bbw,Bbw=Bbw,
+                        Conv_pool=Conv_pool,
+                        FC_pool=FC_pool,
+                        errDistr=errDistr,
+                        input_shape=None,depth=None,
+                        optimizer=optimizer,
+                        X_train=X_train, Y_train=Y_train,
+                        X_test=X_test, Y_test=Y_test,
+                        batch_size=batch_size,
+                        epochs=epochs,
+                        callbacks=None,
+                        saveModel=saveModel,folder_models=folder_models,
+                        folder_results=folder_results)
+
+"""
 ### TRAINING
 for d in range(len(isAConnect)): #Iterate over the networks
     if isAConnect[d]: #is a network with A-Connect?
@@ -142,3 +162,4 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             #Save in a txt the accuracy and the validation accuracy for further analysis
                             np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.2f") 
                             np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.2f")
+"""

@@ -10,7 +10,8 @@ def resnet_layer(inputs,num_filters=16,kernel_size=(3,3),
                 conv_first=True,
                 isAConnect=False,Wstd=0,Bstd=0,
                 pool=2,errDistr="normal",
-                isQuant=['no','no'],bw=[8,8]):
+                isQuant=['no','no'],bw=[8,8],
+                **kwargs):
     """2D Convolution-Batch Normalization-Activation stack builder
 
     # Arguments
@@ -63,7 +64,7 @@ def resnet_layer(inputs,num_filters=16,kernel_size=(3,3),
 def resnet_v1(input_shape, depth, num_classes=10, 
                 isAConnect=False,Wstd=0,Bstd=0,
                 Conv_pool=2,FC_pool=2,errDistr="normal",
-                isQuant=['no','no'],bw=[8,8]):
+                isQuant=['no','no'],bw=[8,8],**kwargs):
     """ResNet Version 1 Model builder [a]
 
     Stacks of 2 x (3 x 3) Conv2D-BN-ReLU
@@ -176,7 +177,7 @@ def resnet_v1(input_shape, depth, num_classes=10,
 def resnet_v2(input_shape, depth, num_classes=10,
                 isAConnect=False,Wstd=0,Bstd=0,
                 Conv_pool=2,FC_pool=2,errDistr="normal",
-                isQuant=['no','no'],bw=[8,8]):
+                isQuant=['no','no'],bw=[8,8],**kwargs):
     """ResNet Version 2 Model builder [b]
 
     Stacks of (1 x 1)-(3 x 3)-(1 x 1) BN-ReLU-Conv2D or also known as
