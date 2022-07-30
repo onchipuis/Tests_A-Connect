@@ -3,7 +3,7 @@ import tensorflow as tf
 import LeNet5 as lenet5
 import time
 from aconnect1 import layers, scripts
-import general_training.general_training as training
+from general_training import general_training
 tic=time.time()
 start_time = time.time()
 def hms_string(sec_elapsed):
@@ -55,7 +55,7 @@ optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentu
 batch_size = 256
 epochs = 20
 
-general_training (model_int=lenet5.model_creation,isAConnect=isAConnect,
+general_training(model_int=lenet5.model_creation,isAConnect=isAConnect,
                         model_base=None,transferLearn=False,
                         Wstd_err=Wstd_err,Bstd_err=Bstd_err,
                         WisQuant=WisQuant,BisQuant=BisQuant,
