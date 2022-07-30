@@ -59,6 +59,7 @@ errDistr = ["normal"]
 MCsims = 100
 acc=np.zeros([500,1])
 force = "yes"
+force_save = True
 
 model_name = 'ResNet20_CIFAR10/'
 folder_models = './Models/'+model_name
@@ -130,7 +131,7 @@ for d in range(len(isAConnect)): #Iterate over the networks
                             name_sim = name+'_simErr_'+str(int(100*Err))                      
                             name_stats = name+'_stats_simErr_'+str(int(100*Err))                      
                        
-                            if not os.path.exists(folder_results+name_sim+'.txt'): 
+                            if not(os.path.exists(folder_results+name_sim+'.txt')) or force_save: 
                             #if os.path.exists(folder_results+name_sim+'.txt'): 
                                 if Err == 0:
                                     N = 1
