@@ -102,7 +102,10 @@ def general_training (model_int=None,isAConnect=[True],
                                     quant = bws+'bQuant_'
                                 else:
                                     quant = ''
-                                name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr_aux[k]+'Distr'+namev
+                                if Werr == '0':
+                                    name = 'Wstd_0_Bstd_0'
+                                else:
+                                    name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr_aux[k]+'Distr'+namev
                             else:
                                 name = 'Base'+namev
                             
