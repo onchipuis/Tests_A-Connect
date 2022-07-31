@@ -75,69 +75,69 @@ def general_testing (isAConnect=[True],
                         for k in range(len(errDistr)):
                             for m in range(len(Sim_err)):
                             
-                            Werr = Wstd_aux[j]
-                            Err = Sim_err[m]
-                            # NAME
-                            if isAConnect[d]:
-                                Werr = str(int(100*Werr))
-                                Nm = str(int(Conv_pool_aux[i]))
-                                if WisQuant_aux[p] == "yes":
-                                    bws = str(int(Wbw_aux[q]))
-                                    quant = bws+'bQuant_'
+                                Werr = Wstd_aux[j]
+                                Err = Sim_err[m]
+                                # NAME
+                                if isAConnect[d]:
+                                    Werr = str(int(100*Werr))
+                                    Nm = str(int(Conv_pool_aux[i]))
+                                    if WisQuant_aux[p] == "yes":
+                                        bws = str(int(Wbw_aux[q]))
+                                        quant = bws+'bQuant_'
+                                    else:
+                                        quant = ''
+                                    if Werr == '0':
+                                        name = 'Wstd_0_Bstd_0'
+                                    else:
+                                        name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'+namev
                                 else:
-                                    quant = ''
-                                if Werr == '0':
-                                    name = 'Wstd_0_Bstd_0'
-                                else:
-                                    name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'+namev
-                            else:
-                                name = 'Base'+namev
-                            
-                            string = folder_models + name + '.h5'
-                            name_sim = name+'_simErr_'+str(int(100*Err))                      
-                            name_stats = name+'_stats_simErr_'+str(int(100*Err))                      
-                            
-                            if not(os.path.exists(folder_results+name_sim+'.txt')) or force_save: 
-                                if Err == 0:
-                                    N = 1
-                                else:
-                                    N = MCsims
-                                        #####
-
-                                elapsed_time = time.time() - start_time
-                                print("Elapsed time: {}".format(hms_string(elapsed_time)))
-                                now = datetime.now()
-                                starttime = now.time()
-                                print('\n\n******************************************************************\n\n')
-                                print('TESTING NETWORK: ', name)
-                                print('With simulation error: ', Err)
-                                print('\n\n**********************************************************************')
+                                    name = 'Base'+namev
                                 
-                                #Load the trained model
-                                #net = tf.keras.models.load_model(string,custom_objects = custom_objects) 
-                                net = string
-                                #MC sim
-                                acc, stats = scripts.MonteCarlo(net=net,Xtest=X_test,Ytest=Y_test,M=N,
-                                        Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
-                                        custom_objects=custom_objects,
-                                        optimizer=optimizer,
-                                        loss='sparse_categorical_crossentropy',
-                                        metrics=['accuracy'],top5=False,dtype='float16',
-                                        errDistr=errDistr[k],evaluate_batch_size=batch_size
-                                        )
-                                np.savetxt(folder_results+name_sim+'.txt',acc,fmt="%.4f")
-                                np.savetxt(folder_results+name_stats+'.txt',stats,fmt="%.4f")
+                                string = folder_models + name + '.h5'
+                                name_sim = name+'_simErr_'+str(int(100*Err))                      
+                                name_stats = name+'_stats_simErr_'+str(int(100*Err))                      
+                                
+                                if not(os.path.exists(folder_results+name_sim+'.txt')) or force_save: 
+                                    if Err == 0:
+                                        N = 1
+                                    else:
+                                        N = MCsims
+                                            #####
 
-                                now = datetime.now()
-                                endtime = now.time()
-                                elapsed_time = time.time() - start_time
-                                print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                                    elapsed_time = time.time() - start_time
+                                    print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                                    now = datetime.now()
+                                    starttime = now.time()
+                                    print('\n\n******************************************************************\n\n')
+                                    print('TESTING NETWORK: ', name)
+                                    print('With simulation error: ', Err)
+                                    print('\n\n**********************************************************************')
+                                    
+                                    #Load the trained model
+                                    #net = tf.keras.models.load_model(string,custom_objects = custom_objects) 
+                                    net = string
+                                    #MC sim
+                                    acc, stats = scripts.MonteCarlo(net=net,Xtest=X_test,Ytest=Y_test,M=N,
+                                            Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
+                                            custom_objects=custom_objects,
+                                            optimizer=optimizer,
+                                            loss='sparse_categorical_crossentropy',
+                                            metrics=['accuracy'],top5=False,dtype='float16',
+                                            errDistr=errDistr[k],evaluate_batch_size=batch_size
+                                            )
+                                    np.savetxt(folder_results+name_sim+'.txt',acc,fmt="%.4f")
+                                    np.savetxt(folder_results+name_stats+'.txt',stats,fmt="%.4f")
 
-                                print('\n\n*********************************************************************')
-                                print('\n Simulation started at: ',starttime)
-                                print('Simulation finished at: ', endtime)
-                                del net,acc,stats
-                                gc.collect()
-                                tf.keras.backend.clear_session()
-                                tf.compat.v1.reset_default_graph()
-                                #exit()
+                                    now = datetime.now()
+                                    endtime = now.time()
+                                    elapsed_time = time.time() - start_time
+                                    print("Elapsed time: {}".format(hms_string(elapsed_time)))
+
+                                    print('\n\n*********************************************************************')
+                                    print('\n Simulation started at: ',starttime)
+                                    print('Simulation finished at: ', endtime)
+                                    del net,acc,stats
+                                    gc.collect()
+                                    tf.keras.backend.clear_session()
+                                    tf.compat.v1.reset_default_graph()
+                                    #exit()
