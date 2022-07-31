@@ -43,6 +43,7 @@ epochs = 30
 # TESTING THE MODEL:
 general_testing(isAConnect=isAConnect,
                 Wstd_err=Wstd_err,
+                Sim_err=Sim_err,
                 WisQuant=WisQuant,BisQuant=BisQuant,
                 Wbw=Bbw,Bbw=Bbw,
                 Conv_pool=Conv_pool,
