@@ -33,12 +33,11 @@ def get_top_n_score(target, prediction, n):
 ################################################################
 ### TRAINING
 acc=np.zeros([500,1])
-def general_training (model_int=None,isAConnect=[True],
+def general_training (isAConnect=[True],
                         Wstd_err=[0],
                         WisQuant=["no"],BisQuant=["no"],
                         Wbw=[8],Bbw=[8],
                         Conv_pool=[2],
-                        FC_pool=[2],
                         errDistr=["normal"],
                         namev='', # Use for ResNet only
                         optimizer=None,
@@ -53,13 +52,11 @@ def general_training (model_int=None,isAConnect=[True],
     for d in range(len(isAConnect)): #Iterate over the networks
         if isAConnect[d]: #is a network with A-Connect?
             Wstd_aux = Wstd_err
-            FC_pool_aux = FC_pool
             Conv_pool_aux = Conv_pool
             WisQuant_aux = WisQuant
             BisQuant_aux = BisQuant
         else:
             Wstd_aux = [0]
-            FC_pool_aux = [0]
             Conv_pool_aux = [0]
             WisQuant_aux = ["no"]
             BisQuant_aux = ["no"]

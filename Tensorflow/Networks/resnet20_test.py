@@ -5,22 +5,8 @@ Due to the memory usage we recommend to uncomment the first train the model and 
 """
 import numpy as np
 import tensorflow as tf
-import time
-import gc
-import os
-from datetime import datetime
-from aconnect1 import layers, scripts
+from general_training import general_training
 
-#from keras.callbacks import LearningRateScheduler
-custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
-
-tic=time.time()
-start_time = time.time()
-def hms_string(sec_elapsed):
-    h = int(sec_elapsed / (60 * 60))
-    m = int((sec_elapsed % (60 * 60)) / 60)
-    s = sec_elapsed % 60
-    return f"{h}:{m:>02}:{s:>05.2f}"
 #Extra code to improve model accuracy
 def normalization(train_images, test_images):
     mean = np.mean(train_images, axis=(0, 1, 2, 3))
@@ -28,17 +14,6 @@ def normalization(train_images, test_images):
     train_images =(train_images - mean) / (std + 1e-7)
     test_images = (test_images - mean) / (std + 1e-7)
     return train_images, test_images
-def get_top_n_score(target, prediction, n):
-    #ordeno los indices de menor a mayor probabilidad
-    pre_sort_index = np.argsort(prediction)
-    #ordeno de mayor probabilidad a menor
-    pre_sort_index = pre_sort_index[:,::-1]
-    #cojo las n-top predicciones
-    pre_top_n = pre_sort_index[:,:n]
-    #obtengo el conteo de acierto
-    precision = [1 if target[i] in pre_top_n[i] else 0 for i in range(target.shape[0])]
-    #se retorna la precision
-    return np.mean(precision)
 
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()	
@@ -87,6 +62,24 @@ optimizer = tf.optimizers.SGD(learning_rate=learning_rate,
                             momentum=momentum, decay = lr_decay, nesterov= True) #Define optimizer
 """
 
+################################################################
+# TESTING THE MODEL:
+general_testing(isAConnect=isAConnect,
+                Wstd_err=Wstd_err,
+                WisQuant=WisQuant,BisQuant=BisQuant,
+                Wbw=Bbw,Bbw=Bbw,
+                Conv_pool=Conv_pool,
+                errDistr=errDistr,
+                namev=namev,
+                optimizer=optimizer,
+                X_train=X_train, Y_train=Y_train,
+                X_test=X_test, Y_test=Y_test,
+                batch_size=batch_size,
+                MCsims=MCsims,force=force,force_save=force_save,
+                folder_models=folder_models,
+                folder_results=folder_results)
+
+"""
 for d in range(len(isAConnect)): #Iterate over the networks
     if isAConnect[d]: #is a network with A-Connect?
         Wstd_aux = Wstd_err
@@ -176,3 +169,4 @@ for d in range(len(isAConnect)): #Iterate over the networks
                                 tf.keras.backend.clear_session()
                                 tf.compat.v1.reset_default_graph()
                                 #exit()
+"""
