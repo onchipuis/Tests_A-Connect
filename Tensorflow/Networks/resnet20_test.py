@@ -5,7 +5,7 @@ Due to the memory usage we recommend to uncomment the first train the model and 
 """
 import numpy as np
 import tensorflow as tf
-from general_training import general_training
+from general_testing import general_testing
 
 #Extra code to improve model accuracy
 def normalization(train_images, test_images):

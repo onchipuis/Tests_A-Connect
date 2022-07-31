@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from general_training import general_training
+from general_testing import general_testing
 from aconnect1 import layers, scripts
 #from aconnect import layers, scripts
 
