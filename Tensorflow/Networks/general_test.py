@@ -1,17 +1,12 @@
-"""
-Script for testing VGG with A-Connect, DVA, or none (Baseline)
-INSTRUCTIONS:
-Due to the memory usage we recommend to uncomment the first train the model and save it. Then just comment the training stage and then load the model to test it using the Monte Carlo simulation.
-"""
-import numpy as np
+# Based on https://keras.io/zh/examples/cifar10_resnet/
 import tensorflow as tf
-import time
-import gc
+import numpy as np
 import os
+import gc
+import time
 from datetime import datetime
 from aconnect1 import layers, scripts
-
-#from keras.callbacks import LearningRateScheduler
+#from aconnect import layers, scripts
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
 tic=time.time()
@@ -21,13 +16,8 @@ def hms_string(sec_elapsed):
     m = int((sec_elapsed % (60 * 60)) / 60)
     s = sec_elapsed % 60
     return f"{h}:{m:>02}:{s:>05.2f}"
-#Extra code to improve model accuracy
-def normalization(train_images, test_images):
-    mean = np.mean(train_images, axis=(0, 1, 2, 3))
-    std = np.std(train_images, axis=(0, 1, 2, 3))
-    train_images =(train_images - mean) / (std + 1e-7)
-    test_images = (test_images - mean) / (std + 1e-7)
-    return train_images, test_images
+
+#### TRAINING STAGE #########3
 def get_top_n_score(target, prediction, n):
     #ordeno los indices de menor a mayor probabilidad
     pre_sort_index = np.argsort(prediction)
@@ -40,105 +30,83 @@ def get_top_n_score(target, prediction, n):
     #se retorna la precision
     return np.mean(precision)
 
-# LOADING DATASET:
-(X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()	
-X_train, X_test = normalization(X_train,X_test)    
-
-#### MODEL TESTING WITH MONTE CARLO STAGE ####
-# INPUT PARAMTERS:
-isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.3]   # Define the stddev for training
-Sim_err = [0.1]
-Conv_pool = [8]
-WisQuant = ["yes"]		    # Do you want binary weights?
-BisQuant = WisQuant 
-Wbw = [8]
-Bbw = Wbw
-errDistr = ["lognormal"]
-#errDistr = ["normal"]
-MCsims = 100
+################################################################
+### TRAINING
 acc=np.zeros([500,1])
-force = "yes"
-force_save = True
+def general_training (model_int=None,isAConnect=[True],
+                        Wstd_err=[0],
+                        WisQuant=["no"],BisQuant=["no"],
+                        Wbw=[8],Bbw=[8],
+                        Conv_pool=[2],
+                        FC_pool=[2],
+                        errDistr=["normal"],
+                        namev='', # Use for ResNet only
+                        optimizer=None,
+                        X_train=None, Y_train=None,
+                        X_test=None, Y_test=None,
+                        batch_size=256,
+                        MCsims=100,force="yes",force_save=True,
+                        folder_models=None,
+                        folder_results=None,
+                        **kwargs):
 
-model_name = 'ResNet20_CIFAR10/'
-folder_models = './Models/'+model_name
-folder_results = '../Results/'+model_name
+    for d in range(len(isAConnect)): #Iterate over the networks
+        if isAConnect[d]: #is a network with A-Connect?
+            Wstd_aux = Wstd_err
+            FC_pool_aux = FC_pool
+            Conv_pool_aux = Conv_pool
+            WisQuant_aux = WisQuant
+            BisQuant_aux = BisQuant
+        else:
+            Wstd_aux = [0]
+            FC_pool_aux = [0]
+            Conv_pool_aux = [0]
+            WisQuant_aux = ["no"]
+            BisQuant_aux = ["no"]
+            
+        for i in range(len(Conv_pool_aux)):
+            for p in range (len(WisQuant_aux)):
+                if WisQuant_aux[p]=="yes":
+                    Wbw_aux = Wbw
+                    Bbw_aux = Bbw
+                else:
+                    Wbw_aux = [8]
+                    Bbw_aux = [8]
 
-# TRAINING PARAMETERS
-learning_rate = 0.1
-momentum = 0.9
-batch_size = 256
-epochs = 50
-lr_decay = 1e-6
-lr_drop = 30
-lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-                initial_learning_rate=0.01,
-                decay_steps=196,
-                decay_rate=0.9,
-                staircase=True)
-optimizer = tf.optimizers.SGD(learning_rate=lr_schedule, 
-                            momentum=momentum) #Define optimizer
-"""
-def lr_scheduler(epoch):
-    return learning_rate * (0.5 ** (epoch // lr_drop))    
-reduce_lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)    
-optimizer = tf.optimizers.SGD(learning_rate=learning_rate, 
-                            momentum=momentum, decay = lr_decay, nesterov= True) #Define optimizer
-"""
-
-for d in range(len(isAConnect)): #Iterate over the networks
-    if isAConnect[d]: #is a network with A-Connect?
-        Wstd_aux = Wstd_err
-        Conv_pool_aux = Conv_pool
-    else:
-        Wstd_aux = [0]
-        Conv_pool_aux = [0]
-        
-    for i in range(len(Conv_pool_aux)):
-        for p in range (len(WisQuant)):
-            if WisQuant[p]=="yes":
-                Wbw_aux = Wbw
-                Bbw_aux = Bbw
-            else:
-                Wbw_aux = [8]
-                Bbw_aux = [8]
-
-            for q in range (len(Wbw_aux)):
-                for j in range(len(Wstd_aux)):
-                    for k in range(len(errDistr)):
-                        for m in range(len(Sim_err)):
-
+                for q in range (len(Wbw_aux)):
+                    for j in range(len(Wstd_aux)):
+                        for k in range(len(errDistr)):
+                            for m in range(len(Sim_err)):
+                            
                             Werr = Wstd_aux[j]
                             Err = Sim_err[m]
                             # NAME
                             if isAConnect[d]:
                                 Werr = str(int(100*Werr))
                                 Nm = str(int(Conv_pool_aux[i]))
-                                if WisQuant[p] == "yes":
+                                if WisQuant_aux[p] == "yes":
                                     bws = str(int(Wbw_aux[q]))
                                     quant = bws+'bQuant_'
                                 else:
                                     quant = ''
                                 if Werr == '0':
-                                    name = 'Wstd_'+Werr+'_Bstd_'+Werr
+                                    name = 'Wstd_0_Bstd_0'
                                 else:
-                                    name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'
-
+                                    name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr[k]+'Distr'+namev
                             else:
-                                name = 'Base'
+                                name = 'Base'+namev
+                            
                             string = folder_models + name + '.h5'
                             name_sim = name+'_simErr_'+str(int(100*Err))                      
                             name_stats = name+'_stats_simErr_'+str(int(100*Err))                      
-                       
+                            
                             if not(os.path.exists(folder_results+name_sim+'.txt')) or force_save: 
-                            #if os.path.exists(folder_results+name_sim+'.txt'): 
                                 if Err == 0:
                                     N = 1
                                 else:
                                     N = MCsims
                                         #####
-                                
+
                                 elapsed_time = time.time() - start_time
                                 print("Elapsed time: {}".format(hms_string(elapsed_time)))
                                 now = datetime.now()
