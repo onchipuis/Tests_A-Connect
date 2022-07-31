@@ -35,6 +35,7 @@ MCsims = 100
 acc=np.zeros([500,1])
 force = "yes"
 force_save = True
+namev=''
 
 model_name = 'ResNet20_CIFAR10/'
 folder_models = './Models/'+model_name
