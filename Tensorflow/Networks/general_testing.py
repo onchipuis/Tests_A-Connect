@@ -33,7 +33,7 @@ def get_top_n_score(target, prediction, n):
 ################################################################
 ### TRAINING
 acc=np.zeros([500,1])
-def general_training (isAConnect=[True],
+def general_testing (isAConnect=[True],
                         Wstd_err=[0],
                         WisQuant=["no"],BisQuant=["no"],
                         Wbw=[8],Bbw=[8],
