@@ -1,7 +1,6 @@
 import numpy as np
 import tensorflow as tf
-import LeNet5 as lenet5
-import time
+import CNN_fashion as fashion
 from general_training import general_training
 from tensorflow.keras.datasets import fashion_mnist
 from aconnect1 import layers, scripts
@@ -46,7 +45,7 @@ batch_size = 256
 epochs = 50
 
 # TRAINING THE MODEL:
-general_training(model_int=lenet5.model_creation,isAConnect=isAConnect,
+general_training(model_int=fashion.model_creation,isAConnect=isAConnect,
                         model_base=None,transferLearn=False,
                         Wstd_err=Wstd_err,
                         WisQuant=WisQuant,BisQuant=BisQuant,
