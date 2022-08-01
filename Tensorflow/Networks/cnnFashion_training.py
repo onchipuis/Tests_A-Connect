@@ -18,6 +18,8 @@ def normalization(train_images, test_images):
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = fashion_mnist.load_data()
 X_train, X_test = normalization(X_train,X_test)    
+X_train = np.pad(X_train, ((0,0),(2,2),(2,2)), 'constant')
+X_test = np.pad(X_test, ((0,0),(2,2),(2,2)), 'constant')
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
