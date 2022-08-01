@@ -24,17 +24,17 @@ X_test = np.pad(X_test, ((0,0),(2,2),(2,2)), 'constant')
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 #Wstd_err = [0,0.3,0.5,0.7]   # Define the stddev for training
-Wstd_err = [0]	    # Define the stddev for training
+Wstd_err = [0,0.3]
 Conv_pool = [2]
 FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
 Bbw = [8]
-saveModel = False
-errDistr = ["lognormal"]
-#errDistr = ["normal"]
-model_name = 'LeNet5_MNIST/'
+saveModel = True
+#errDistr = ["lognormal"]
+errDistr = ["normal"]
+model_name = 'CNN_FASHION_MNIST/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 
@@ -43,7 +43,7 @@ learning_rate = 0.01
 momentum = 0.9
 optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum) #Define optimizer
 batch_size = 256
-epochs = 35
+epochs = 50
 
 # TRAINING THE MODEL:
 general_training(model_int=lenet5.model_creation,isAConnect=isAConnect,
