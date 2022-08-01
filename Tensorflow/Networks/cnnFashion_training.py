@@ -9,8 +9,8 @@ from aconnect1 import layers, scripts
 
 #Extra code to improve model accuracy
 def normalization(train_images, test_images):
-    mean = np.mean(train_images, axis=(0, 1, 2, 3))
-    std = np.std(train_images, axis=(0, 1, 2, 3))
+    mean = np.mean(train_images, axis=(0, 1, 2))
+    std = np.std(train_images, axis=(0, 1, 2))
     train_images =(train_images - mean) / (std + 1e-7)
     test_images = (test_images - mean) / (std + 1e-7)
     return train_images, test_images
