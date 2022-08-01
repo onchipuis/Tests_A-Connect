@@ -45,50 +45,31 @@ class FC_AConnect(tf.keras.layers.Layer):
                 self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
                 self.validate_init()
         
-        #This method is used for initialize the layer variables that depend on input_shape
-        #input_shape is automatically computed by tensorflow
-        def build(self,input_shape):                                                             
-                                                                                                    
-                #Weights matrix
+        def build(self,input_shape):                                                             #This method is used for initialize the layer variables that depend on input_shape
+                                                                                                    #input_shape is automatically computed by tensorflow
                 self.W = self.add_weight("W",
-                                        shape = [int(input_shape[-1]),self.output_size], 
+                                        shape = [int(input_shape[-1]),self.output_size], #Weights matrix
                                         initializer = "glorot_uniform",
                                         dtype = self.d_type,
                                         regularizer = self.weights_regularizer,
                                         trainable=True)
-                wi = tf.math.reduce_max(tf.math.abs(self.W)).numpy()
-                wa_init = tf.constant_initializer(wi)
-                self.wa = self.add_weight("wa",
-                                        shape = [1,], 
-                                        initializer = wa_init,
-                                        dtype = self.d_type,
-                                        regularizer = self.weights_regularizer,
-                                        trainable=True)
-                #Bias vector
+
                 self.bias = self.add_weight("bias",
-                                        shape = [self.output_size,],                                    
+                                        shape = [self.output_size,],                                    #Bias vector
                                         initializer = "zeros",
                                         dtype = self.d_type,
                                         regularizer = self.bias_regularizer,
                                         trainable=True)
-                ba_init = tf.constant_initializer(1)
-                self.ba = self.add_weight("ba",
-                                        shape = [1,], 
-                                        initializer = ba_init,
-                                        dtype = self.d_type,
-                                        regularizer = self.bias_regularizer,
-                                        trainable=True)
-                #Output scaling
 
                 if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
                         if(self.Bstd != 0):
-                                self.infBerr = Merr_distr([self.output_size],self.Bstd,self.d_type,self.errDistr)
+                                self.infBerr = self.Merr([self.output_size],self.Bstd,self.d_type,self.errDistr)
                                 self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
                                                                                                          #This was necessary to change the error matrix/array when Monte Carlo was running.
                         else:
                                 self.Berr = tf.constant(1,dtype=self.d_type)
                         if(self.Wstd != 0):
-                                self.infWerr = Merr_distr([int(input_shape[-1]),self.output_size],self.Wstd,self.d_type,self.errDistr)
+                                self.infWerr = self.Merr([int(input_shape[-1]),self.output_size],self.Wstd,self.d_type,self.errDistr)
                                 self.infWerr = self.infWerr.numpy()
                         else:
                                 self.Werr = tf.constant(1,dtype=self.d_type)
@@ -105,12 +86,12 @@ class FC_AConnect(tf.keras.layers.Layer):
                                                       #Then the batch_size of the input data also is the first dimension.
                 #Quantize the weights
                 if(self.isQuant[0]=="yes"):
-                    weights = self.LQuant(self.W,self.wa)    
+                    weights = self.LQuant(self.W)    
                 else:
                     weights = self.W
                 #Quantize the biases
                 if(self.isQuant[1]=="yes"):
-                    bias = self.LQuant(self.bias,self.ba)
+                    bias = self.LQuant(self.bias)
                 else:
                     bias = self.bias
                 #This code will train the network. For inference, please go to the else part
@@ -137,7 +118,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                             Z = tf.concat([Z,Z1],axis=0)
                                     else:
                                         if(self.Wstd !=0):
-                                            Werr = Merr_distr([self.batch_size,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
+                                            Werr = self.Merr([self.batch_size,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
                                         else:
                                             Werr = self.Werr
                                         #Finally we multiply element-wise the error matrix with the weights.
@@ -145,7 +126,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         
                                         #For the bias is exactly the same situation
                                         if(self.Bstd !=0):                                                              
-                                            Berr = Merr_distr([self.batch_size,self.output_size],self.Bstd,self.d_type,self.errDistr)
+                                            Berr = self.Merr([self.batch_size,self.output_size],self.Bstd,self.d_type,self.errDistr)
                                         else:
                                             Berr = self.Berr
                                         membias = tf.multiply(Berr,self.bias)
@@ -165,12 +146,12 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         Z = tf.add(Z,membias) #FInally, we add the bias error mask
                                 else: #if we have pool attribute the layer will train with a pool of error matrices created during the forward propagation.
                                     if(self.Wstd !=0):
-                                        Werr = Merr_distr([self.pool,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
+                                        Werr = self.Merr([self.pool,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
                                     else:
                                         Werr = self.Werr
 
                                     if(self.Bstd !=0):  
-                                        Berr = Merr_distr([self.pool,self.output_size],self.Bstd,self.d_type,self.errDistr)
+                                        Berr = self.Merr([self.pool,self.output_size],self.Bstd,self.d_type,self.errDistr)
                                     else:
                                         Berr = self.Berr
 
@@ -207,18 +188,17 @@ class FC_AConnect(tf.keras.layers.Layer):
                         w = weights*Werr
                         b = bias*Berr
                         Z = tf.add(tf.matmul(self.X, w), b)
-                
-                #za = tf.math.reduce_max(tf.math.abs(Z))       
-                #Z = self.LQuant(Z,za)
+                        
+                Z = self.LQuant(Z)
                 return Z
         
         def slice_batch(self,miniBatch,N,row):
                 if(self.Wstd != 0):
-                        Werr = Merr_distr([miniBatch,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
+                        Werr = self.Merr([miniBatch,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
                 else:
                         Werr = self.Werr
                 if(self.Bstd != 0):
-                        Berr = Merr_distr([miniBatch,self.output_size],self.Bstd,self.d_type,self.errDistr)
+                        Berr = self.Merr([miniBatch,self.output_size],self.Bstd,self.d_type,self.errDistr)
                 else:
                         Berr = self.Berr
                 memW = weights*Werr
@@ -263,50 +243,15 @@ class FC_AConnect(tf.keras.layers.Layer):
                     raise TypeError('pool must be a integer. ' 'Found %s' %(type(self.pool),))
         
         @tf.custom_gradient
-        def LQuant(self,x,a):      # Gradient function for weights quantization
-            y, grad = Quant_custom(x,a,self)
+        def LQuant(self,x):      # Gradient function for weights quantization
+            y, grad = Quant_custom(x,self)
+            return y,grad
+
+        @tf.custom_gradient
+        def Merr(shape,stddev,dtype,errDistr):      # Gradient function for weights quantization
+            y, grad = Merr_distr(shape,stddev,dtype,errDistr)
             return y,grad
         
-###HOW TO IMPLEMENT MANUALLY THE BACKPROPAGATION###
-"""
-        @tf.custom_gradient
-        def forward(self,W,bias,X):
-                if(self.Wstd != 0):
-                        mWerr = Merr_distr([self.miniBatch,tf.cast(self.row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
-                else:
-                        mWerr = self.Werr
-                if(self.Bstd != 0):
-                        Berr = Merr_distr([self.miniBatch,self.output_size],self.Bstd,self.d_type,self.errDistr)
-                else:
-                        Berr = self.Berr
-                if(self.isBin=='yes'):
-                        weights = tf.math.sign(W)                       #Binarize the weights
-                else:
-                        weights = W
-                weights = tf.expand_dims(weights, axis=0)
-                loc_W = weights*mWerr                           #Get the weights with the error matrix included. Also takes the binarization error when isBin=yes
-                bias = tf.expand_dims(bias, axis=0)
-                loc_bias = bias*Berr
-                Z = tf.matmul(X,loc_W)
-                Z = tf.reshape(Z, [self.miniBatch,tf.shape(Z)[-1]]) #Reshape Z to column vector
-                Z = tf.add(Z, loc_bias) # Add the bias error mask
-                def grad(dy):
-                        if(self.isBin=="yes"):
-                                layerW = tf.expand_dims(W, axis=0)
-                                Werr = loc_W/layerW             #If the layer is binary we use Werr as W*/layer.W as algorithm 3 describes.
-                        else:
-                                Werr = mWerr  #If not, Werr will be the same matrices that we multiplied before
-                        dy = tf.reshape(dy, [self.miniBatch,1,tf.shape(dy)[-1]]) #Reshape dy to [batch,1,outputsize]
-                        dX = tf.matmul(dy,loc_W, transpose_b=True) #Activations gradient
-                        dX = tf.reshape(dX, [self.miniBatch, tf.shape(dX)[-1]])
-                        dWerr = tf.matmul(X,dy,transpose_a=True) #Gradient for the error mask of weights
-                        dBerr = tf.reshape(dy, [self.miniBatch,tf.shape(dy)[-1] ]) #Get the gradient of the error mask of bias with property shape
-                        dW = dWerr*Werr #Get the property weights gradient
-                        dW = tf.reduce_sum(dW, axis=0)
-                        dB = dBerr*Berr #Get the property bias gradient
-                        dB = tf.reduce_sum(dB, axis=0)
-                        return dW,dB,dX
-                return Z, grad """
 ###########################################################################################################3
 """
 Convolutional layer with A-Connect
@@ -368,37 +313,22 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                           dtype=self.d_type,
                                           regularizer = self.weights_regularizer,
                                           trainable=True)
-                wi = tf.math.reduce_max(tf.math.abs(self.W)).numpy()
-                wa_init = tf.constant_initializer(wi)
-                self.wa = self.add_weight("wa",
-                                        shape = [1,], 
-                                        initializer = wa_init,
-                                        dtype = self.d_type,
-                                        regularizer = self.weights_regularizer,
-                                        trainable=True)
                 self.bias = self.add_weight('bias',
                                             shape=(self.filters,),
                                             initializer = 'zeros',
                                             dtype=self.d_type,
                                             regularizer = self.bias_regularizer,
                                             trainable=True)
-                ba_init = tf.constant_initializer(1)
-                self.ba = self.add_weight("ba",
-                                        shape = [1,], 
-                                        initializer = ba_init,
-                                        dtype = self.d_type,
-                                        regularizer = self.bias_regularizer,
-                                        trainable=True)
                 if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
                         if(self.Bstd != 0):
-                                self.infBerr = Merr_distr([self.filters,],self.Bstd,self.d_type,self.errDistr)
+                                self.infBerr = self.Merr([self.filters,],self.Bstd,self.d_type,self.errDistr)
                                 self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
                                                                                                          #This was necessary to change the error matrix/array when Monte Carlo was running.
 
                         else:
                                 self.Berr = tf.constant(1,dtype=self.d_type)
                         if(self.Wstd !=0):
-                                self.infWerr = Merr_distr(self.shape,self.Wstd,self.d_type,self.errDistr)
+                                self.infWerr = self.Merr(self.shape,self.Wstd,self.d_type,self.errDistr)
                                 self.infWerr = self.infWerr.numpy()
 
                         else:
@@ -413,12 +343,12 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 
                 #Quantize the weights
                 if(self.isQuant[0]=="yes"):
-                    weights = self.LQuant(self.W,self.wa)    
+                    weights = self.LQuant(self.W)    
                 else:
                     weights = self.W
                 #Quantize the biases
                 if(self.isQuant[1]=="yes"):
-                    bias = self.LQuant(self.bias,self.ba)
+                    bias = self.LQuant(self.bias)
                 else:
                     bias = self.bias
                 
@@ -445,20 +375,20 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                                     Z = tf.concat([Z,Z1],axis=0)
                                         else:
                                             if(self.Wstd != 0):
-                                                Werr = Merr_distr(list((self.batch_size,))+self.shape,self.Wstd,self.d_type,self.errDistr)
+                                                Werr = self.Merr(list((self.batch_size,))+self.shape,self.Wstd,self.d_type,self.errDistr)
                                             else:
                                                 Werr = self.Werr
                                             weights = tf.expand_dims(weights,axis=0)
                                             memW = tf.multiply(weights,Werr)
                                             if(self.Bstd != 0):
-                                                Berr = Merr_distr([self.batch_size,self.filters],self.Bstd,self.d_type,self.errDistr)
+                                                Berr = self.Merr([self.batch_size,self.filters],self.Bstd,self.d_type,self.errDistr)
                                             else:
-                                                Berr = self.Berr
+                                                    Berr = self.Berr
                                             bias = tf.expand_dims(self.bias,axis=0)
                                             membias = tf.multiply(bias,Berr)
                                             membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])
-                                            Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(self.X,1),memW),
-                                                            fn_output_signature=self.d_type),axis=1)
+                                            Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(self.X,1),memW)
+                                                        ,fn_output_signature=self.d_type),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
                                             Z = tf.reshape(Z, [self.batch_size, tf.shape(Z)[1],tf.shape(Z)[2],tf.shape(Z)[3]])
                                             Z = Z+membias
                                 ##################################################################################################################################
@@ -483,13 +413,13 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                                     Z = tf.concat([Z,Z1],axis=0)
                                         else:
                                                 if(self.Wstd != 0):
-                                                    Werr = Merr_distr(list((self.batch_size,))+self.shape,self.Wstd,self.d_type,self.errDistr)
+                                                    Werr = self.Merr(list((self.batch_size,))+self.shape,self.Wstd,self.d_type,self.errDistr)
                                                 else:
                                                     Werr = self.Werr
                                                 weights = tf.expand_dims(weights,axis=0)
                                                 memW = tf.multiply(weights,Werr)
                                                 if(self.Bstd != 0):
-                                                    Berr = Merr_distr([self.batch_size,self.filters],self.Bstd,self.d_type,self.errDistr)
+                                                    Berr = self.Merr([self.batch_size,self.filters],self.Bstd,self.d_type,self.errDistr)
                                                 else:
                                                     Berr = self.Berr
                                                 bias = tf.expand_dims(self.bias,axis=0)
@@ -507,12 +437,12 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                                 Z = membias+Z                                   #Add the bias
                                 else:
                                     if(self.Wstd != 0):
-                                        Werr = Merr_distr(list((self.pool,))+self.shape,self.Wstd,self.d_type,self.errDistr)
+                                        Werr = self.Merr(list((self.pool,))+self.shape,self.Wstd,self.d_type,self.errDistr)
                                     else:
                                         Werr = self.Werr
 
                                     if(self.Bstd != 0):
-                                        Berr = Merr_distr([self.pool,self.filters],self.Bstd,self.d_type,self.errDistr)
+                                        Berr = self.Merr([self.pool,self.filters],self.Bstd,self.d_type,self.errDistr)
                                     else:
                                         Berr = self.Berr
 
@@ -547,20 +477,19 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         b = bias*Berr
                         Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
                 
-                #za = tf.math.reduce_max(tf.math.abs(Z))       
-                #Z = self.LQuant(Z,za)
+                Z = self.LQuant(Z)
                 return Z
         
         def slice_batch(self,weights,miniBatch,N,strides):
                 if(self.Wstd != 0):
-                        Werr = Merr_distr(list((miniBatch,))+self.shape,self.Wstd,self.d_type,self.errDistr)
+                        Werr = self.Merr(list((miniBatch,))+self.shape,self.Wstd,self.d_type,self.errDistr)
                 else:
                         Werr = self.Werr
 
                 weights = tf.expand_dims(weights,axis=0)
                 memW = tf.multiply(weights,Werr)
                 if(self.Bstd != 0):
-                        Berr = Merr_distr([miniBatch,self.filters],self.Bstd,self.d_type,self.errDistr)
+                        Berr = self.Merr([miniBatch,self.filters],self.Bstd,self.d_type,self.errDistr)
                 else:
                         Berr = self.Berr
                 bias = tf.expand_dims(self.bias,axis=0)
@@ -621,8 +550,13 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 return config
         
         @tf.custom_gradient
-        def LQuant(self,x,a):      # Gradient function for weights quantization
-            y, grad = Quant_custom(x,a,self)
+        def LQuant(self,x):      # Gradient function for weights quantization
+            y, grad = Quant_custom(x,self)
+            return y,grad
+        
+        @tf.custom_gradient
+        def Merr(shape,stddev,dtype,errDistr):      # Gradient function for weights quantization
+            y, grad = Merr_distr(shape,stddev,dtype,errDistr)
             return y,grad
             
 ############################AUXILIAR FUNCTIONS##################################################
@@ -667,9 +601,14 @@ def Merr_distr(shape,stddev,dtype,errDistr):
     elif errDistr == "lognormal":
       #Merr = tf.math.exp(-N)*np.exp(0.5*np.power(stddev,2))
       Merr = tf.math.exp(-N)
-    return Merr
+    
+    def grad(dy):
+        dydx = dy
+        return dydx
+    
+    return Merr,grad
 
-def Quant_custom(x,a,self):
+def Quant_custom(x,self):
     
     if x.name == "bias":
         bwidth = self.bw[1]
@@ -679,8 +618,7 @@ def Quant_custom(x,a,self):
         bwidth = self.bw[0]
     
     if (bwidth==1):
-        xq = tf.math.sign(x)
-        y = xq
+        y = tf.math.sign(x)
     else:
     
         """
@@ -694,29 +632,37 @@ def Quant_custom(x,a,self):
         #limit = 3*xStd
         #limit = tf.cast(limit,tf.dtypes.float32)
         #limit = 1
-        """
+    
         xi = tf.cast(x,tf.dtypes.float32)
         xMin = tf.math.reduce_min(xi)
         xMax = tf.math.reduce_max(xi)
         xq = tf.quantization.fake_quant_with_min_max_vars(inputs=xi,min=xMin,max=xMax,num_bits=bwidth)
         y = tf.cast(xq,self.d_type)
+    
         """
-        
-        #xFS = xMax-xMin
-        l = -a
-        u = a
-        xFS = u-l
-        Nlevels = 2**bwidth-1
+        xFS = xMax-xMin
+        Nlevels = 2**bwidth
         xLSB = xFS/Nlevels
-        xClip = tf.clip_by_value(x,l,u)
-        xq = tf.round((xClip-l)/xLSB)*xLSB
-        y = xq + l
+        xq = tf.floor(x/xLSB+1)
+        xq = tf.clip_by_value(xq,-Nlevels/2+1,Nlevels/2-1)-0.5
+        y = xq*xLSB
+        """
+        """
+        limit = math.sqrt(6/((x.get_shape()[0])+(x.get_shape()[1])))
+        y = (tf.clip_by_value(tf.floor((x/limit)*(2**(self.bw[0]-1))+1),-(2**(self.bw[0]-1)-1), 2**(self.bw[0]-1)) -0.5)*(2/(2**self.bw[0]-1))*limit
+        def grad(dy):
+                dydx = tf.multiply(dy,tf.divide(y,x+1e-5))
+        """
     
     def grad(dy):
-        e = 1e-5
-        xe = tf.divide(xq,x+e)
-        dydx = tf.multiply(dy,xe)
-        dyda = 2*xq/xFS-1
-        return dydx,dyda
+        #e = tf.cast(xLSB,self.d_type)*1e-2
+        e = 1e-18
+        if (bwidth==1):
+            dydx = tf.divide(dy,abs(x)+e)
+        else:
+            #xe = tf.divide(y,x+1e-12)  # Not working
+            #dydx = tf.multiply(dy,xe)
+            dydx = dy
+        return dydx
     
     return y,grad
