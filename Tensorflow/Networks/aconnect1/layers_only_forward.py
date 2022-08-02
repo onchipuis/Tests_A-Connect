@@ -254,8 +254,8 @@ class FC_AConnect(tf.keras.layers.Layer):
             y = x*xerr
             
             def grad(dy):
-                    dydx = dy
-                    dydxerr = dy
+                dydx = dy
+                dydxerr = dy
                 return dydx,dydxerr
             return y,grad
         
@@ -608,8 +608,8 @@ class Conv_AConnect(tf.keras.layers.Layer):
             y = x*xerr
             
             def grad(dy):
-                    dydx = dy
-                    dydxerr = dy
+                dydx = dy
+                dydxerr = dy
                 return dydx,dydxerr
             return y,grad  
 ############################AUXILIAR FUNCTIONS##################################################
