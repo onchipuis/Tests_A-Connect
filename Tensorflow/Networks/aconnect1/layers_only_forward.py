@@ -252,7 +252,7 @@ class FC_AConnect(tf.keras.layers.Layer):
             return y,grad
         
         @tf.custom_gradient
-        def custom_mult(x,xerr):      # Gradient function for weights quantization
+        def custom_mult(self,x,xerr):      # Gradient function for weights quantization
             y = x*xerr
             
             def grad(dy):
@@ -608,7 +608,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
             return y,grad
         
         @tf.custom_gradient
-        def custom_mult(x,xerr):      # Gradient function for weights quantization
+        def custom_mult(self,x,xerr):      # Gradient function for weights quantization
             y = x*xerr
             
             def grad(dy):
