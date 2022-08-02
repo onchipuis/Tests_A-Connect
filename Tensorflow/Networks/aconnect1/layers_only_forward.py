@@ -156,9 +156,11 @@ class FC_AConnect(tf.keras.layers.Layer):
                                         Berr = self.Berr
 
                                     newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
-                                    Z = tf.matmul(self.X[0:newBatch], weights*Werr[0])  #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
+                                    werr_aux = self.custom_mult(weights,Werr[0])
+                                    berr_aux = self.custom_mult(bias,Berr[0])
+                                    Z = tf.matmul(self.X[0:newBatch], werr_aux)  #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
                                     Z = tf.reshape(Z,[newBatch,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
-                                    Z = tf.add(Z,bias*Berr[0]) #FInally, we add the bias error mask
+                                    Z = tf.add(Z,berr_aux) #FInally, we add the bias error mask
                                     for i in range(self.pool-1):
                                         werr_aux = self.custom_mult(weights,Werr[i+1])
                                         berr_aux = self.custom_mult(bias,Berr[i+1])
@@ -254,9 +256,9 @@ class FC_AConnect(tf.keras.layers.Layer):
             y = x*xerr
             
             def grad(dy):
-                dydx = dy
-                dydxerr = dy
-                return dydx,dydxerr
+                dy_dx = dy
+                dy_dxerr = dy
+                return dydx, dydxerr
             return y,grad
         
 ###HOW TO IMPLEMENT MANUALLY THE BACKPROPAGATION###
@@ -494,8 +496,10 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                         Berr = self.Berr
 
                                     newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
-                                    Z = tf.nn.conv2d(self.X[0:newBatch], weights*Werr[0],strides=[1,self.strides,self.strides,1],padding=self.padding)
-                                    Z = tf.add(Z,self.bias*Berr[0]) #FInally, we add the bias error mask
+                                    werr_aux = self.custom_mult(weights,Werr[0])
+                                    berr_aux = self.custom_mult(bias,Berr[0])
+                                    Z = tf.nn.conv2d(self.X[0:newBatch],werr_aux,strides=[1,self.strides,self.strides,1],padding=self.padding)
+                                    Z = tf.add(Z,berr_aux) #FInally, we add the bias error mask
                                     for i in range(self.pool-1):
                                         werr_aux = self.custom_mult(weights,Werr[i+1])
                                         berr_aux = self.custom_mult(bias,Berr[i+1])
@@ -608,9 +612,9 @@ class Conv_AConnect(tf.keras.layers.Layer):
             y = x*xerr
             
             def grad(dy):
-                dydx = dy
-                dydxerr = dy
-                return dydx,dydxerr
+                dy_dx = dy
+                dy_dxerr = dy
+                return dy_dx, dy_dxerr
             return y,grad  
 ############################AUXILIAR FUNCTIONS##################################################
 def reshape(X,F): #Used to reshape the input data and the noisy filters
