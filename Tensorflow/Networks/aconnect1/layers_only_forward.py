@@ -160,8 +160,8 @@ class FC_AConnect(tf.keras.layers.Layer):
                                     Z = tf.reshape(Z,[newBatch,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
                                     Z = tf.add(Z,bias*Berr[0]) #FInally, we add the bias error mask
                                     for i in range(self.pool-1):
-                                        werr_aux = custom_mult(weights,Werr[i+1])
-                                        berr_aux = custom_mult(bias,Berr[i+1])
+                                        werr_aux = self.custom_mult(weights,Werr[i+1])
+                                        berr_aux = self.custom_mult(bias,Berr[i+1])
                                         Z1 = tf.matmul(self.X[(i+1)*newBatch:(i+2)*newBatch],werr_aux)
                                         Z1 = tf.add(Z1,berr_aux)
                                         Z = tf.concat([Z,Z1],axis=0)
@@ -497,8 +497,8 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                     Z = tf.nn.conv2d(self.X[0:newBatch], weights*Werr[0],strides=[1,self.strides,self.strides,1],padding=self.padding)
                                     Z = tf.add(Z,self.bias*Berr[0]) #FInally, we add the bias error mask
                                     for i in range(self.pool-1):
-                                        werr_aux = custom_mult(weights,Werr[i+1])
-                                        berr_aux = custom_mult(bias,Berr[i+1])
+                                        werr_aux = self.custom_mult(weights,Werr[i+1])
+                                        berr_aux = self.custom_mult(bias,Berr[i+1])
                                         Z1 = tf.nn.conv2d(self.X[(i+1)*newBatch:(i+2)*newBatch],werr_aux,strides=[1,self.strides,self.strides,1],padding=self.padding)
                                         Z1 = tf.add(Z1,berr_aux)
                                         Z = tf.concat([Z,Z1],axis=0)
