@@ -253,12 +253,7 @@ class FC_AConnect(tf.keras.layers.Layer):
         
         @tf.custom_gradient
         def custom_mult(self,x,xerr):      # Gradient function for weights quantization
-            y = x*xerr
-            
-            def grad(dy):
-                dy_dx = dy#*xerr
-                dy_dxerr = dy#*x
-                return dy_dx, dy_dxerr
+            y,grad = mult_custom(x,xerr)
             return y,grad
         
 ###HOW TO IMPLEMENT MANUALLY THE BACKPROPAGATION###
@@ -609,13 +604,8 @@ class Conv_AConnect(tf.keras.layers.Layer):
         
         @tf.custom_gradient
         def custom_mult(self,x,xerr):      # Gradient function for weights quantization
-            y = x*xerr
-            
-            def grad(dy):
-                dy_dx = dy#*xerr
-                dy_dxerr = dy#*x
-                return dy_dx, dy_dxerr
-            return y,grad  
+            y,grad = mult_custom(x,xerr)
+            return y,grad
 ############################AUXILIAR FUNCTIONS##################################################
 def reshape(X,F): #Used to reshape the input data and the noisy filters
     batch_size=tf.shape(X)[0]
@@ -717,4 +707,13 @@ def Quant_custom(x,self):
             dydx = dy
         return dydx
     
+    return y,grad
+
+def mult_custom(x,xerr):      # Gradient function for weights quantization
+    y = x*xerr
+    
+    def grad(dy):
+        dy_dx = dy#*xerr
+        dy_dxerr = dy#*x
+        return dy_dx, dy_dxerr
     return y,grad
