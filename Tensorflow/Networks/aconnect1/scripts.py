@@ -319,8 +319,8 @@ def Merr_distr(Merr,stddev,stddev_layer,errDistr): #Used to reshape the output o
     N = stddev*Merr
 
     if errDistr == "normal":
-      #Merr = np.abs(1+N)
-      Merr = 1+N
+      Merr = np.abs(1+N)
+      #Merr = 1+N
     elif errDistr == "lognormal":
         #stddev_layer1 = 0
         stddev_layer1 = stddev_layer
