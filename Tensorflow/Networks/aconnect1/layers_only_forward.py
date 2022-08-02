@@ -258,7 +258,7 @@ class FC_AConnect(tf.keras.layers.Layer):
             def grad(dy):
                 dy_dx = dy
                 dy_dxerr = dy
-                return dydx, dydxerr
+                return dy_dx, dy_dxerr
             return y,grad
         
 ###HOW TO IMPLEMENT MANUALLY THE BACKPROPAGATION###
