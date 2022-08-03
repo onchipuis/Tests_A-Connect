@@ -36,7 +36,7 @@ force = "yes"
 force_save = True
 
 #model_name = 'CNN_FASHION_MNIST/'
-model_name = 'CNN_FASHION_MNIST2/'
+model_name = 'CNN_FASHION_MNIST3/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name
 
