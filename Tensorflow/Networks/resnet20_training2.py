@@ -6,7 +6,8 @@ from general_training import general_training
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from tensorflow.keras.callbacks import ReduceLROnPlateau
 from tensorflow.keras.datasets import cifar10
-from aconnect1 import layers_only_forward, scripts
+from aconnect1 import layers_only_forward as layers
+from aconnect1 import scripts
 #from aconnect import layers, scripts
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
