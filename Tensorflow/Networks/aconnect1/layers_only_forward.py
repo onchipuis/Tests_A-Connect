@@ -198,8 +198,6 @@ INPUT ARGUMENTS:
 -isBin: string yes or no, whenever you want binary weights
 -strides: Number of strides (or steps) that the filter moves during the convolution
 -padding: "SAME" or "VALID". If you want to keep the same size or reduce it.
--Op: 1 or 2. Which way to do the convolution you want to use. The first option is slower but has less memory cosumption and the second one is faster
-but consumes a lot of memory.
 -d_type: Type of the parameters that the layers will create. Supports fp16, fp32 and fp64
 """
 class Conv_AConnect(tf.keras.layers.Layer):
@@ -214,7 +212,6 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 pool=0,
                 isQuant=['no','no'],
                 bw=[1,1],
-                Op=1,
                 d_type=tf.dtypes.float32,
                 weights_regularizer=None,
                 bias_regularizer=None,
@@ -231,7 +228,6 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 self.bw = bw
                 self.strides = strides
                 self.padding = padding
-                self.Op = Op
                 self.d_type = d_type
                 self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)                  #Weights regularizer. Default is None
                 self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
@@ -361,7 +357,6 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         'bw': self.bw,
                         'strides': self.strides,
                         'padding': self.padding,
-                        'Op': self.Op,
                         'd_type': self.d_type})
                 return config
         
@@ -389,22 +384,6 @@ def reshape(X,F): #Used to reshape the input data and the noisy filters
     inp_r = tf.transpose(X, [1, 2, 0, 3])
     inp_r = tf.reshape(inp_r, [1, H, W, batch_size*channels_img])
     return inp_r, F
-
-def Z_reshape(Z,F,X,padding,strides): #Used to reshape the output of the layer
-    batch_size=tf.shape(X)[0]
-    H = tf.shape(X)[1]
-    W = tf.shape(X)[2]
-    channels_img = tf.shape(X)[3]
-    channels = channels_img
-    fh = tf.shape(F)[1]
-    fw = tf.shape(F)[2]
-    out_channels = tf.shape(F)[-1]
-    #tf.print(fh)
-    if padding == "SAME":
-        return tf.reshape(Z, [tf.floor(tf.cast((H)/strides,dtype=tf.float16)), tf.floor(tf.cast((W)/strides,dtype=tf.float16)), batch_size, channels, out_channels])
-    if padding == "VALID":
-        return tf.reshape(Z, [tf.floor(tf.cast((H-fh)/strides,dtype=tf.float16))+1, tf.floor(tf.cast((W-fw)/strides,dtype=tf.float16))+1, batch_size, channels, out_channels])
-    #return out
 
 def Merr_distr(shape,stddev,dtype,errDistr):
     N =  tf.random.normal(shape=shape,
@@ -466,7 +445,7 @@ def Quant_custom(x,self):
     
     def grad(dy):
         #e = tf.cast(xLSB,self.d_type)*1e-2
-        e = 1e-18
+        e = 1e-5
         if (bwidth==1):
             dydx = tf.divide(dy,abs(x)+e)
         else:
