@@ -22,7 +22,7 @@ X_test = np.pad(X_test, ((0,0),(2,2),(2,2)), 'constant')
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 #Wstd_err = [0,0.3,0.5,0.7]   # Define the stddev for training
 Wstd_err = [0.7]
-Conv_pool = [8]
+Conv_pool = [1]
 FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
@@ -32,7 +32,7 @@ saveModel = True
 #errDistr = ["lognormal"]
 errDistr = ["normal"]
 #model_name = 'CNN_FASHION_MNIST/'
-model_name = 'CNN_FASHION_MNIST2/'
+model_name = 'CNN_FASHION_MNIST3/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 

@@ -460,9 +460,9 @@ def mult_custom(x,xerr):      # Gradient function for weights quantization
     y = x*xerr
     
     def grad(dy):
-        #dy_dx = dy*xerr
-        #dy_dxerr = dy*x
-        dy_dx = dy
-        dy_dxerr = dy
+        dy_dx = dy*xerr
+        dy_dxerr = dy*x
+        #dy_dx = dy
+        #dy_dxerr = dy
         return dy_dx, dy_dxerr
     return y,grad

@@ -27,7 +27,7 @@ Sim_err = [0.7]
 Conv_pool = [8]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
-Wbw = [8]
+Wbw = [1]
 Bbw = Wbw
 #errDistr = ["lognormal"]
 errDistr = ["normal"]
@@ -36,7 +36,7 @@ force = "yes"
 force_save = True
 
 #model_name = 'CNN_FASHION_MNIST/'
-model_name = 'CNN_FASHION_MNIST2/'
+model_name = 'CNN_FASHION_MNIST3/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name
 
