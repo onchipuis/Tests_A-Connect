@@ -1,12 +1,12 @@
 # Based on https://keras.io/zh/examples/cifar10_resnet/
 import tensorflow as tf
 import numpy as np
-from ResNet import resnet_v1, resnet_v2
+from ResNet2 import resnet_v1, resnet_v2
 from general_training import general_training
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from tensorflow.keras.callbacks import ReduceLROnPlateau
 from tensorflow.keras.datasets import cifar10
-from aconnect1 import layers, scripts
+from aconnect1 import layers_only_forward, scripts
 #from aconnect import layers, scripts
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
@@ -54,9 +54,9 @@ input_shape = X_train.shape[1:]
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect
-Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-Conv_pool = [1]
-FC_pool = [1]
+Wstd_err = [0.5]   # Define the stddev for training
+Conv_pool = [1,8]
+FC_pool = [1,2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
@@ -64,7 +64,7 @@ Bbw = [8]
 #errDistr = ["lognormal"]
 errDistr = ["normal"]
 saveModel = True
-model_name = 'ResNet20_CIFAR10/'
+model_name = 'ResNet20_CIFAR10_2/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 if isAConnect[0]:
