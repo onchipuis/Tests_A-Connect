@@ -39,11 +39,17 @@ saveModel = True
 
 model_name = 'AlexNet_CIFAR10/'
 folder_models = './Models/'+model_name
-folder_results = '../Results/'+model_name+'Training_data/'
 #net_base = folder_models+'Base.h5'
 net_base = folder_models+'Wstd_0_Bstd_0.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 transferLearn = True
+
+# Does include error matrices during backward propagation?
+bwErrProp = [True]
+if not(bwErrProp):
+    model_name = model_name+'ForwNoise_only/' 
+folder_models = './Models/'+model_name
+folder_results = '../Results/'+model_name+'Training_data/'
 
 # TRAINING PARAMETERS
 lr_init = 0.01
@@ -71,6 +77,7 @@ general_training(model_int=alexnet.model_creation,isAConnect=isAConnect,
                         Conv_pool=Conv_pool,
                         FC_pool=FC_pool,
                         errDistr=errDistr,
+                        bwErrProp=bwErrProp,
                         input_shape=None,depth=None,namev='',
                         optimizer=optimizer,
                         X_train=X_train, Y_train=Y_train,

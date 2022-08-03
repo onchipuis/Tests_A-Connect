@@ -12,7 +12,8 @@ Xsz = 227
 
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,
         isQuant=["no","no"],bw=[8,8],
-        Conv_pool=8,FC_pool=8,errDistr="normal",**kwargs):
+        Conv_pool=8,FC_pool=8,errDistr="normal",
+        bwErrProp=True,**kwargs):
         
         if(not(isAConnect)):
                 model = tf.keras.models.Sequential([
@@ -45,38 +46,36 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,
                 model = tf.keras.models.Sequential([
                         InputLayer(input_shape=[32,32,3]),
                         tf.keras.layers.experimental.preprocessing.Resizing(Xsz,Xsz),   
-                        Conv_AConnect(filters=96,kernel_size=(11,11),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,isQuant=isQuant,bw=bw,strides=4,padding="VALID",Op=1,Slice=1,d_type=tf.dtypes.float16),      
+                        Conv_AConnect(filters=96,kernel_size=(11,11),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,isQuant=isQuant,bw=bw,strides=4,padding="VALID",bwErrProp=bwErrProp,d_type=tf.dtypes.float16),      
                         BatchNormalization(),              
                         ReLU(),
                         MaxPool2D(pool_size=(3,3),strides=(2,2)),
-                        Conv_AConnect(filters=256,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,isQuant=isQuant,bw=bw,strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),      
+                        Conv_AConnect(filters=256,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,isQuant=isQuant,bw=bw,strides=1,padding="SAME",bwErrProp=bwErrProp,d_type=tf.dtypes.float16),      
                         BatchNormalization(),                  
                         ReLU(),
                         MaxPool2D(pool_size=(3,3),strides=(2,2)),
-                        Conv_AConnect(filters=384,kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,isQuant=isQuant,bw=bw,strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),       
+                        Conv_AConnect(filters=384,kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,isQuant=isQuant,bw=bw,strides=1,padding="SAME",bwErrProp=bwErrProp,d_type=tf.dtypes.float16),       
                         BatchNormalization(),                  
                         ReLU(),
-                        Conv_AConnect(filters=384,kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,isQuant=isQuant,bw=bw,strides=1,padding="SAME",Op=2,Slice=1,d_type=tf.dtypes.float16),     
-                        #Conv_AConnect(filters=384,kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,isQuant=isQuant,bw=bw,strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),     
+                        Conv_AConnect(filters=384,kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,isQuant=isQuant,bw=bw,strides=1,padding="SAME",bwErrProp=bwErrProp,d_type=tf.dtypes.float16),     
                         BatchNormalization(),                     
                         ReLU(),
-                        Conv_AConnect(filters=256,kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,isQuant=isQuant,bw=bw,strides=1,padding="SAME",Op=2,Slice=1,d_type=tf.dtypes.float16),       
-                        #Conv_AConnect(filters=256,kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,isQuant=isQuant,bw=bw,strides=1,padding="SAME",Op=1,Slice=1,d_type=tf.dtypes.float16),       
+                        Conv_AConnect(filters=256,kernel_size=(3,3),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=Conv_pool,isQuant=isQuant,bw=bw,strides=1,padding="SAME",bwErrProp=bwErrProp,d_type=tf.dtypes.float16),       
                         BatchNormalization(),                     
                         ReLU(),
                         MaxPool2D(pool_size=(3,3),strides=(2,2)),
                         Flatten(),
-                        FC_AConnect(1024,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=FC_pool,isQuant=isQuant,bw=bw,d_type=tf.dtypes.float16),  
+                        FC_AConnect(1024,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=FC_pool,isQuant=isQuant,bw=bw,bwErrProp=bwErrProp,d_type=tf.dtypes.float16),  
                         BatchNormalization(),                     
                         ReLU(),
                         Dropout(0.5),
-                        FC_AConnect(1024,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=FC_pool,isQuant=isQuant,bw=bw,d_type=tf.dtypes.float16),     
+                        FC_AConnect(1024,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=FC_pool,isQuant=isQuant,bw=bw,bwErrProp=bwErrProp,d_type=tf.dtypes.float16),     
                         BatchNormalization(),   
                         ReLU(),
-                        FC_AConnect(512,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=FC_pool,isQuant=isQuant,bw=bw,d_type=tf.dtypes.float16),       
+                        FC_AConnect(512,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=FC_pool,isQuant=isQuant,bw=bw,bwErrProp=bwErrProp,d_type=tf.dtypes.float16),       
                         BatchNormalization(),   
                         ReLU(),
-                        FC_AConnect(10,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=FC_pool,isQuant=isQuant,bw=bw,d_type=tf.dtypes.float16),
+                        FC_AConnect(10,Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,pool=FC_pool,isQuant=isQuant,bw=bw,bwErrProp=bwErrProp,d_type=tf.dtypes.float16),
                         Softmax()
             ])
 

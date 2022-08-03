@@ -32,6 +32,10 @@ saveModel = True
 #errDistr = ["lognormal"]
 errDistr = ["normal"]
 model_name = 'CNN_FASHION_MNIST/'
+# Does include error matrices during backward propagation?
+bwErrProp = [True]
+if not(bwErrProp):
+    model_name = model_name+'ForwNoise_only/' 
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 
@@ -51,6 +55,7 @@ general_training(model_int=fashion.model_creation,isAConnect=isAConnect,
                         Conv_pool=Conv_pool,
                         FC_pool=FC_pool,
                         errDistr=errDistr,
+                        bwErrProp=bwErrProp,
                         input_shape=None,depth=None,namev='',
                         optimizer=optimizer,
                         X_train=X_train, Y_train=Y_train,

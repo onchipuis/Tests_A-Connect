@@ -38,6 +38,7 @@ def general_training (model_int=None,isAConnect=[True],
                         Conv_pool=[2],
                         FC_pool=[2],
                         errDistr=["normal"],
+                        bwErrProp=[True],
                         input_shape=None,depth=None,namev='', # Use for ResNet only
                         optimizer=None,
                         X_train=None, Y_train=None,
@@ -75,72 +76,74 @@ def general_training (model_int=None,isAConnect=[True],
                     Bbw_aux = [8]
 
                 for q in range (len(Wbw_aux)):
-                    for j in range(len(Wstd_aux)):
-                        for k in range(len(errDistr_aux)):
-                            Err = Wstd_aux[j]
-                            # CREATING NN:
-                            model = model_int(isAConnect = isAConnect[d], 
-                                            Wstd=Err,Bstd=Err,
-                                            isQuant=[WisQuant_aux[p],BisQuant_aux[p]],
-                                            bw=[Wbw_aux[q],Bbw_aux[q]],
-                                            Conv_pool=Conv_pool_aux[i],
-                                            FC_pool=FC_pool_aux[i],
-                                            errDistr=errDistr_aux[k],
-                                            input_shape=input_shape,
-                                            depth=depth)
-                            
-                            ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
-                            if isAConnect[d] and transferLearn:
-                                model.set_weights(model_base.get_weights())
-                            
-                            # NAME
-                            if isAConnect[d]:
-                                Werr = str(int(100*Err))
-                                Nm = str(int(Conv_pool_aux[i]))
-                                if WisQuant_aux[p] == "yes":
-                                    bws = str(int(Wbw_aux[q]))
-                                    quant = bws+'bQuant_'
+                    for b in range (len(bwErrProp)):
+                        for j in range(len(Wstd_aux)):
+                            for k in range(len(errDistr_aux)):
+                                Err = Wstd_aux[j]
+                                # CREATING NN:
+                                model = model_int(isAConnect = isAConnect[d], 
+                                                Wstd=Err,Bstd=Err,
+                                                isQuant=[WisQuant_aux[p],BisQuant_aux[p]],
+                                                bw=[Wbw_aux[q],Bbw_aux[q]],
+                                                Conv_pool=Conv_pool_aux[i],
+                                                FC_pool=FC_pool_aux[i],
+                                                errDistr=errDistr_aux[k],
+                                                bwErrProp=bwErrProp[b],
+                                                input_shape=input_shape,
+                                                depth=depth)
+                                
+                                ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
+                                if isAConnect[d] and transferLearn:
+                                    model.set_weights(model_base.get_weights())
+                                
+                                # NAME
+                                if isAConnect[d]:
+                                    Werr = str(int(100*Err))
+                                    Nm = str(int(Conv_pool_aux[i]))
+                                    if WisQuant_aux[p] == "yes":
+                                        bws = str(int(Wbw_aux[q]))
+                                        quant = bws+'bQuant_'
+                                    else:
+                                        quant = ''
+                                    if Werr == '0':
+                                        name = 'Wstd_0_Bstd_0'
+                                    else:
+                                        name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr_aux[k]+'Distr'+namev
                                 else:
-                                    quant = ''
-                                if Werr == '0':
-                                    name = 'Wstd_0_Bstd_0'
-                                else:
-                                    name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr_aux[k]+'Distr'+namev
-                            else:
-                                name = 'Base'+namev
-                            
-                            print("*************************TRAINING NETWORK*********************")
-                            print("\n\t\t\t", name)
-                            
-                            #TRAINING PARAMETERS
-                            model.compile(loss='sparse_categorical_crossentropy',
-                                          optimizer=optimizer,
-                                          metrics=['accuracy'])
+                                    name = 'Base'+namev
+                                
+                                print("*************************TRAINING NETWORK*********************")
+                                print("\n\t\t\t", name)
+                                
+                                #TRAINING PARAMETERS
+                                model.compile(loss='sparse_categorical_crossentropy',
+                                              optimizer=optimizer,
+                                              metrics=['accuracy'])
 
-                            # Run training, with or without data augmentation.
-                            history = model.fit(X_train, Y_train,
-                                          batch_size=batch_size,
-                                          epochs=epochs,
-                                          validation_data=(X_test, Y_test),
-                                          shuffle=True,
-                                          callbacks=callbacks)
-                            model.evaluate(X_test,Y_test) 
-                            
-                            y_predict =model.predict(X_test)
-                            elapsed_time = time.time() - start_time
-                            print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
-                            print("Elapsed time: {}".format(hms_string(elapsed_time)))
-                            print('Tiempo de procesamiento (secs): ', time.time()-tic)
-                            #Save the accuracy and the validation accuracy
-                            acc = history.history['accuracy'] 
-                            val_acc = history.history['val_accuracy']
-                                          
-                            # SAVE MODEL:
-                            if saveModel:
-                                string = folder_models + name + '.h5'
-                                model.save(string,include_optimizer=False)
-                                #Save in a txt the accuracy and the validation accuracy for further analysis
-                                if not os.path.isdir(folder_results):
-                                    os.makedirs(folder_results)
-                                np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.4f") 
-                                np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.4f")              
+                                # Run training, with or without data augmentation.
+                                history = model.fit(X_train, Y_train,
+                                              batch_size=batch_size,
+                                              epochs=epochs,
+                                              validation_data=(X_test, Y_test),
+                                              shuffle=True,
+                                              callbacks=callbacks)
+                                model.evaluate(X_test,Y_test) 
+                                
+                                y_predict =model.predict(X_test)
+                                elapsed_time = time.time() - start_time
+                                print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
+                                print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                                print('Tiempo de procesamiento (secs): ', time.time()-tic)
+                                #Save the accuracy and the validation accuracy
+                                acc = history.history['accuracy'] 
+                                val_acc = history.history['val_accuracy']
+                                              
+                                # SAVE MODEL:
+                                if saveModel:
+                                    string = folder_models + name + '.h5'
+                                    model.save(string,include_optimizer=False)
+                                    #Save in a txt the accuracy and the validation accuracy for further analysis
+                                    if not os.path.isdir(folder_results):
+                                        os.makedirs(folder_results)
+                                    np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.4f") 
+                                    np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.4f")              

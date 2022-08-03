@@ -11,7 +11,7 @@ def resnet_layer(inputs,num_filters=16,kernel_size=(3,3),
                 isAConnect=False,Wstd=0,Bstd=0,
                 pool=2,errDistr="normal",
                 isQuant=['no','no'],bw=[8,8],
-                **kwargs):
+                bwErrProp=True,**kwargs):
     """2D Convolution-Batch Normalization-Activation stack builder
 
     # Arguments
@@ -35,7 +35,7 @@ def resnet_layer(inputs,num_filters=16,kernel_size=(3,3),
                             errDistr = errDistr,
                             pool = pool,
                             isQuant=isQuant,bw=bw,
-                            Op=1,Slice=1)
+                            bwErrProp=bwErrProp)
     
     else:
         conv = Conv2D(num_filters,
@@ -64,7 +64,8 @@ def resnet_layer(inputs,num_filters=16,kernel_size=(3,3),
 def resnet_v1(input_shape, depth, num_classes=10, 
                 isAConnect=False,Wstd=0,Bstd=0,
                 Conv_pool=2,FC_pool=2,errDistr="normal",
-                isQuant=['no','no'],bw=[8,8],**kwargs):
+                isQuant=['no','no'],bw=[8,8],
+                bwErrProp=True,**kwargs):
     """ResNet Version 1 Model builder [a]
 
     Stacks of 2 x (3 x 3) Conv2D-BN-ReLU
@@ -116,7 +117,7 @@ def resnet_v1(input_shape, depth, num_classes=10,
     x = resnet_layer(inputs=x,
             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
             pool=Conv_pool,errDistr=errDistr,
-            isQuant=isQuant,bw=bw)
+            isQuant=isQuant,bw=bw,bwErrProp=bwErrProp)
 
     # Instantiate the stack of residual units
     for stack in range(3):
@@ -129,14 +130,14 @@ def resnet_v1(input_shape, depth, num_classes=10,
                             strides=strides,
                             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                             pool=Conv_pool,errDistr=errDistr,
-                            isQuant=isQuant,bw=bw)
+                            isQuant=isQuant,bw=bw,bwErrProp=bwErrProp)
             y = resnet_layer(inputs=y,
                             num_filters=num_filters,
                             activation=None,
                             batch_normalization=False, # Added by Luis E. Rueda G. (testing)
                             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                             pool=Conv_pool,errDistr=errDistr,
-                            isQuant=isQuant,bw=bw)
+                            isQuant=isQuant,bw=bw,bwErrProp=bwErrProp)
             if stack > 0 and res_block == 0:  # first layer but not first stack
                 # linear projection residual shortcut connection to match
                 # changed dims
@@ -148,7 +149,7 @@ def resnet_v1(input_shape, depth, num_classes=10,
                                 batch_normalization=False,
                                 isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                                 pool=Conv_pool,errDistr=errDistr,
-                                isQuant=isQuant,bw=bw)
+                                isQuant=isQuant,bw=bw,bwErrProp=bwErrProp)
             x = tf.keras.layers.add([x, y])
             x = BatchNormalization()(x) # Added by Luis E. Rueda G. (testing)
             x = Activation('relu')(x)
@@ -162,7 +163,7 @@ def resnet_v1(input_shape, depth, num_classes=10,
     if isAConnect:
         y = FC_AConnect(num_classes,Wstd=Wstd,Bstd=Bstd,
                         pool=FC_pool,errDistr=errDistr,
-                        isQuant=isQuant,bw=bw)(y)
+                        isQuant=isQuant,bw=bw,bwErrProp=bwErrProp)(y)
         outputs = Softmax()(y)
     else:
         outputs = Dense(num_classes,
@@ -177,7 +178,7 @@ def resnet_v1(input_shape, depth, num_classes=10,
 def resnet_v2(input_shape, depth, num_classes=10,
                 isAConnect=False,Wstd=0,Bstd=0,
                 Conv_pool=2,FC_pool=2,errDistr="normal",
-                isQuant=['no','no'],bw=[8,8],**kwargs):
+                isQuant=['no','no'],bw=[8,8],bwErrProp=True,**kwargs):
     """ResNet Version 2 Model builder [b]
 
     Stacks of (1 x 1)-(3 x 3)-(1 x 1) BN-ReLU-Conv2D or also known as
@@ -224,7 +225,7 @@ def resnet_v2(input_shape, depth, num_classes=10,
                     #conv_first=True,
                     isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                     pool=Conv_pool,errDistr=errDistr,
-                    isQuant=isQuant,bw=bw)
+                    isQuant=isQuant,bw=bw,bwErrProp=bwErrProp)
 
     # Instantiate the stack of residual units
     for stage in range(3):
@@ -252,13 +253,13 @@ def resnet_v2(input_shape, depth, num_classes=10,
                             #conv_first=False,           # Removed by Luis Rueda
                             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                             pool=Conv_pool,errDistr=errDistr,
-                            isQuant=isQuant,bw=bw)
+                            isQuant=isQuant,bw=bw,bwErrProp=bwErrProp)
             y = resnet_layer(inputs=y,
                             num_filters=num_filters_in,
                             #conv_first=False,           # Removed by Luis Rueda
                             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                             pool=Conv_pool,errDistr=errDistr,
-                            isQuant=isQuant,bw=bw)
+                            isQuant=isQuant,bw=bw,bwErrProp=bwErrProp)
             y = resnet_layer(inputs=y,
                             num_filters=num_filters_out,
                             kernel_size=(1,1),
@@ -267,7 +268,7 @@ def resnet_v2(input_shape, depth, num_classes=10,
                             batch_normalization=False,  # Added by Luis Rueda
                             isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                             pool=Conv_pool,errDistr=errDistr,
-                            isQuant=isQuant,bw=bw)
+                            isQuant=isQuant,bw=bw,bwErrProp=bwErrProp)
             if res_block == 0:
                 # linear projection residual shortcut connection to match
                 # changed dims
@@ -279,7 +280,7 @@ def resnet_v2(input_shape, depth, num_classes=10,
                                 batch_normalization=False,
                                 isAConnect=isAConnect,Wstd=Wstd,Bstd=Bstd, 
                                 pool=Conv_pool,errDistr=errDistr,
-                                isQuant=isQuant,bw=bw)
+                                isQuant=isQuant,bw=bw,bwErrProp=bwErrProp)
             x = tf.keras.layers.add([x, y])
             x = BatchNormalization()(x) # Added by Luis Rueda
             x = Activation('relu')(x)   # Added by Luis Rueda
@@ -297,7 +298,7 @@ def resnet_v2(input_shape, depth, num_classes=10,
     if isAConnect:
         y = FC_AConnect(num_classes,Wstd=Wstd,Bstd=Bstd,
                         pool=FC_pool,errDistr=errDistr,
-                        isQuant=isQuant,bw=bw)(y)
+                        isQuant=isQuant,bw=bw,bwErrProp=bwErrProp)(y)
         outputs = Softmax()(y)
     else:
         outputs = Dense(num_classes,

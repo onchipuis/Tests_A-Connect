@@ -66,13 +66,19 @@ errDistr = ["normal"]
 saveModel = True
 model_name = 'ResNet20_CIFAR10/'
 folder_models = './Models/'+model_name
-folder_results = '../Results/'+model_name+'Training_data/'
 if isAConnect[0]:
     net_base = folder_models+'Wstd_0_Bstd_0.h5'
     #net_base = folder_models+'8Werr_Wstd_70_Bstd_70_8bQuant_normalDistr.h5'
     #net_base = folder_models+'8Werr_Wstd_50_Bstd_50_8bQuant_lognormalDistr.h5'
     model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
     transferLearn = True
+
+# Does include error matrices during backward propagation?
+bwErrProp = [True]
+if not(bwErrProp):
+    model_name = model_name+'ForwNoise_only/' 
+folder_models = './Models/'+model_name
+folder_results = '../Results/'+model_name+'Training_data/'
 
 # TRAINING PARAMETERS
 #lrate = 1e-3        # for Adam optimizer
@@ -150,6 +156,7 @@ general_training(model_int=resnet_v1 if(version==1) else resnet_v2,isAConnect=is
                         Conv_pool=Conv_pool,
                         FC_pool=FC_pool,
                         errDistr=errDistr,
+                        bwErrProp=bwErrProp,
                         input_shape=input_shape,depth=depth,namev=namev,
                         optimizer=optimizer,
                         X_train=X_train, Y_train=Y_train,

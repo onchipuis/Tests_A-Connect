@@ -35,6 +35,10 @@ MCsims = 100
 force = "yes"
 
 model_name = 'VGG16_CIFAR10/'
+# Does include error matrices during backward propagation?
+bwErrProp = [True]
+if not(bwErrProp):
+    model_name = model_name+'ForwNoise_only/' 
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name
 
