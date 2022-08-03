@@ -10,7 +10,6 @@ INPUT ARGUMENTS:
 -Bstd: Bstd standard deviation of the bias(number between 0-1. By default is 0)
 -isBin: if the layer will binarize the weights(String yes or no. By default is no)
 -pool: Number of error that you want to use
--Slice: If you want to slice the batch in order to reduce the memory usage. Only supports slicing the batch into 2,4 or 8 parts. Any other number will not slice the batch.
 -d_type: Data type of the weights and other variables. Default is fp32. Please see tf.dtypes.Dtype
 -weights_regularizer: Weights regularizer. Default is None
 -bias_regularizer: Bias regularizer. Default is None
@@ -24,8 +23,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                 errDistr="normal",
                 isQuant=["no","no"],
                 bw=[1,1],
-                pool=None,
-                Slice=1,
+                pool=0,
                 d_type=tf.dtypes.float16,
                 weights_regularizer=None,
                 bias_regularizer=None,
@@ -39,7 +37,6 @@ class FC_AConnect(tf.keras.layers.Layer):
                 self.isQuant = isQuant                                           #if the layer will binarize the weights, bias or both (list [weights_quat (yes or no) , bias_quant (yes or no)]. By default is ["no","no"])
                 self.bw = bw                                                     #Number of bits of weights and bias quantization (List [bw_weights, bw_bias]. By default is [1,1])
                 self.pool = pool                                                #Number of error that you want to use
-                self.Slice = Slice                                              #If you want to slice the batch in order to reduce the memory usage
                 self.d_type = d_type                                            #Data type of the weights and other variables. Default is fp32. Please see tf.dtypes.Dtype
                 self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)                  #Weights regularizer. Default is None
                 self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
@@ -96,124 +93,59 @@ class FC_AConnect(tf.keras.layers.Layer):
                     bias = self.bias
                 #This code will train the network. For inference, please go to the else part
                 if(training):
-                        if(self.Wstd != 0 or self.Bstd != 0):
-                                
-                                if(self.pool is None):
-                                    if(self.Slice == 2): #Slice the batch into 2 minibatches of size batch/2
-                                        miniBatch = tf.cast(self.batch_size/2,dtype=tf.int32)
-                                        Z1 = self.slice_batch(weights,miniBatch,0,row) #Takes a portion from 0:minibatch
-                                        Z2 = self.slice_batch(weights,miniBatch,1,row) #Takes a portion from minibatch:2*minibatch
-                                        Z = tf.concat([Z1,Z2],axis=0)
-                                    elif(self.Slice == 4):
-                                        miniBatch = tf.cast(self.batch_size/4,dtype=tf.int32) #Slice the batch into 4 minibatches of size batch/4
-                                        Z = self.slice_batch(weights,miniBatch,0,row) #Takes a portion from 0:minibatch
-                                        for i in range(3):
-                                            Z1 = self.slice_batch(weights,miniBatch,i+1,row) #Takes a portion from minibatch:2*minibatch
-                                            Z = tf.concat([Z,Z1],axis=0)
-                                    elif(self.Slice == 8):
-                                        miniBatch = tf.cast(self.batch_size/8,dtype=tf.int32) #Slice the batch into 8 minibatches of size batch/8
-                                        Z = self.slice_batch(miniBatch,0,row) #Takes a portion from 0:minibatch
-                                        for i in range(7):
-                                            Z1 = self.slice_batch(miniBatch,i+1,row) #Takes a portion from minibatch:2*minibatch
-                                            Z = tf.concat([Z,Z1],axis=0)
-                                    else:
-                                        if(self.Wstd !=0):
-                                            Werr = Merr_distr([self.batch_size,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
-                                        else:
-                                            Werr = self.Werr
-                                        #Finally we multiply element-wise the error matrix with the weights.
-                                        memW = tf.multiply(weights,Werr)                                        
-                                        
-                                        #For the bias is exactly the same situation
-                                        if(self.Bstd !=0):                                                              
-                                            Berr = Merr_distr([self.batch_size,self.output_size],self.Bstd,self.d_type,self.errDistr)
-                                        else:
-                                            Berr = self.Berr
-                                        membias = tf.multiply(Berr,self.bias)
-
-                                        Xaux = tf.reshape(self.X, [self.batch_size,1,tf.shape(self.X)[-1]]) #We need this reshape, beacuse the input data is a column vector with
-                                                                                            # 2 dimension, e.g. in the first layer using MNIST we will have a vector with
-                                                                                            #shape [batchsize,784], and we need to do a matrix multiplication.
-                                                                                            #Which means the last dimension of the first matrix and the first dimension of the
-                                                                                            #second matrix must be equal. In this case, with a FC layer with 128 neurons we will have this dimensions
-                                                                                            #[batchsize,784] for the input and for the weights mask [batchsize,784,128]
-                                                                                            #And the function tf.matmul will not recognize the first dimension of X as the batchsize, so the multiplication will return a wrong result.
-                                                                                            #Thats why we add an extra dimension, and transpose the vector. At the end we will have a vector with shape [batchsize,1,784].
-                                                                                            #And the multiplication result will be correct.
-
-                                        Z = tf.matmul(Xaux, memW)       #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
-                                        Z = tf.reshape(Z,[self.batch_size,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
-                                        Z = tf.add(Z,membias) #FInally, we add the bias error mask
-                                else: #if we have pool attribute the layer will train with a pool of error matrices created during the forward propagation.
-                                    if(self.Wstd !=0):
-                                        Werr = Merr_distr([self.pool,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
-                                    else:
-                                        Werr = self.Werr
-
-                                    if(self.Bstd !=0):  
-                                        Berr = Merr_distr([self.pool,self.output_size],self.Bstd,self.d_type,self.errDistr)
-                                    else:
-                                        Berr = self.Berr
-
-                                    newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
-                                    werr_aux = self.custom_mult(weights,Werr[0])
-                                    berr_aux = self.custom_mult(bias,Berr[0])
-                                    Z = tf.matmul(self.X[0:newBatch], werr_aux)  #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
-                                    Z = tf.reshape(Z,[newBatch,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
-                                    Z = tf.add(Z,berr_aux) #FInally, we add the bias error mask
-                                    for i in range(self.pool-1):
-                                        werr_aux = self.custom_mult(weights,Werr[i+1])
-                                        berr_aux = self.custom_mult(bias,Berr[i+1])
-                                        Z1 = tf.matmul(self.X[(i+1)*newBatch:(i+2)*newBatch],werr_aux)
-                                        Z1 = tf.add(Z1,berr_aux)
-                                        Z = tf.concat([Z,Z1],axis=0)
-
+                    if(self.Wstd != 0 or self.Bstd != 0):
+                            
+                        if(self.Wstd !=0):
+                            Werr = Merr_distr([self.pool,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
                         else:
-                                #Custom FC layer operation when we don't have Wstd or Bstd.
-                                w = weights*self.Werr
-                                b = bias*self.Berr
-                                Z = tf.add(tf.matmul(self.X,w),b) 
+                            Werr = self.Werr
+
+                        if(self.Bstd !=0):  
+                            Berr = Merr_distr([self.pool,self.output_size],self.Bstd,self.d_type,self.errDistr)
+                        else:
+                            Berr = self.Berr
+
+                        newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
+                        werr_aux = self.custom_mult(weights,Werr[0])
+                        berr_aux = self.custom_mult(bias,Berr[0])
+                        Z = tf.matmul(self.X[0:newBatch], werr_aux)  #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
+                        Z = tf.reshape(Z,[newBatch,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
+                        Z = tf.add(Z,berr_aux) #FInally, we add the bias error mask
+                        for i in range(self.pool-1):
+                            werr_aux = self.custom_mult(weights,Werr[i+1])
+                            berr_aux = self.custom_mult(bias,Berr[i+1])
+                            Z1 = tf.matmul(self.X[(i+1)*newBatch:(i+2)*newBatch],werr_aux)
+                            Z1 = tf.add(Z1,berr_aux)
+                            Z = tf.concat([Z,Z1],axis=0)
+
+                    else:
+                        #Custom FC layer operation when we don't have Wstd or Bstd.
+                        w = weights*self.Werr
+                        b = bias*self.Berr
+                        Z = tf.add(tf.matmul(self.X,w),b) 
 
                 else:
                     #This part of the code will be executed during the inference
-                        if(self.Wstd != 0 or self.Bstd !=0):
-                                if(self.Wstd !=0):
-                                        Werr = self.infWerr
-                                else:
-                                        Werr = self.Werr
-                                if(self.Bstd != 0):
-                                        Berr = self.infBerr
-                                else:
-                                        Berr = self.Berr
+                    if(self.Wstd != 0 or self.Bstd !=0):
+                        if(self.Wstd !=0):
+                                Werr = self.infWerr
                         else:
                                 Werr = self.Werr
+                        if(self.Bstd != 0):
+                                Berr = self.infBerr
+                        else:
                                 Berr = self.Berr
-                        #Custom FC layer operation
-                        w = weights*Werr
-                        b = bias*Berr
-                        Z = tf.add(tf.matmul(self.X, w), b)
+                    else:
+                        Werr = self.Werr
+                        Berr = self.Berr
+                    #Custom FC layer operation
+                    w = weights*Werr
+                    b = bias*Berr
+                    Z = tf.add(tf.matmul(self.X, w), b)
                         
                 Z = self.LQuant(Z)
                 return Z
         
-        def slice_batch(self,miniBatch,N,row):
-                if(self.Wstd != 0):
-                        Werr = Merr_distr([miniBatch,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
-                else:
-                        Werr = self.Werr
-                if(self.Bstd != 0):
-                        Berr = Merr_distr([miniBatch,self.output_size],self.Bstd,self.d_type,self.errDistr)
-                else:
-                        Berr = self.Berr
-                memW = weights*Werr
-                membias = self.bias*Berr
-                Xaux = tf.reshape(self.X[N*miniBatch:(N+1)*miniBatch], [miniBatch,1,row])
-
-                Z = tf.matmul(Xaux, memW)       #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
-                Z = tf.reshape(Z,[miniBatch,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
-                Z = tf.add(Z,membias) #FInally, we add the bias error mask
-                return Z
-
         #THis is only for saving purposes. Does not affect the layer performance.
         def get_config(self):
                 config = super(FC_AConnect, self).get_config()
@@ -224,7 +156,6 @@ class FC_AConnect(tf.keras.layers.Layer):
                         'isQuant': self.isQuant,
                         'bw': self.bw,
                         'pool' : self.pool,
-                        'Slice': self.Slice,
                         'd_type': self.d_type,
                         'errDistr ': self.errDistr,
                         'weights_regularizer': self.weights_regularizer,
@@ -256,46 +187,6 @@ class FC_AConnect(tf.keras.layers.Layer):
             y,grad = mult_custom(x,xerr)
             return y,grad
         
-###HOW TO IMPLEMENT MANUALLY THE BACKPROPAGATION###
-"""
-        @tf.custom_gradient
-        def forward(self,W,bias,X):
-                if(self.Wstd != 0):
-                        mWerr = Merr_distr([self.miniBatch,tf.cast(self.row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
-                else:
-                        mWerr = self.Werr
-                if(self.Bstd != 0):
-                        Berr = Merr_distr([self.miniBatch,self.output_size],self.Bstd,self.d_type,self.errDistr)
-                else:
-                        Berr = self.Berr
-                if(self.isBin=='yes'):
-                        weights = tf.math.sign(W)                       #Binarize the weights
-                else:
-                        weights = W
-                weights = tf.expand_dims(weights, axis=0)
-                loc_W = weights*mWerr                           #Get the weights with the error matrix included. Also takes the binarization error when isBin=yes
-                bias = tf.expand_dims(bias, axis=0)
-                loc_bias = bias*Berr
-                Z = tf.matmul(X,loc_W)
-                Z = tf.reshape(Z, [self.miniBatch,tf.shape(Z)[-1]]) #Reshape Z to column vector
-                Z = tf.add(Z, loc_bias) # Add the bias error mask
-                def grad(dy):
-                        if(self.isBin=="yes"):
-                                layerW = tf.expand_dims(W, axis=0)
-                                Werr = loc_W/layerW             #If the layer is binary we use Werr as W*/layer.W as algorithm 3 describes.
-                        else:
-                                Werr = mWerr  #If not, Werr will be the same matrices that we multiplied before
-                        dy = tf.reshape(dy, [self.miniBatch,1,tf.shape(dy)[-1]]) #Reshape dy to [batch,1,outputsize]
-                        dX = tf.matmul(dy,loc_W, transpose_b=True) #Activations gradient
-                        dX = tf.reshape(dX, [self.miniBatch, tf.shape(dX)[-1]])
-                        dWerr = tf.matmul(X,dy,transpose_a=True) #Gradient for the error mask of weights
-                        dBerr = tf.reshape(dy, [self.miniBatch,tf.shape(dy)[-1] ]) #Get the gradient of the error mask of bias with property shape
-                        dW = dWerr*Werr #Get the property weights gradient
-                        dW = tf.reduce_sum(dW, axis=0)
-                        dB = dBerr*Berr #Get the property bias gradient
-                        dB = tf.reduce_sum(dB, axis=0)
-                        return dW,dB,dX
-                return Z, grad """
 ###########################################################################################################3
 """
 Convolutional layer with A-Connect
@@ -309,7 +200,6 @@ INPUT ARGUMENTS:
 -padding: "SAME" or "VALID". If you want to keep the same size or reduce it.
 -Op: 1 or 2. Which way to do the convolution you want to use. The first option is slower but has less memory cosumption and the second one is faster
 but consumes a lot of memory.
--Slice: Optional parameter. Used to divide the batch into 2,4 or 8 minibatches of size batch/N.
 -d_type: Type of the parameters that the layers will create. Supports fp16, fp32 and fp64
 """
 class Conv_AConnect(tf.keras.layers.Layer):
@@ -321,11 +211,10 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 Wstd=0,
                 Bstd=0,
                 errDistr="normal",
-                pool=None,
+                pool=0,
                 isQuant=['no','no'],
                 bw=[1,1],
                 Op=1,
-                Slice=1,
                 d_type=tf.dtypes.float32,
                 weights_regularizer=None,
                 bias_regularizer=None,
@@ -343,7 +232,6 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 self.strides = strides
                 self.padding = padding
                 self.Op = Op
-                self.Slice = Slice
                 self.d_type = d_type
                 self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)                  #Weights regularizer. Default is None
                 self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
@@ -397,174 +285,55 @@ class Conv_AConnect(tf.keras.layers.Layer):
                     bias = self.bias
                 
                 if(training):
-                        if(self.Wstd != 0 or self.Bstd != 0):
-                                if(self.pool is None):
-                                    if(self.Op == 1):
-                                        if(self.Slice == 2): #Slice the batch into 2 minibatches of size batch/2
-                                            miniBatch = tf.cast(self.batch_size/2,dtype=tf.int32)
-                                            Z1 = self.slice_batch(weights,miniBatch,0,self.strides) #Takes a portion from 0:minibatch
-                                            Z2 = self.slice_batch(weights,miniBatch,1,self.strides) #Takes a portion from minibatch:2*minibatch
-                                            Z = tf.concat([Z1,Z2],axis=0)
-                                        elif(self.Slice == 4):
-                                                miniBatch = tf.cast(self.batch_size/4,dtype=tf.int32) #Slice the batch into 4 minibatches of size batch/4
-                                                Z = self.slice_batch(weights,miniBatch,0,self.strides) #Takes a portion from 0:minibatch
-                                                for i in range(3):
-                                                    Z1 = self.slice_batch(weights,miniBatch,i+1,self.strides) #Takes a portion from i*minibatch:(i+1)*minibatch
-                                                    Z = tf.concat([Z,Z1],axis=0)
-                                        elif(self.Slice == 8):
-                                                miniBatch = tf.cast(self.batch_size/8,dtype=tf.int32) #Slice the batch into 8 minibatches of size batch/8
-                                                Z = self.slice_batch(weights,miniBatch,0,self.strides) #Takes a portion from 0:minibatch
-                                                for i in range(7):
-                                                    Z1 = self.slice_batch(weights,miniBatch,i+1,self.strides) #Takes a portion from i*minibatch:(i+1)*minibatch
-                                                    Z = tf.concat([Z,Z1],axis=0)
-                                        else:
-                                            if(self.Wstd != 0):
-                                                Werr = Merr_distr(list((self.batch_size,))+self.shape,self.Wstd,self.d_type,self.errDistr)
-                                            else:
-                                                Werr = self.Werr
-                                            weights = tf.expand_dims(weights,axis=0)
-                                            memW = tf.multiply(weights,Werr)
-                                            if(self.Bstd != 0):
-                                                Berr = Merr_distr([self.batch_size,self.filters],self.Bstd,self.d_type,self.errDistr)
-                                            else:
-                                                    Berr = self.Berr
-                                            bias = tf.expand_dims(self.bias,axis=0)
-                                            membias = tf.multiply(bias,Berr)
-                                            membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])
-                                            Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(self.X,1),memW)
-                                                        ,fn_output_signature=self.d_type),axis=1)#tf.nn.convolution(Xaux,memW,self.strides,self.padding)
-                                            Z = tf.reshape(Z, [self.batch_size, tf.shape(Z)[1],tf.shape(Z)[2],tf.shape(Z)[3]])
-                                            Z = Z+membias
-                                ##################################################################################################################################
-                                    else:
-                                        strides = [1,self.strides,self.strides,1]
-                                        if(self.Slice == 2): #Slice the batch into 2 minibatches of size batch/2
-                                            miniBatch = tf.cast(self.batch_size/2,dtype=tf.int32)
-                                            Z1 = self.slice_batch(weights,miniBatch,0,strides) #Takes a portion from 0:minibatch
-                                            Z2 = self.slice_batch(weights,miniBatch,1,strides) #Takes a portion from minibatch:2*minibatch
-                                            Z = tf.concat([Z1,Z2],axis=0)
-                                        elif(self.Slice == 4):
-                                                miniBatch = tf.cast(self.batch_size/4,dtype=tf.int32) #Slice the batch into 4 minibatches of size batch/4
-                                                Z = self.slice_batch(weights,miniBatch,0,strides) #Takes a portion from 0:minibatch
-                                                for i in range(3):
-                                                    Z1 = self.slice_batch(weights,miniBatch,i+1,strides) #Takes a portion from i*minibatch:(i+1)*minibatch
-                                                    Z = tf.concat([Z,Z1],axis=0)
-                                        elif(self.Slice == 8):
-                                                miniBatch = tf.cast(self.batch_size/8,dtype=tf.int32) #Slice the batch into 8 minibatches of size batch/8
-                                                Z = self.slice_batch(weights,miniBatch,0,strides) #Takes a portion from 0:minibatch
-                                                for i in range(7):
-                                                    Z1 = self.slice_batch(weights,miniBatch,i+1,strides) #Takes a portion from i*minibatch:(i+1)*minibatch
-                                                    Z = tf.concat([Z,Z1],axis=0)
-                                        else:
-                                                if(self.Wstd != 0):
-                                                    Werr = Merr_distr(list((self.batch_size,))+self.shape,self.Wstd,self.d_type,self.errDistr)
-                                                else:
-                                                    Werr = self.Werr
-                                                weights = tf.expand_dims(weights,axis=0)
-                                                memW = tf.multiply(weights,Werr)
-                                                if(self.Bstd != 0):
-                                                    Berr = Merr_distr([self.batch_size,self.filters],self.Bstd,self.d_type,self.errDistr)
-                                                else:
-                                                    Berr = self.Berr
-                                                bias = tf.expand_dims(self.bias,axis=0)
-                                                membias = tf.multiply(bias,Berr)
-                                                membias = tf.reshape(membias,[self.batch_size,1,1,tf.shape(membias)[-1]])
-                                                inp_r, F = reshape(self.X,memW) #Makes the reshape from [batch,H,W,ch] to [1,H,W,Ch*batch] for input. For filters from [batch,fh,fw,Ch,out_ch]  to
-                                                                        #[fh,fw,ch*batch,out_ch]
-                                                Z = tf.nn.depthwise_conv2d(inp_r,filter=F,strides=strides,padding=self.padding)
-                                                Z = Z_reshape(Z,memW,self.X,self.padding,self.strides) #Output shape from convolution is [1,newH,newW,batch*Ch*out_ch] so it is reshaped to [newH,newW,batch,Ch,out_ch]
-                                                                #Where newH and newW are the new image dimensions. This depends on the value of padding
-                                                                #Padding same: newH = H  and newW = W
-                                                                #Padding valid: newH = H-fh+1 and newW = W-fw+1
-                                                Z = tf.transpose(Z, [2, 0, 1, 3, 4]) #Get the property output shape [batch,nH,nW,Ch,out_ch]
-                                                Z = tf.reduce_sum(Z, axis=3)            #Removes the input channel dimension by adding all this elements
-                                                Z = membias+Z                                   #Add the bias
-                                else:
-                                    if(self.Wstd != 0):
-                                        Werr = Merr_distr(list((self.pool,))+self.shape,self.Wstd,self.d_type,self.errDistr)
-                                    else:
-                                        Werr = self.Werr
-
-                                    if(self.Bstd != 0):
-                                        Berr = Merr_distr([self.pool,self.filters],self.Bstd,self.d_type,self.errDistr)
-                                    else:
-                                        Berr = self.Berr
-
-                                    newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
-                                    werr_aux = self.custom_mult(weights,Werr[0])
-                                    berr_aux = self.custom_mult(bias,Berr[0])
-                                    Z = tf.nn.conv2d(self.X[0:newBatch],werr_aux,strides=[1,self.strides,self.strides,1],padding=self.padding)
-                                    Z = tf.add(Z,berr_aux) #FInally, we add the bias error mask
-                                    for i in range(self.pool-1):
-                                        werr_aux = self.custom_mult(weights,Werr[i+1])
-                                        berr_aux = self.custom_mult(bias,Berr[i+1])
-                                        Z1 = tf.nn.conv2d(self.X[(i+1)*newBatch:(i+2)*newBatch],werr_aux,strides=[1,self.strides,self.strides,1],padding=self.padding)
-                                        Z1 = tf.add(Z1,berr_aux)
-                                        Z = tf.concat([Z,Z1],axis=0)
+                    if(self.Wstd != 0 or self.Bstd != 0):
+                        if(self.Wstd != 0):
+                            Werr = Merr_distr(list((self.pool,))+self.shape,self.Wstd,self.d_type,self.errDistr)
                         else:
-                                #Custom Conv layer operation
-                                w = weights*self.Werr
-                                b = bias*self.Berr
-                                Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
+                            Werr = self.Werr
+
+                        if(self.Bstd != 0):
+                            Berr = Merr_distr([self.pool,self.filters],self.Bstd,self.d_type,self.errDistr)
+                        else:
+                            Berr = self.Berr
+
+                        newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
+                        werr_aux = self.custom_mult(weights,Werr[0])
+                        berr_aux = self.custom_mult(bias,Berr[0])
+                        Z = tf.nn.conv2d(self.X[0:newBatch],werr_aux,strides=[1,self.strides,self.strides,1],padding=self.padding)
+                        Z = tf.add(Z,berr_aux) #FInally, we add the bias error mask
+                        for i in range(self.pool-1):
+                            werr_aux = self.custom_mult(weights,Werr[i+1])
+                            berr_aux = self.custom_mult(bias,Berr[i+1])
+                            Z1 = tf.nn.conv2d(self.X[(i+1)*newBatch:(i+2)*newBatch],werr_aux,strides=[1,self.strides,self.strides,1],padding=self.padding)
+                            Z1 = tf.add(Z1,berr_aux)
+                            Z = tf.concat([Z,Z1],axis=0)
+                    else:
+                        #Custom Conv layer operation
+                        w = weights*self.Werr
+                        b = bias*self.Berr
+                        Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
                 else:
-                        if(self.Wstd != 0 or self.Bstd !=0):
-                                if(self.Wstd !=0):
-                                        Werr = self.infWerr
-                                else:
-                                        Werr = self.Werr
-                                if(self.Bstd != 0):
-                                        Berr = self.infBerr
-                                else:
-                                        Berr = self.Berr
+                    if(self.Wstd != 0 or self.Bstd !=0):
+                        if(self.Wstd !=0):
+                                Werr = self.infWerr
                         else:
                                 Werr = self.Werr
+                        if(self.Bstd != 0):
+                                Berr = self.infBerr
+                        else:
                                 Berr = self.Berr
-                        
-                        #Custom Conv layer operation
-                        w = weights*Werr
-                        b = bias*Berr
-                        Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
+                    else:
+                        Werr = self.Werr
+                        Berr = self.Berr
+                    
+                    #Custom Conv layer operation
+                    w = weights*Werr
+                    b = bias*Berr
+                    Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
                 
                 Z = self.LQuant(Z)
                 return Z
         
-        def slice_batch(self,weights,miniBatch,N,strides):
-                if(self.Wstd != 0):
-                        Werr = Merr_distr(list((miniBatch,))+self.shape,self.Wstd,self.d_type,self.errDistr)
-                else:
-                        Werr = self.Werr
-
-                weights = tf.expand_dims(weights,axis=0)
-                memW = tf.multiply(weights,Werr)
-                if(self.Bstd != 0):
-                        Berr = Merr_distr([miniBatch,self.filters],self.Bstd,self.d_type,self.errDistr)
-                else:
-                        Berr = self.Berr
-                bias = tf.expand_dims(self.bias,axis=0)
-                membias = tf.multiply(bias,Berr)
-                membias = tf.reshape(membias,[miniBatch,1,1,tf.shape(membias)[-1]])
-                if self.Op == 1:
-                        Z = tf.squeeze(tf.map_fn(self.conv,(tf.expand_dims(self.X[N*miniBatch:(N+1)*miniBatch],1),memW),
-            fn_output_signature=self.d_type),axis=1)
-                        Z = tf.reshape(Z, [miniBatch, tf.shape(Z)[1],tf.shape(Z)[2],tf.shape(Z)[3]])
-                        Z = Z+membias
-                else:
-                    inp_r, memW = reshape(self.X[N*miniBatch:(N+1)*miniBatch],memW)
-                    Z = tf.nn.depthwise_conv2d(
-                                    inp_r,
-                                    filter=memW,
-                                    strides=strides,
-                                    padding=self.padding)
-                    Z = Z_reshape(Z,Werr,self.X[N*miniBatch:(N+1)*miniBatch],self.padding,self.strides)
-                    Z = tf.transpose(Z, [2, 0, 1, 3, 4])
-                    Z = tf.reduce_sum(Z, axis=3)
-                    Z = Z+membias
-                #Z = tf.cond(tf.less_equal(inp_shape[1],100),cond2(miniBatch,N,memW,Werr,membias),cond1(miniBatch,N,memW,membias))
-                return Z
-
-        def conv(self,tupla):
-                x,kernel = tupla
-                return tf.nn.convolution(x,kernel,strides=self.strides,padding=self.padding)
         def validate_init(self):
                 if not isinstance(self.filters, int):
                     raise TypeError('filters must be an integer. ' 'Found %s' %(type(self.filters),))
@@ -593,7 +362,6 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         'strides': self.strides,
                         'padding': self.padding,
                         'Op': self.Op,
-                        'Slice': self.Slice,
                         'd_type': self.d_type})
                 return config
         

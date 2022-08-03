@@ -24,7 +24,7 @@ X_test = np.pad(X_test, ((0,0),(2,2),(2,2)), 'constant')
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.7]   # Define the stddev for training
 Sim_err = [0.7]
-Conv_pool = [1]
+Conv_pool = [8]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
@@ -35,8 +35,7 @@ MCsims = 100
 force = "yes"
 force_save = True
 
-#model_name = 'CNN_FASHION_MNIST/'
-model_name = 'CNN_FASHION_MNIST2/'
+model_name = 'CNN_FASHION_MNIST/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name
 
