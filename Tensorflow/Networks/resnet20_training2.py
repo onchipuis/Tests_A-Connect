@@ -55,7 +55,7 @@ input_shape = X_train.shape[1:]
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect
-Wstd_err = [0.3,0.7,0.5]   # Define the stddev for training
+Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
 Conv_pool = [1,8]
 FC_pool = [1,2]
 WisQuant = ["yes"]		    # Do you want binary weights?
@@ -65,11 +65,11 @@ Bbw = [8]
 #errDistr = ["lognormal"]
 errDistr = ["normal"]
 saveModel = True
-model_name = 'ResNet20_CIFAR10_2/'
+model_name = 'ResNet20_CIFAR10_3/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
 if isAConnect[0]:
-    net_base = folder_models+'Wstd_0_Bstd_0.h5'
+    net_base = 'ResNet20_CIFAR10_2'+'Wstd_0_Bstd_0.h5'
     #net_base = folder_models+'8Werr_Wstd_70_Bstd_70_8bQuant_normalDistr.h5'
     #net_base = folder_models+'8Werr_Wstd_50_Bstd_50_8bQuant_lognormalDistr.h5'
     model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)

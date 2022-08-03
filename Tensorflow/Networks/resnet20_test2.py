@@ -37,7 +37,7 @@ force = "yes"
 force_save = True
 namev=''
 
-model_name = 'ResNet20_CIFAR10_2/'
+model_name = 'ResNet20_CIFAR10_3/'
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name
 
