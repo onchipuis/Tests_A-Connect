@@ -28,15 +28,15 @@ X_train, X_test = normalization(X_train,X_test)
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.7]   # Define the stddev for training
-Conv_pool = [2]
-FC_pool = [2]
+Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
+Conv_pool = [1,2]
+FC_pool = [1,2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
 Bbw = Wbw
-errDistr = ["lognormal"]
-#errDistr = ["normal"]
+#errDistr = ["lognormal"]
+errDistr = ["normal"]
 saveModel = True
 model_name = 'VGG16_CIFAR10/'
 folder_models = './Models/'+model_name
@@ -48,7 +48,7 @@ if isAConnect[0]:
     transferLearn = True
 
 # Does include error matrices during backward propagation?
-bwErrProp = [True]
+bwErrProp = [False]
 if not(bwErrProp[0]):
     model_name = model_name+'ForwNoise_only/' 
 folder_models = './Models/'+model_name
