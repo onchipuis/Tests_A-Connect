@@ -1,5 +1,6 @@
 from aconnect1.layers.conv_aconnect import Conv_AConnect
 from aconnect1.layers.fc_aconnect import FC_AConnect
+from aconnect1.layers import scripts
 
 
 __version__ = "1.3.5"
