@@ -110,7 +110,7 @@ def general_testing (isAConnect=[True],
                                     now = datetime.now()
                                     starttime = now.time()
                                     print('\n\n******************************************************************\n\n')
-                                    print('TESTING NETWORK: ', name)
+                                    print('TESTING NETWORK: ', folder_models+name)
                                     print('With simulation error: ', Err)
                                     print('\n\n**********************************************************************')
                                     
