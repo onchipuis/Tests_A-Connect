@@ -113,7 +113,7 @@ def general_training (model_int=None,isAConnect=[True],
                                     name = 'Base'+namev
                                 
                                 print("*************************TRAINING NETWORK*********************")
-                                print("\n\t\t\t", name)
+                                print("\n\t\t\t", folder_models + name)
                                 
                                 #TRAINING PARAMETERS
                                 model.compile(loss='sparse_categorical_crossentropy',
