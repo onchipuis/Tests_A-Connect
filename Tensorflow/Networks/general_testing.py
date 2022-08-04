@@ -48,6 +48,7 @@ def general_testing (isAConnect=[True],
                         MCsims=100,force="yes",force_save=True,
                         folder_models=None,
                         folder_results=None,
+                        enable_exit=False,
                         **kwargs):
 
     for d in range(len(isAConnect)): #Iterate over the networks
@@ -141,4 +142,5 @@ def general_testing (isAConnect=[True],
                                     gc.collect()
                                     tf.keras.backend.clear_session()
                                     tf.compat.v1.reset_default_graph()
-                                    #exit()
+                                    if enable_exit:
+                                        exit()

@@ -66,6 +66,7 @@ optimizer = tf.optimizers.SGD(learning_rate=learning_rate,
 """
 ################################################################
 # TESTING THE MODEL:
+enable_exit=True
 general_testing(isAConnect=isAConnect,
                 Wstd_err=Wstd_err,
                 Sim_err=Sim_err,
@@ -80,5 +81,6 @@ general_testing(isAConnect=isAConnect,
                 batch_size=batch_size,
                 MCsims=MCsims,force=force,force_save=force_save,
                 folder_models=folder_models,
-                folder_results=folder_results)
+                folder_results=folder_results,
+                enable_exit=enable_exit)
 
