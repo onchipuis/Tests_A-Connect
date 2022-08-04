@@ -33,7 +33,7 @@ Bbw = Wbw
 errDistr = ["normal"]
 MCsims = 100
 force = "yes"
-force_save = True
+force_save = False
 
 model_name = 'VGG16_CIFAR10/'
 # Does include error matrices during backward propagation?
