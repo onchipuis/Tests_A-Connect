@@ -6,9 +6,8 @@ Due to the memory usage we recommend to uncomment the first train the model and 
 import numpy as np
 import tensorflow as tf
 import VGG16 as vgg
-import time
+from general_training import general_training
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.utils import to_categorical
 from aconnect1 import layers, scripts
 #from aconnect import layers, scripts
 #from keras.callbacks import LearningRateScheduler
