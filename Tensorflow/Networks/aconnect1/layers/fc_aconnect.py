@@ -17,7 +17,7 @@ INPUT ARGUMENTS:
 -bias_regularizer: Bias regularizer. Default is None
 """
 
-@tf.python.util.tf_export.tf_export("aconnect1.layers.Conv_AConnect")
+@tf.util.tf_export.tf_export("aconnect1.layers.Conv_AConnect")
 class FC_AConnect(tf.keras.layers.Layer):
         def __init__(self,
                 output_size,

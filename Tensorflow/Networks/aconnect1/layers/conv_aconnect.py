@@ -18,7 +18,7 @@ INPUT ARGUMENTS:
 -d_type: Type of the parameters that the layers will create. Supports fp16, fp32 and fp64
 """
 
-@tf.python.util.tf_export.tf_export("aconnect1.layers.Conv_AConnect")
+@tf.util.tf_export.tf_export("aconnect1.layers.Conv_AConnect")
 class Conv_AConnect(tf.keras.layers.Layer):
         def __init__(self,
                 filters,
