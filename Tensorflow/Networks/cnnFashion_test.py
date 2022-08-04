@@ -2,8 +2,7 @@ import numpy as np
 import tensorflow as tf
 from general_testing import general_testing
 from tensorflow.keras.datasets import fashion_mnist
-from aconnect1 import layers, scripts
-#from aconnect import layers, scripts
+from aconnect import layers, scripts
 
 #Extra code to improve model accuracy
 def normalization(train_images, test_images):

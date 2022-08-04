@@ -9,8 +9,7 @@ import tensorflow as tf
 import AlexNet as alexnet
 from general_training import general_training
 from keras.callbacks import LearningRateScheduler
-from aconnect1 import layers, scripts
-#from aconnect import layers, scripts
+from aconnect import layers, scripts
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
 # LOADING DATASET:

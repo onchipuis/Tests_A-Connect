@@ -3,8 +3,7 @@ import tensorflow as tf
 import LeNet5 as lenet5
 import time
 from general_training import general_training
-from aconnect1 import layers, scripts
-#from aconnect import layers, scripts
+from aconnect import layers, scripts
 
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = scripts.load_ds() #Load dataset

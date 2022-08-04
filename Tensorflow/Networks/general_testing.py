@@ -5,7 +5,7 @@ import os
 import gc
 import time
 from datetime import datetime
-from aconnect1 import layers, scripts
+from aconnect import layers, scripts
 #from aconnect import layers, scripts
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 

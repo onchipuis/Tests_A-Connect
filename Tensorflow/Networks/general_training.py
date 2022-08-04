@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 import os
 import time
-from aconnect1 import layers, scripts
+from aconnect import layers, scripts
 #from aconnect import layers, scripts
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 

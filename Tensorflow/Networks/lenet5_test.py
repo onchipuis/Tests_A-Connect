@@ -1,8 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from general_testing import general_testing
-from aconnect1 import layers, scripts
-#from aconnect import layers, scripts
+from aconnect import layers, scripts
 
 # LOADING DATASET:
 (X_train, Y_train), (X_test, Y_test) = scripts.load_ds() #Load dataset

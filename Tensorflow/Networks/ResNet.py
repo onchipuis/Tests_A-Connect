@@ -3,7 +3,7 @@ from tensorflow.keras.layers import Dense, Conv2D, BatchNormalization, Activatio
 from tensorflow.keras.layers import AveragePooling2D, Input, Flatten, RandomFlip, RandomZoom, Softmax
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.models import Model
-from aconnect1.layers import Conv_AConnect, FC_AConnect
+from aconnect.layers import Conv_AConnect, FC_AConnect
 
 def resnet_layer(inputs,num_filters=16,kernel_size=(3,3),
                 strides=1,activation='relu',batch_normalization=True,
