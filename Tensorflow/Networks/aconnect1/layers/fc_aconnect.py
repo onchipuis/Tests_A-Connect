@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import math
-#from scripts import Merr_distr,mult_custom,Quant_custom
+from aconnect.layers.scripts import Merr_distr,mult_custom,Quant_custom
 ############ This layer was made using the template provided by Keras. For more info, go to the official site.
 """
 Fully Connected layer with A-Connect
