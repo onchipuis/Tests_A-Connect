@@ -79,6 +79,7 @@ def lr_scheduler(epoch):
 reduce_lr = tf.keras.callbacks.LearningRateScheduler(lr_scheduler)    
 optimizer = tf.optimizers.SGD(learning_rate=0.0, 
                             momentum=momentum, nesterov= True, decay = lr_decay) #Define optimizer
+callbacks = [reduce_lr]
             
 ################################################################
 # TRAINING THE MODEL:
