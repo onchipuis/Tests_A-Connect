@@ -142,5 +142,5 @@ def general_testing (isAConnect=[True],
                                     gc.collect()
                                     tf.keras.backend.clear_session()
                                     tf.compat.v1.reset_default_graph()
-                                    if enable_exit:
+                                    if enable_exit and not(Err==0):
                                         exit()
