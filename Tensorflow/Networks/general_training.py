@@ -102,13 +102,13 @@ def general_training (model_int=None,isAConnect=[True],
                                     Nm = str(int(Conv_pool_aux[i]))
                                     if WisQuant_aux[p] == "yes":
                                         bws = str(int(Wbw_aux[q]))
-                                        quant = bws+'bQuant_'
+                                        quant = bws+'bQuant'
                                     else:
                                         quant = ''
                                     if Werr == '0':
-                                        name = 'Wstd_0_Bstd_0'
+                                        name = 'Wstd_0_Bstd_0_'+quant
                                     else:
-                                        name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+errDistr_aux[k]+'Distr'+namev
+                                        name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+'_'+errDistr_aux[k]+'Distr'+namev
                                 else:
                                     name = 'Base'+namev
                                 
