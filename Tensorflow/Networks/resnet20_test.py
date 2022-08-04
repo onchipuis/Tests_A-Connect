@@ -40,7 +40,7 @@ namev=''
 model_name = 'ResNet20_CIFAR10/'
 # Does include error matrices during backward propagation?
 bwErrProp = [True]
-if not(bwErrProp):
+if not(bwErrProp[0]):
     model_name = model_name+'ForwNoise_only/' 
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name

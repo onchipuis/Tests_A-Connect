@@ -29,7 +29,7 @@ model_name = 'LeNet5_MNIST/'
 
 # Does include error matrices during backward propagation?
 bwErrProp = [True]
-if not(bwErrProp):
+if not(bwErrProp[0]):
     model_name = model_name+'ForwNoise_only/' 
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'

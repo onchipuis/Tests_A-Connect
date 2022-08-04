@@ -33,7 +33,7 @@ errDistr = ["normal"]
 model_name = 'CNN_FASHION_MNIST/'
 # Does include error matrices during backward propagation?
 bwErrProp = [False]
-if not(bwErrProp):
+if not(bwErrProp[0]):
     model_name = model_name+'ForwNoise_only/' 
 folder_models = './Models/'+model_name
 folder_results = '../Results/'+model_name+'Training_data/'
