@@ -54,8 +54,8 @@ input_shape = X_train.shape[1:]
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect
 Wstd_err = [0.7]   # Define the stddev for training
-Conv_pool = [1]
-FC_pool = [1]
+Conv_pool = [2,4,16]
+FC_pool = [2,2,2]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]

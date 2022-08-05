@@ -114,21 +114,21 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                             Berr = self.Berr
 
                         newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
-                        werr_aux = self.custom_mult(weights,Werr[0])
-                        berr_aux = self.custom_mult(bias,Berr[0])
-                        Z = tf.nn.conv2d(self.X[0:newBatch],werr_aux,strides=[1,self.strides,self.strides,1],padding=self.padding)
-                        Z = tf.add(Z,berr_aux) #FInally, we add the bias error mask
-                        for i in range(self.pool-1):
-                            werr_aux = self.custom_mult(weights,Werr[i+1])
-                            berr_aux = self.custom_mult(bias,Berr[i+1])
-                            Z1 = tf.nn.conv2d(self.X[(i+1)*newBatch:(i+2)*newBatch],werr_aux,strides=[1,self.strides,self.strides,1],padding=self.padding)
+                        Z = [] #FInally, we add the bias error mask
+                        for i in range(self.pool):
+                            werr_aux = self.custom_mult(weights,Werr[i])
+                            berr_aux = self.custom_mult(bias,Berr[i])
+                            Z1 = tf.nn.depthwise_conv2d(inputs=self.X[(i)*newBatch:(i+1)*newBatch],
+                                                        filter=werr_aux,
+                                                        strides=[1,self.strides,self.strides,1],
+                                                        padding=self.padding)
                             Z1 = tf.add(Z1,berr_aux)
                             Z = tf.concat([Z,Z1],axis=0)
                     else:
                         #Custom Conv layer operation
                         w = weights*self.Werr
                         b = bias*self.Berr
-                        Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
+                        Z = b+tf.nn.depthwise_conv2d(self.X,w,self.strides,self.padding)
                 else:
                     if(self.Wstd != 0 or self.Bstd !=0):
                         if(self.Wstd !=0):
@@ -146,7 +146,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                     #Custom Conv layer operation
                     w = weights*Werr
                     b = bias*Berr
-                    Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
+                    Z = b+tf.nn.depthwise_conv2d(self.X,w,self.strides,self.padding)
                 
                 Z = self.LQuant(Z)
                 return Z
