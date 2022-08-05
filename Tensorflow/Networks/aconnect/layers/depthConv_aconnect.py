@@ -7,8 +7,7 @@ from aconnect.layers.scripts import Merr_distr,mult_custom,Quant_custom
 """
 DepthWise-Convolutional layer with A-Connect
 INPUT ARGUMENTS:
--filters: Number of filter that you want to use during the convolution.(Also known as output channels)
--filter_size: List with the dimension of the filter. e.g. [3,3]. It must be less than the input data size
+-kernel_size: List with the dimension of the filter. e.g. [3,3]. It must be less than the input data size
 -Wstd and Bstd: Weights and bias standard deviation for training
 -pool: Number of error matrices that you want to use.
 -bwErrProp: True or False flag to enable/disable backward propagation of error matrices
@@ -20,8 +19,7 @@ INPUT ARGUMENTS:
 
 class DepthWiseConv_AConnect(tf.keras.layers.Layer):
         def __init__(self,
-                filters,
-                filter_size=(3, 3),
+                kernel_size=(3, 3),
                 Wstd=0,
                 Bstd=0,
                 errDistr="normal",
@@ -41,8 +39,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 **kwargs):
 
                 super(DepthWiseConv_AConnect, self).__init__()
-                self.filters = filters
-                self.filter_size = filter_size
+                self.kernel_size = kernel_size
                 self.Wstd = Wstd
                 self.Bstd = Bstd
                 self.errDistr = errDistr
@@ -79,7 +76,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 
                 ### Compute the shape of the weights. Input shape could be
                 ### [H,W,Ch,depth_mult] RGB
-                self.filter_shape = [self.filter_size[0],self.filter_size[1],self.in_channels, self.depth_multiplier]
+                self.filter_shape = [self.kernel_size[0],self.kernel_size[1],self.in_channels, self.depth_multiplier]
                 self.bias_shape = self.in_channels*self.depth_multiplier
 
                 self.W = self.add_weight('kernel',
@@ -192,8 +189,6 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 return Z
         
         def validate_init(self):
-                if not isinstance(self.filters, int):
-                    raise TypeError('filters must be an integer. ' 'Found %s' %(type(self.filters),))
                 if self.Wstd > 1 or self.Wstd < 0:
                     raise ValueError('Wstd must be a number between 0 and 1. \n' 'Found %d' %(self.Wstd,))
                 if self.Bstd > 1 or self.Bstd < 0:
@@ -208,8 +203,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
         def get_config(self):
                 config = super(DepthWiseConv_AConnect, self).get_config()
                 config.update({
-                        'filters': self.filters,
-                        'filter_size': self.filter_size,
+                        'kernel_size': self.kernel_size,
                         'Wstd': self.Wstd,
                         'Bstd': self.Bstd,
                         'errDistr': self.errDistr,
