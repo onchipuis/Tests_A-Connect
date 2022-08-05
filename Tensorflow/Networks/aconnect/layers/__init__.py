@@ -1,4 +1,5 @@
 from aconnect.layers.conv_aconnect import Conv_AConnect
+from aconnect.layers.depthConv_aconnect import DepthWiseConv_AConnect
 from aconnect.layers.fc_aconnect import FC_AConnect
 
 
