@@ -22,7 +22,7 @@ INPUT ARGUMENTS:
 class Conv_AConnect(tf.keras.layers.Layer):
         def __init__(self,
                 filters,
-                kernel_size,
+                kernel_size=(3,3),
                 strides=1,
                 padding="VALID",
                 Wstd=0,
@@ -54,7 +54,8 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
                 self.validate_init()
         def build(self,input_shape):
-                self.shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters)) ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Ch] RGB
+                ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Chin] RGB
+                self.shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters)) 
 
                 self.W = self.add_weight('kernel',
                                           shape = self.shape,
@@ -68,11 +69,15 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                             dtype=self.d_type,
                                             regularizer = self.bias_regularizer,
                                             trainable=True)
-                if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
+                #If the layer will take into account the standard deviation of the weights or the std of 
+                #the bias or both
+                if(self.Wstd != 0 or self.Bstd != 0):
                         if(self.Bstd != 0):
                                 self.infBerr = Merr_distr([self.filters,],self.Bstd,self.d_type,self.errDistr)
-                                self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
-                                                                                                         #This was necessary to change the error matrix/array when Monte Carlo was running.
+                                #It is necessary to convert the tensor to a numpy array.Tensors are constants 
+                                #and cannot be changed. Necessary to change the error matrix/array when 
+                                #Monte Carlo is running.
+                                self.infBerr = self.infBerr.numpy()
 
                         else:
                                 self.Berr = tf.constant(1,dtype=self.d_type)
@@ -114,14 +119,13 @@ class Conv_AConnect(tf.keras.layers.Layer):
                             Berr = self.Berr
 
                         newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
-                        werr_aux = self.custom_mult(weights,Werr[0])
-                        berr_aux = self.custom_mult(bias,Berr[0])
-                        Z = tf.nn.conv2d(self.X[0:newBatch],werr_aux,strides=[1,self.strides,self.strides,1],padding=self.padding)
-                        Z = tf.add(Z,berr_aux) #FInally, we add the bias error mask
-                        for i in range(self.pool-1):
-                            werr_aux = self.custom_mult(weights,Werr[i+1])
-                            berr_aux = self.custom_mult(bias,Berr[i+1])
-                            Z1 = tf.nn.conv2d(self.X[(i+1)*newBatch:(i+2)*newBatch],werr_aux,strides=[1,self.strides,self.strides,1],padding=self.padding)
+                        Z = [] #FInally, we add the bias error mask
+                        for i in range(self.pool):
+                            werr_aux = self.custom_mult(weights,Werr[i])
+                            berr_aux = self.custom_mult(bias,Berr[i])
+                            Z1 = tf.nn.conv2d(self.X[(i)*newBatch:(i+1)*newBatch],
+                                                werr_aux,strides=[1,self.strides,self.strides,1],
+                                                padding=self.padding)
                             Z1 = tf.add(Z1,berr_aux)
                             Z = tf.concat([Z,Z1],axis=0)
                     else:
