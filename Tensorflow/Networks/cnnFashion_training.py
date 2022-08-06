@@ -20,8 +20,8 @@ X_test = np.pad(X_test, ((0,0),(2,2),(2,2)), 'constant')
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-Conv_pool = [1,8]
+Wstd_err = [0.7]   # Define the stddev for training
+Conv_pool = [8]
 FC_pool = Conv_pool
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
@@ -32,7 +32,7 @@ saveModel = True
 errDistr = ["normal"]
 model_name = 'CNN_FASHION_MNIST/'
 # Does include error matrices during backward propagation?
-bwErrProp = [False]
+bwErrProp = [True]
 if not(bwErrProp[0]):
     model_name = model_name+'ForwNoise_only/' 
 folder_models = './Models/'+model_name
