@@ -38,7 +38,7 @@ learning_rate = 0.01
 momentum = 0.9
 optimizer = tf.keras.optimizers.SGD(learning_rate=learning_rate,momentum=momentum) #Define optimizer
 batch_size = 256
-epochs = 20
+epochs = 50
 
 # TRAINING THE MODEL:
 general_training(model_int=lenet5.model_creation,isAConnect=isAConnect,
