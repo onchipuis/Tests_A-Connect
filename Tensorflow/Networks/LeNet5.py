@@ -7,7 +7,7 @@
 #sys.path.append(folder+'/Layers/')
 import tensorflow as tf
 from aconnect.layers import Conv_AConnect, FC_AConnect,DepthWiseConv_AConnect 
-from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D, Flatten, AveragePooling2D
+from tensorflow.keras.layers import InputLayer, Conv2D, Dense, MaxPool2D,Flatten, AveragePooling2D, DepthwiseConv2D
 from tensorflow.keras.layers import BatchNormalization, Dropout, ReLU, Softmax, Reshape, Activation
 
 
@@ -47,7 +47,8 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,
 			Activation('tanh'),           
 			AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
 			#Conv_AConnect(16,kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,isQuant=isQuant,bw=bw,bwErrProp=bwErrProp,strides=1,padding="VALID",pool=Conv_pool,d_type=tf.dtypes.float16),
-			DepthWiseConv_AConnect(kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,isQuant=isQuant,bw=bw,bwErrProp=bwErrProp,strides=(1,1),padding="VALID",pool=Conv_pool,d_type=tf.dtypes.float16),
+			#DepthWiseConv_AConnect(kernel_size=(5,5),Wstd=Wstd,Bstd=Bstd,errDistr=errDistr,isQuant=isQuant,bw=bw,bwErrProp=bwErrProp,strides=(1,1),padding="VALID",pool=Conv_pool,d_type=tf.dtypes.float16),
+			DepthwiseConv2D(kernel_size=(5,5),strides=(1,1),padding="valid"),
                         BatchNormalization(),           
 			Activation('tanh'),                       
 			AveragePooling2D(pool_size=(2,2),strides=(2,2),padding="valid"),
