@@ -33,7 +33,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 strides=(1, 1),
                 padding="VALID",
                 data_format='channels_last',
-                depth_multiplier: int=1,
+                depth_multiplier: int=1 ,
                 in_channels=None,
                 **kwargs):
                 #dilation_rate=(1, 1),
