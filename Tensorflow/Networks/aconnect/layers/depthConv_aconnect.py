@@ -79,7 +79,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 print(type(self.in_channels))
                 print(type(self.depth_multiplier))
                 self.filter_shape = [self.kernel_size[0],self.kernel_size[1],self.in_channels, self.depth_multiplier]
-                self.bias_shape = self.in_channels*self.depth_multiplier
+                self.bias_shape = self.in_channels*int(self.depth_multiplier)
 
                 self.W = self.add_weight('kernel',
                                           shape = self.filter_shape,
