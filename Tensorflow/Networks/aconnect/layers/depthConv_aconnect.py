@@ -62,14 +62,14 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                     self.data_format = 'NHWC'
                     if self.in_channels is None:
                         self.in_channels = input_shape[-1]
-                        self._strides = [1,self._strides[0],self._strides[1],1]
-                        #self._dilation_rate = [1,self._dilation_rate[0],self._dilation_rate[1],1]
+                    self._strides = [1,self._strides[0],self._strides[1],1]
+                    #self._dilation_rate = [1,self._dilation_rate[0],self._dilation_rate[1],1]
                 elif self.data_format == 'channels_first':
                     self.data_format = 'NCHW'
                     if self.in_channels is None:
                         self.in_channels = input_shape[1]      
-                        self._strides = [1,1,self._strides[0],self._strides[1]]
-                        #self._dilation_rate = [1,1,self._dilation_rate[0],self._dilation_rate[1]]
+                    self._strides = [1,1,self._strides[0],self._strides[1]]
+                    #self._dilation_rate = [1,1,self._dilation_rate[0],self._dilation_rate[1]]
                 else:
                     raise Exception("data_format should be either channels_last or channels_first")
                 
