@@ -46,7 +46,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 self.isQuant = isQuant
                 self.bw = bw
                 self.bwErrProp = bwErrProp                                      # Do backward propagation of error matrices or not
-                self.strides = strides
+                self.strides = self._strides = strides
                 self.padding = padding
                 self.d_type = d_type
                 self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)                  #Weights regularizer. Default is None
