@@ -118,17 +118,15 @@ class FC_AConnect(tf.keras.layers.Layer):
                             Berr = self.Berr
 
                         newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
-                        werr_aux = self.custom_mult(weights,Werr[0])
-                        berr_aux = self.custom_mult(bias,Berr[0])
-                        Z = tf.matmul(self.X[0:newBatch], werr_aux)  #Matrix multiplication between input and mask. With output shape [batchsize,1,128]
-                        Z = tf.reshape(Z,[newBatch,tf.shape(Z)[-1]]) #We need to reshape again because we are working with column vectors. The output shape must be[batchsize,128]
-                        Z = tf.add(Z,berr_aux) #FInally, we add the bias error mask
-                        for i in range(self.pool-1):
-                            werr_aux = self.custom_mult(weights,Werr[i+1])
-                            berr_aux = self.custom_mult(bias,Berr[i+1])
-                            Z1 = tf.matmul(self.X[(i+1)*newBatch:(i+2)*newBatch],werr_aux)
+                        for i in range(self.pool):
+                            werr_aux = self.custom_mult(weights,Werr[i])
+                            berr_aux = self.custom_mult(bias,Berr[i])
+                            Z1 = tf.matmul(self.X[(i)*newBatch:(i+1)*newBatch],werr_aux)
                             Z1 = tf.add(Z1,berr_aux)
-                            Z = tf.concat([Z,Z1],axis=0)
+                            if i==0:
+                                Z = Z1
+                            else:
+                                Z = tf.concat([Z,Z1],axis=0)
 
                     else:
                         #Custom FC layer operation when we don't have Wstd or Bstd.

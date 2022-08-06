@@ -142,7 +142,6 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                             Berr = self.Berr
 
                         newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
-                        Z = [] #FInally, we add the bias error mask
                         for i in range(self.pool):
                             werr_aux = self.custom_mult(weights,Werr[i])
                             berr_aux = self.custom_mult(bias,Berr[i])
@@ -152,7 +151,10 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                                                         padding=self.padding,
                                                         data_format=self.data_format)
                             Z1 = tf.add(Z1,berr_aux)
-                            Z = tf.concat([Z,Z1],axis=0)
+                            if i==0:
+                                Z = Z1
+                            else:
+                                Z = tf.concat([Z,Z1],axis=0)
                     else:
                         #Custom Conv layer operation
                         w = weights*self.Werr
