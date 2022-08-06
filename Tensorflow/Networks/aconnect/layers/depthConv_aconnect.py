@@ -33,7 +33,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 strides=(1, 1),
                 padding="VALID",
                 data_format='channels_last',
-                depth_multiplier=1, in_channels=None,
+                depth_multiplier=1 , in_channels=None,
                 **kwargs):
                 #dilation_rate=(1, 1),
 
@@ -51,10 +51,10 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 self.d_type = d_type
                 self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)                  #Weights regularizer. Default is None
                 self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
-                self.data_format=data_format,
+                self.data_format=data_format
                 #self.dilation_rate=dilation_rate,
-                self.depth_multiplier=depth_multiplier,
-                self.in_channels=in_channels,
+                self.depth_multiplier=depth_multiplier
+                self.in_channels=in_channels
                 self.validate_init()
         
         def build(self,input_shape):
@@ -70,8 +70,8 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                         self.in_channels = input_shape[1]      
                         self._strides = [1,1,self._strides[0],self._strides[1]]
                         #self._dilation_rate = [1,1,self._dilation_rate[0],self._dilation_rate[1]]
-                #else:
-                    #raise Exception("data_format should be either channels_last or channels_first")
+                else:
+                    raise Exception("data_format should be either channels_last or channels_first")
                 
                 ### Compute the shape of the weights. Input shape could be
                 ### [H,W,Ch,depth_mult] RGB
