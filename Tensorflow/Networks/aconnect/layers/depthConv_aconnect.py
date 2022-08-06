@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import math
-from aconnect.layers.scripts import Merr_distr,mult_custom,Quant_custom
+from .scripts import Merr_distr,mult_custom,Quant_custom
 
 ###########################################################################################################3
 """
