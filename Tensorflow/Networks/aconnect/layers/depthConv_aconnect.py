@@ -72,7 +72,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                         self._strides = [1,1,self._strides[0],self._strides[1]]
                         #self._dilation_rate = [1,1,self._dilation_rate[0],self._dilation_rate[1]]
                 else:
-                    raise Exception("data_format should be either channels_last or channels_first")
+                    #raise Exception("data_format should be either channels_last or channels_first")
                 
                 ### Compute the shape of the weights. Input shape could be
                 ### [H,W,Ch,depth_mult] RGB
