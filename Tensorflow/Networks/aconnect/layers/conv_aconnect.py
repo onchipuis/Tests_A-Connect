@@ -160,7 +160,8 @@ class Conv_AConnect(tf.keras.layers.Layer):
                     b = bias*Berr
                     Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
                 
-                Z = self.LQuant(Z)*self.scale
+                #Z = self.LQuant(Z)*self.scale
+                Z = self.LQuant(Z)
                 return Z
         
         def validate_init(self):

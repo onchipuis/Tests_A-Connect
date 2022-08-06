@@ -155,7 +155,8 @@ class FC_AConnect(tf.keras.layers.Layer):
                     b = bias*Berr
                     Z = tf.add(tf.matmul(self.X, w), b)
                         
-                Z = self.LQuant(Z)*self.scale
+                #Z = self.LQuant(Z)*self.scale
+                Z = self.LQuant(Z)
                 return Z
         
         #THis is only for saving purposes. Does not affect the layer performance.
