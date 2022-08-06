@@ -125,7 +125,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                             Berr = self.Berr
 
                         newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
-                        Z = tf.reshape(tf.constant([]),tf.shape(self.bias)) #FInally, we add the bias error mask
+                        Z = tf.reshape(tf.constant([]),[0]+tf.shape(self.bias)[1:]) #FInally, we add the bias error mask
                         for i in range(self.pool):
                             werr_aux = self.custom_mult(weights,Werr[i])
                             berr_aux = self.custom_mult(bias,Berr[i])
