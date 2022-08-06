@@ -135,7 +135,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                             Werr = self.Werr
 
                         if(self.Bstd != 0):
-                            berr_shape = [self.pool]+self.bias_shape
+                            berr_shape = [self.pool,self.bias_shape]
                             Berr = Merr_distr(berr_shape,self.Bstd,self.d_type,self.errDistr)
                         else:
                             Berr = self.Berr
