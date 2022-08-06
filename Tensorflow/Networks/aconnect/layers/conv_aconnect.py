@@ -69,6 +69,12 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                             dtype=self.d_type,
                                             regularizer = self.bias_regularizer,
                                             trainable=True)
+                self.scale = self.add_weight("scale",
+                                            shape=(self.filters,),
+                                            initializer = tf.keras.initializers.Constant(0.1),
+                                            dtype = self.d_type,
+                                            regularizer = self.bias_regularizer,
+                                            trainable=True)
                 #If the layer will take into account the standard deviation of the weights or the std of 
                 #the bias or both
                 if(self.Wstd != 0 or self.Bstd != 0):
@@ -152,7 +158,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                     b = bias*Berr
                     Z = b+tf.nn.conv2d(self.X,w,self.strides,self.padding)
                 
-                Z = self.LQuant(Z)
+                Z = self.LQuant(Z)*self.scale
                 return Z
         
         def validate_init(self):
