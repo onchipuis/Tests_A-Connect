@@ -36,7 +36,7 @@ force_save = True
 
 model_name = 'CNN_FASHION_MNIST/'
 # Does include error matrices during backward propagation?
-bwErrProp = [False]
+bwErrProp = [True]
 if not(bwErrProp[0]):
     model_name = model_name+'ForwNoise_only/' 
 folder_models = './Models/'+model_name
