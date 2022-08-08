@@ -52,6 +52,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 self.d_type = d_type
                 self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)                  #Weights regularizer. Default is None
                 self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
+                self.kwargs = kwargs
                 self.validate_init()
         def build(self,input_shape):
                 ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Chin] RGB
@@ -91,7 +92,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         self.Werr = tf.constant(1,dtype=self.d_type) #We need to define the number 1 as a float32.
                         self.Berr = tf.constant(1,dtype=self.d_type)
                 super(Conv_AConnect, self).build(input_shape)
-        def call(self,X,training,**kwargs):
+        def call(self,X,training):
                 self.X = tf.cast(X, dtype=self.d_type)
                 self.batch_size = tf.shape(self.X)[0]
                 
@@ -123,7 +124,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                             werr_aux = self.custom_mult(weights,Werr[i])
                             berr_aux = self.custom_mult(bias,Berr[i])
                             Z1 = tf.nn.conv2d(self.X[(i)*newBatch:(i+1)*newBatch],
-                                                werr_aux,**kwargs)
+                                                werr_aux,**self.kwargs)
                                                 #strides=[1,self.strides,self.strides,1],
                                                 #padding=self.padding)
                             Z1 = tf.add(Z1,berr_aux)
@@ -135,7 +136,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         #Custom Conv layer operation
                         w = weights*self.Werr
                         b = bias*self.Berr
-                        Z = b+tf.nn.conv2d(self.X,w,**kwargs)
+                        Z = b+tf.nn.conv2d(self.X,w,**self.kwargs)
                                 #self.strides,self.padding)
                 else:
                     if(self.Wstd != 0 or self.Bstd !=0):
@@ -154,7 +155,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                     #Custom Conv layer operation
                     w = weights*Werr
                     b = bias*Berr
-                    Z = b+tf.nn.conv2d(self.X,w,**kwargs)
+                    Z = b+tf.nn.conv2d(self.X,w,**self.kwargs)
                             #,self.strides,self.padding)
                 
                 #Z = self.LQuant(Z)*self.scale
