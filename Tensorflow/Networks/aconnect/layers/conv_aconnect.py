@@ -23,8 +23,11 @@ class Conv_AConnect(tf.keras.layers.Layer):
         def __init__(self,
                 filters,
                 kernel_size=(3,3),
-                #strides=1,
-                #padding="VALID",
+                strides=1,
+                padding="VALID",
+                data_format='NHWC',
+                dilations=None,
+                name=None,
                 Wstd=0,
                 Bstd=0,
                 errDistr="normal",
@@ -35,11 +38,16 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 d_type=tf.dtypes.float32,
                 weights_regularizer=None,
                 bias_regularizer=None,
-                **kwargs):
+                **args,**kwargs):
 
                 super(Conv_AConnect, self).__init__()
                 self.filters = filters
                 self.kernel_size = kernel_size
+                self.strides = strides
+                self.padding = padding
+                self.data_format=data_format
+                self.dilations=dilations
+                self.name=name
                 self.Wstd = Wstd
                 self.Bstd = Bstd
                 self.errDistr = errDistr
@@ -47,11 +55,10 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 self.isQuant = isQuant
                 self.bw = bw
                 self.bwErrProp = bwErrProp                                      # Do backward propagation of error matrices or not
-                #self.strides = strides
-                #self.padding = padding
                 self.d_type = d_type
                 self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)                  #Weights regularizer. Default is None
                 self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
+                self.args = args
                 self.kwargs = kwargs
                 self.validate_init()
         def build(self,input_shape):
@@ -124,9 +131,12 @@ class Conv_AConnect(tf.keras.layers.Layer):
                             werr_aux = self.custom_mult(weights,Werr[i])
                             berr_aux = self.custom_mult(bias,Berr[i])
                             Z1 = tf.nn.conv2d(self.X[(i)*newBatch:(i+1)*newBatch],
-                                                werr_aux,**self.kwargs)
-                                                #strides=[1,self.strides,self.strides,1],
-                                                #padding=self.padding)
+                                                werr_aux,
+                                                strides=self.strides,
+                                                padding=self.padding,
+                                                data_format=self.data_format,
+                                                dilations=self.dilations,
+                                                name=self.name)
                             Z1 = tf.add(Z1,berr_aux)
                             if i==0:
                                 Z = Z1
@@ -136,8 +146,12 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         #Custom Conv layer operation
                         w = weights*self.Werr
                         b = bias*self.Berr
-                        Z = b+tf.nn.conv2d(self.X,w,**self.kwargs)
-                                #self.strides,self.padding)
+                        Z = b+tf.nn.conv2d(self.X,w,
+                                        strides=self.strides,
+                                        padding=self.padding,
+                                        data_format=self.data_format,
+                                        dilations=self.dilations,
+                                        name=self.name)
                 else:
                     if(self.Wstd != 0 or self.Bstd !=0):
                         if(self.Wstd !=0):
@@ -155,8 +169,12 @@ class Conv_AConnect(tf.keras.layers.Layer):
                     #Custom Conv layer operation
                     w = weights*Werr
                     b = bias*Berr
-                    Z = b+tf.nn.conv2d(self.X,w,**self.kwargs)
-                            #,self.strides,self.padding)
+                    Z = b+tf.nn.conv2d(self.X,w
+                                        strides=self.strides,
+                                        padding=self.padding,
+                                        data_format=self.data_format,
+                                        dilations=self.dilations,
+                                        name=self.name)
                 
                 #Z = self.LQuant(Z)*self.scale
                 Z = self.LQuant(Z)
@@ -180,6 +198,11 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 config = super(Conv_AConnect, self).get_config()
                 config.update({
                         'filters': self.filters,
+                        'strides': self.strides,
+                        'padding': self.padding,
+                        'data_format': self.data_format,
+                        'dilations': self.dilations,
+                        'name' self.name,
                         'kernel_size': self.kernel_size,
                         'Wstd': self.Wstd,
                         'Bstd': self.Bstd,
@@ -188,8 +211,6 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         'isQuant': self.isQuant,
                         'bw': self.bw,
                         'd_type': self.d_type})
-                        #'strides': self.strides,
-                        #'padding': self.padding,
                 return config
         
         @tf.custom_gradient
