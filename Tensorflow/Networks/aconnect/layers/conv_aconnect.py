@@ -38,7 +38,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 d_type=tf.dtypes.float32,
                 weights_regularizer=None,
                 bias_regularizer=None,
-                **args,**kwargs):
+                *args,**kwargs):
 
                 super(Conv_AConnect, self).__init__()
                 self.filters = filters
