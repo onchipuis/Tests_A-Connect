@@ -35,8 +35,8 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 bw=[1,1],
                 bwErrProp = True,
                 d_type=tf.dtypes.float32,
-                weights_regularizer=None,
-                bias_regularizer=None,
+                w_init=tf.keras.initializers.GlorotUniform(),
+                b_init=tf.keras.initializers.Constant(0.),
                 *args,**kwargs):
 
                 super(Conv_AConnect, self).__init__()
@@ -54,8 +54,8 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 self.bw = bw
                 self.bwErrProp = bwErrProp                                      # Do backward propagation of error matrices or not
                 self.d_type = d_type
-                self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)                  #Weights regularizer. Default is None
-                self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
+                self.w_init = w_init                  #Weights regularizer. Default is None
+                self.b_init = b_init                        #Bias regularizer. Default is None
                 self.args = args
                 self.kwargs = kwargs
                 self.validate_init()
@@ -65,15 +65,13 @@ class Conv_AConnect(tf.keras.layers.Layer):
 
                 self.W = self.add_weight('kernel',
                                           shape = self.shape,
-                                          initializer = "glorot_uniform",
+                                          initializer = self.w_init,
                                           dtype=self.d_type,
-                                          regularizer = self.weights_regularizer,
                                           trainable=True)
                 self.bias = self.add_weight('bias',
                                             shape=(self.filters,),
-                                            initializer = 'zeros',
+                                            initializer = self.b_init,
                                             dtype=self.d_type,
-                                            regularizer = self.bias_regularizer,
                                             trainable=True)
                 #If the layer will take into account the standard deviation of the weights or the std of 
                 #the bias or both
