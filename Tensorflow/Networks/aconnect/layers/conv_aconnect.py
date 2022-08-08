@@ -169,7 +169,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                     #Custom Conv layer operation
                     w = weights*Werr
                     b = bias*Berr
-                    Z = b+tf.nn.conv2d(self.X,w
+                    Z = b+tf.nn.conv2d(self.X,w,
                                         strides=self.strides,
                                         padding=self.padding,
                                         data_format=self.data_format,
