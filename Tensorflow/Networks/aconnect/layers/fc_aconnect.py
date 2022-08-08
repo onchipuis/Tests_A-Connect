@@ -13,8 +13,6 @@ INPUT ARGUMENTS:
 -pool: Number of error that you want to use
 -bwErrProp: True or False flag to enable/disable backward propagation of error matrices
 -d_type: Data type of the weights and other variables. Default is fp32. Please see tf.dtypes.Dtype
--weights_regularizer: Weights regularizer. Default is None
--bias_regularizer: Bias regularizer. Default is None
 """
 
 #@tf.util.tf_export.tf_export("aconnect1.layers.Conv_AConnect")
@@ -29,8 +27,8 @@ class FC_AConnect(tf.keras.layers.Layer):
                 pool=0,
                 bwErrProp = True,
                 d_type=tf.dtypes.float16,
-                weights_regularizer=None,
-                bias_regularizer=None,
+                w_init=tf.keras.initializers.GlorotUniform(),
+                b_init=tf.keras.initializers.Constant(0.),
                 **kwargs): #__init__ method is the first method used for an object in python to initialize the ...
 
                 super(FC_AConnect, self).__init__()                                                             #...object attributes
@@ -43,24 +41,22 @@ class FC_AConnect(tf.keras.layers.Layer):
                 self.pool = pool                                                #Number of error that you want to use
                 self.bwErrProp = bwErrProp                                      # Do backward propagation of error matrices or not
                 self.d_type = d_type                                            #Data type of the weights and other variables. Default is fp32. Please see tf.dtypes.Dtype
-                self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)                  #Weights regularizer. Default is None
-                self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
+                self.w_init = w_init 
+                self.b_init = b_init
                 self.validate_init()
         
         def build(self,input_shape):                                                             #This method is used for initialize the layer variables that depend on input_shape
                                                                                                     #input_shape is automatically computed by tensorflow
                 self.W = self.add_weight("W",
                                         shape = [int(input_shape[-1]),self.output_size], #Weights matrix
-                                        initializer = "glorot_uniform",
+                                        initializer = self.w_init,
                                         dtype = self.d_type,
-                                        regularizer = self.weights_regularizer,
                                         trainable=True)
 
                 self.bias = self.add_weight("bias",
-                                        shape = [self.output_size,],                                    #Bias vector
-                                        initializer = "zeros",
+                                        shape = [self.output_size,],    #Bias vector
+                                        initializer = self.b_init,
                                         dtype = self.d_type,
-                                        regularizer = self.bias_regularizer,
                                         trainable=True)
 
                 if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
@@ -161,9 +157,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                         'bw': self.bw,
                         'pool' : self.pool,
                         'd_type': self.d_type,
-                        'errDistr ': self.errDistr,
-                        'weights_regularizer': self.weights_regularizer,
-                        'bias_regularizer' : self.bias_regularizer})
+                        'errDistr ': self.errDistr})
                 return config
 
         def validate_init(self):

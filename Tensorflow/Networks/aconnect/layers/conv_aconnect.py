@@ -9,12 +9,12 @@ Convolutional layer with A-Connect
 INPUT ARGUMENTS:
 -filters: Number of filter that you want to use during the convolution.(Also known as output channels)
 -kernel_size: List with the dimension of the filter. e.g. [3,3]. It must be less than the input data size
+-strides: Number of strides (or steps) that the filter moves during the convolution
+-padding: "SAME" or "VALID". If you want to keep the same size or reduce it.
 -Wstd and Bstd: Weights and bias standard deviation for training
 -pool: Number of error matrices that you want to use.
 -bwErrProp: True or False flag to enable/disable backward propagation of error matrices
 -isBin: string yes or no, whenever you want binary weights
--strides: Number of strides (or steps) that the filter moves during the convolution
--padding: "SAME" or "VALID". If you want to keep the same size or reduce it.
 -d_type: Type of the parameters that the layers will create. Supports fp16, fp32 and fp64
 """
 
@@ -34,7 +34,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 isQuant=['no','no'],
                 bw=[1,1],
                 bwErrProp = True,
-                d_type=tf.dtypes.float32,
+                d_type=tf.dtypes.float16,
                 w_init=tf.keras.initializers.GlorotUniform(),
                 b_init=tf.keras.initializers.Constant(0.),
                 *args,**kwargs):
@@ -52,10 +52,10 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 self.pool = pool
                 self.isQuant = isQuant
                 self.bw = bw
-                self.bwErrProp = bwErrProp                                      # Do backward propagation of error matrices or not
+                self.bwErrProp = bwErrProp 
                 self.d_type = d_type
-                self.w_init = w_init                  #Weights regularizer. Default is None
-                self.b_init = b_init                        #Bias regularizer. Default is None
+                self.w_init = w_init 
+                self.b_init = b_init
                 self.args = args
                 self.kwargs = kwargs
                 self.validate_init()
