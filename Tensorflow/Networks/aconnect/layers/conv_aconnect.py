@@ -27,7 +27,6 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 padding="VALID",
                 data_format='NHWC',
                 dilations=None,
-                name=None,
                 Wstd=0,
                 Bstd=0,
                 errDistr="normal",
@@ -47,7 +46,6 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 self.padding = padding
                 self.data_format=data_format
                 self.dilations=dilations
-                self.name=name
                 self.Wstd = Wstd
                 self.Bstd = Bstd
                 self.errDistr = errDistr
@@ -135,8 +133,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                                 strides=self.strides,
                                                 padding=self.padding,
                                                 data_format=self.data_format,
-                                                dilations=self.dilations,
-                                                name=self.name)
+                                                dilations=self.dilations)
                             Z1 = tf.add(Z1,berr_aux)
                             if i==0:
                                 Z = Z1
@@ -150,8 +147,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                         strides=self.strides,
                                         padding=self.padding,
                                         data_format=self.data_format,
-                                        dilations=self.dilations,
-                                        name=self.name)
+                                        dilations=self.dilations)
                 else:
                     if(self.Wstd != 0 or self.Bstd !=0):
                         if(self.Wstd !=0):
@@ -173,8 +169,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                                         strides=self.strides,
                                         padding=self.padding,
                                         data_format=self.data_format,
-                                        dilations=self.dilations,
-                                        name=self.name)
+                                        dilations=self.dilations)
                 
                 #Z = self.LQuant(Z)*self.scale
                 Z = self.LQuant(Z)
@@ -202,7 +197,6 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         'padding': self.padding,
                         'data_format': self.data_format,
                         'dilations': self.dilations,
-                        'name': self.name,
                         'kernel_size': self.kernel_size,
                         'Wstd': self.Wstd,
                         'Bstd': self.Bstd,
