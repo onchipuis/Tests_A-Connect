@@ -91,7 +91,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         self.Werr = tf.constant(1,dtype=self.d_type) #We need to define the number 1 as a float32.
                         self.Berr = tf.constant(1,dtype=self.d_type)
                 super(Conv_AConnect, self).build(input_shape)
-        def call(self,X,training):
+        def call(self,X,training,**kwargs):
                 self.X = tf.cast(X, dtype=self.d_type)
                 self.batch_size = tf.shape(self.X)[0]
                 
