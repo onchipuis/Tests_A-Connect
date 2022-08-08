@@ -39,7 +39,7 @@ saveModel = True
 model_name = 'AlexNet_CIFAR10/'
 folder_models = './Models/'+model_name
 #net_base = folder_models+'Base.h5'
-net_base = folder_models+'Wstd_0_Bstd_0.h5'
+net_base = folder_models+'Wstd_0_Bstd_0_8bQuant.h5'
 model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 transferLearn = True
 
