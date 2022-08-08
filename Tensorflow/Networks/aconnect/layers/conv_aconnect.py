@@ -99,8 +99,6 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 self.X = tf.cast(X, dtype=self.d_type)
                 self.batch_size = tf.shape(self.X)[0]
                
-                print(self.isQuant)
-                print(self.bw)
                 #Quantize the weights
                 if(self.isQuant[0]=="yes"):
                     weights = self.LQuant(self.W)    
