@@ -43,6 +43,7 @@ class FC_AConnect(tf.keras.layers.Layer):
                 self.d_type = d_type                                            #Data type of the weights and other variables. Default is fp32. Please see tf.dtypes.Dtype
                 self.w_init = w_init 
                 self.b_init = b_init
+                self.kwargs = kwargs
                 self.validate_init()
         
         def build(self,input_shape):                                                             #This method is used for initialize the layer variables that depend on input_shape

@@ -20,6 +20,10 @@ INPUT ARGUMENTS:
 class DepthWiseConv_AConnect(tf.keras.layers.Layer):
         def __init__(self,
                 kernel_size=(3, 3),
+                strides=(1, 1),
+                padding="VALID",
+                data_format='channels_last',
+                depth_multiplier=1 , in_channels=None,
                 Wstd=0,
                 Bstd=0,
                 errDistr="normal",
@@ -27,34 +31,31 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 isQuant=['no','no'],
                 bw=[1,1],
                 bwErrProp = True,
-                d_type=tf.dtypes.float32,
-                weights_regularizer=None,
-                bias_regularizer=None,
-                strides=(1, 1),
-                padding="VALID",
-                data_format='channels_last',
-                depth_multiplier=1 , in_channels=None,
+                d_type=tf.dtypes.float16,
+                w_init=tf.keras.initializers.GlorotUniform(),
+                b_init=tf.keras.initializers.Constant(0.),
                 **kwargs):
                 #dilation_rate=(1, 1),
 
                 super(DepthWiseConv_AConnect, self).__init__()
                 self.kernel_size = kernel_size
+                self.strides = self._strides = strides
+                self.padding = padding
+                self.data_format=data_format
+                #self.dilation_rate=dilation_rate,
+                self.depth_multiplier=depth_multiplier
+                self.in_channels=in_channels
                 self.Wstd = Wstd
                 self.Bstd = Bstd
                 self.errDistr = errDistr
                 self.pool = pool
                 self.isQuant = isQuant
                 self.bw = bw
-                self.bwErrProp = bwErrProp                                      # Do backward propagation of error matrices or not
-                self.strides = self._strides = strides
-                self.padding = padding
+                self.bwErrProp = bwErrProp
                 self.d_type = d_type
-                self.weights_regularizer = tf.keras.regularizers.get(weights_regularizer)                  #Weights regularizer. Default is None
-                self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)                        #Bias regularizer. Default is None
-                self.data_format=data_format
-                #self.dilation_rate=dilation_rate,
-                self.depth_multiplier=depth_multiplier
-                self.in_channels=in_channels
+                self.w_init = w_init 
+                self.b_init = b_init
+                self.kwargs = kwargs
                 self.validate_init()
         
         def build(self,input_shape):
@@ -80,15 +81,13 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
 
                 self.W = self.add_weight('kernel',
                                           shape = self.filter_shape,
-                                          initializer = "glorot_uniform",
+                                          initializer = self.w_init,
                                           dtype=self.d_type,
-                                          regularizer = self.weights_regularizer,
                                           trainable=True)
                 self.bias = self.add_weight('bias',
                                             shape=self.bias_shape,
-                                            initializer = 'zeros',
+                                            initializer = self.b_init,
                                             dtype=self.d_type,
-                                            regularizer = self.bias_regularizer,
                                             trainable=True)
                 #If the layer will take into account the standard deviation of the weights or the std of 
                 #the bias or both
