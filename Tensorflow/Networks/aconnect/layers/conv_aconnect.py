@@ -202,7 +202,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                         'padding': self.padding,
                         'data_format': self.data_format,
                         'dilations': self.dilations,
-                        'name' self.name,
+                        'name': self.name,
                         'kernel_size': self.kernel_size,
                         'Wstd': self.Wstd,
                         'Bstd': self.Bstd,
