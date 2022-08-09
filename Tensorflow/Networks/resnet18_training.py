@@ -1,7 +1,7 @@
 # Based on https://keras.io/zh/examples/cifar10_resnet/
 import tensorflow as tf
 import numpy as np
-from ResNet import resnet_v1, resnet_v2
+from ResNet18 import resnet18
 from general_training import general_training
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from tensorflow.keras.callbacks import ReduceLROnPlateau
