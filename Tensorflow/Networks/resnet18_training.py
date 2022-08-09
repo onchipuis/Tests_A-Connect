@@ -122,10 +122,6 @@ optimizer = tf.optimizers.SGD(learning_rate=0.0,
 
 ################################################################
 # TRAINING THE MODEL:
-print(input_shape)
-model=resnet18(input_shape=input_shape)
-plot_model(model, show_shapes=True, show_layer_names=True)
-"""
 general_training(model_int=resnet18,isAConnect=[True],
                         model_base=model_base,transferLearn=transferLearn,
                         Wstd_err=Wstd_err,
@@ -144,5 +140,4 @@ general_training(model_int=resnet18,isAConnect=[True],
                         callbacks=callbacks,
                         saveModel=saveModel,folder_models=folder_models,
                         folder_results=folder_results)
-"""
 
