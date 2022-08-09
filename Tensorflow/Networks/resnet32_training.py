@@ -165,5 +165,5 @@ general_training(model_int=resnet_v1 if(version==1) else resnet_v2,isAConnect=is
                         epochs=epochs,
                         callbacks=callbacks,
                         saveModel=saveModel,folder_models=folder_models,
-                        folder_results=folder_results,num_classes=100)
+                        folder_results=folder_results,num_classes=num_classes)
 
