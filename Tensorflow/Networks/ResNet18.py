@@ -64,7 +64,7 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
                     "bwErrProp": bwErrProp,
                     "d_type": tf.dtypes.float16}
     
-    inputs = Input(shape=input_shape)
+    inputs = layers.Input(shape=input_shape)
     x = layers.ZeroPadding2D(padding=3)(inputs)
     x = Conv_AConnect(filters=64, kernel_size=(7,7), strides=2,
                     kernel_initializer=kaiming_normal,
