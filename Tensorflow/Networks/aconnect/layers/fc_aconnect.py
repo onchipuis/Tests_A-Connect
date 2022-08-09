@@ -18,7 +18,7 @@ INPUT ARGUMENTS:
 #@tf.util.tf_export.tf_export("aconnect1.layers.Conv_AConnect")
 class FC_AConnect(tf.keras.layers.Layer):
         def __init__(self,
-                units,
+                units or output_size,
                 Wstd=0,
                 Bstd=0,
                 errDistr="normal",
