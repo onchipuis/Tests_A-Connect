@@ -29,7 +29,7 @@ def resnet_layer(inputs,num_filters=16,kernel_size=(3,3),
     if isAConnect:
         conv = Conv_AConnect(num_filters,kernel_size,
                             strides=strides,padding="SAME",
-                            weights_regularizer=l2(1e-4),
+                            kernel_regularizer=l2(1e-4),
                             **AConnect_args)
     else:
         conv = Conv2D(num_filters,

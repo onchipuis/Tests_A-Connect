@@ -20,11 +20,11 @@ def basic_block(x, planes, stride=1, downsample=None,**AConnect_args):
     identity = x
 
     out = conv3x3(x, planes, stride=stride,**AConnect_args)
-    out = layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(out)
+    out = layers.BatchNormalization()(out)
     out = layers.ReLU()(out)
 
     out = conv3x3(out, planes,**AConnect_args)
-    out = layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(out)
+    out = layers.BatchNormalization()(out)
 
     if downsample is not None:
         for layer in downsample:
@@ -43,7 +43,7 @@ def make_layer(x, planes, blocks, stride=1,**AConnect_args):
             Conv_AConnect(filters=planes, kernel_size=(1,1), strides=stride,
                     **AConnect_args),
                     #kernel_initializer=kaiming_normal,
-            layers.BatchNormalization(momentum=0.9, epsilon=1e-5),
+            layers.BatchNormalization(),
         ]
 
     x = basic_block(x, planes, stride, downsample)
@@ -81,7 +81,7 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
     x = Conv_AConnect(filters=64, kernel_size=(7,7), strides=2,
                     **AConnect_args)(x)
                     #kernel_initializer=kaiming_normal,
-    x = layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
+    x = layers.BatchNormalization()(x)
     x = layers.ReLU()(x)
     x = layers.ZeroPadding2D(padding=1)(x)
     x = layers.MaxPool2D(pool_size=3, strides=2)(x)
