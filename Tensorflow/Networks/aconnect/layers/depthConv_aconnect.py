@@ -32,10 +32,10 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 bw=[1,1],
                 bwErrProp = True,
                 d_type=tf.dtypes.float16,
-                self.kernel_initializer = kernel_initializer 
-                self.bias_initializer = bias_initializer
-                self.kernel_regularizer = kernel_regularizer 
-                self.bias_regularizer = bias_regularizer
+                kernel_initializer=tf.keras.initializers.GlorotUniform(),
+                bias_initializer=tf.keras.initializers.Constant(0.),
+                kernel_regularizer=None,
+                bias_regularizer=None,
                 **kwargs):
                 #dilation_rate=(1, 1),
 
