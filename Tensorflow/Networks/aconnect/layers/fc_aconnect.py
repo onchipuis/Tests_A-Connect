@@ -6,7 +6,7 @@ from .scripts import Merr_distr,mult_custom,Quant_custom
 """
 Fully Connected layer with A-Connect
 INPUT ARGUMENTS:
--output_size: output_size is the number of neurons of the layer
+-units: units is the number of neurons of the layer
 -Wstd: Wstd standard deviation of the weights(number between 0-1. By default is 0)
 -Bstd: Bstd standard deviation of the bias(number between 0-1. By default is 0)
 -isBin: if the layer will binarize the weights(String yes or no. By default is no)
@@ -18,7 +18,7 @@ INPUT ARGUMENTS:
 #@tf.util.tf_export.tf_export("aconnect1.layers.Conv_AConnect")
 class FC_AConnect(tf.keras.layers.Layer):
         def __init__(self,
-                output_size,
+                units,
                 Wstd=0,
                 Bstd=0,
                 errDistr="normal",
@@ -27,12 +27,14 @@ class FC_AConnect(tf.keras.layers.Layer):
                 pool=0,
                 bwErrProp = True,
                 d_type=tf.dtypes.float16,
-                w_init=tf.keras.initializers.GlorotUniform(),
-                b_init=tf.keras.initializers.Constant(0.),
+                kernel_initializer=tf.keras.initializers.GlorotUniform(),
+                bias_initializer=tf.keras.initializers.Constant(0.),
+                kernel_regularizer=None,
+                bias_regularizer=None,
                 **kwargs): #__init__ method is the first method used for an object in python to initialize the ...
 
                 super(FC_AConnect, self).__init__()                                                             #...object attributes
-                self.output_size = output_size                                                                  #output_size is the number of neurons of the layer
+                self.units = units                                                                  #units is the number of neurons of the layer
                 self.Wstd = Wstd                                                                                                #Wstd standard deviation of the weights(number between 0-1. By default is 0)
                 self.Bstd = Bstd                                                                                                #Bstd standard deviation of the bias(number between 0-1. By default is 0)
                 self.errDistr = errDistr                                         #Distribution followed by the error matrices
@@ -41,34 +43,38 @@ class FC_AConnect(tf.keras.layers.Layer):
                 self.pool = pool                                                #Number of error that you want to use
                 self.bwErrProp = bwErrProp                                      # Do backward propagation of error matrices or not
                 self.d_type = d_type                                            #Data type of the weights and other variables. Default is fp32. Please see tf.dtypes.Dtype
-                self.w_init = w_init 
-                self.b_init = b_init
+                self.kernel_initializer = kernel_initializer 
+                self.bias_initializer = bias_initializer
+                self.kernel_regularizer = kernel_regularizer 
+                self.bias_regularizer = bias_regularizer
                 self.kwargs = kwargs
                 self.validate_init()
         
         def build(self,input_shape):                                                             #This method is used for initialize the layer variables that depend on input_shape
                                                                                                     #input_shape is automatically computed by tensorflow
                 self.W = self.add_weight("W",
-                                        shape = [int(input_shape[-1]),self.output_size], #Weights matrix
-                                        initializer = self.w_init,
+                                        shape = [int(input_shape[-1]),self.units], #Weights matrix
+                                        initializer = self.kernel_initializer,
+                                        regularizer = self.kernel_regularizer,
                                         dtype = self.d_type,
                                         trainable=True)
 
                 self.bias = self.add_weight("bias",
-                                        shape = [self.output_size,],    #Bias vector
-                                        initializer = self.b_init,
+                                        shape = [self.units,],    #Bias vector
+                                        initializer = self.bias_initializer,
+                                        regularizer = self.bias_regularizer,
                                         dtype = self.d_type,
                                         trainable=True)
 
                 if(self.Wstd != 0 or self.Bstd != 0): #If the layer will take into account the standard deviation of the weights or the std of the bias or both
                         if(self.Bstd != 0):
-                                self.infBerr = Merr_distr([self.output_size],self.Bstd,self.d_type,self.errDistr)
+                                self.infBerr = Merr_distr([self.units],self.Bstd,self.d_type,self.errDistr)
                                 self.infBerr = self.infBerr.numpy()  #It is necessary to convert the tensor to a numpy array, because tensors are constant and therefore cannot be changed
                                                                                                          #This was necessary to change the error matrix/array when Monte Carlo was running.
                         else:
                                 self.Berr = tf.constant(1,dtype=self.d_type)
                         if(self.Wstd != 0):
-                                self.infWerr = Merr_distr([int(input_shape[-1]),self.output_size],self.Wstd,self.d_type,self.errDistr)
+                                self.infWerr = Merr_distr([int(input_shape[-1]),self.units],self.Wstd,self.d_type,self.errDistr)
                                 self.infWerr = self.infWerr.numpy()
                         else:
                                 self.Werr = tf.constant(1,dtype=self.d_type)
@@ -98,12 +104,12 @@ class FC_AConnect(tf.keras.layers.Layer):
                     if(self.Wstd != 0 or self.Bstd != 0):
                             
                         if(self.Wstd !=0):
-                            Werr = Merr_distr([self.pool,tf.cast(row,tf.int32),self.output_size],self.Wstd,self.d_type,self.errDistr)
+                            Werr = Merr_distr([self.pool,tf.cast(row,tf.int32),self.units],self.Wstd,self.d_type,self.errDistr)
                         else:
                             Werr = self.Werr
 
                         if(self.Bstd !=0):  
-                            Berr = Merr_distr([self.pool,self.output_size],self.Bstd,self.d_type,self.errDistr)
+                            Berr = Merr_distr([self.pool,self.units],self.Bstd,self.d_type,self.errDistr)
                         else:
                             Berr = self.Berr
 
@@ -151,7 +157,7 @@ class FC_AConnect(tf.keras.layers.Layer):
         def get_config(self):
                 config = super(FC_AConnect, self).get_config()
                 config.update({
-                        'output_size': self.output_size,
+                        'units': self.units,
                         'Wstd': self.Wstd,
                         'Bstd': self.Bstd,
                         'isQuant': self.isQuant,
@@ -162,8 +168,8 @@ class FC_AConnect(tf.keras.layers.Layer):
                 return config
 
         def validate_init(self):
-                if self.output_size <= 0:
-                    raise ValueError('Unable to build a Dense layer with 0 or negative dimension. ' 'Output size: %d' %(self.output_size,))
+                if self.units <= 0:
+                    raise ValueError('Unable to build a Dense layer with 0 or negative dimension. ' 'Output size: %d' %(self.units,))
                 if self.Wstd > 1 or self.Wstd < 0:
                     raise ValueError('Wstd must be a number between 0 and 1. \n' 'Found %d' %(self.Wstd,))
                 if self.Bstd > 1 or self.Bstd < 0:

@@ -100,7 +100,8 @@ class MBConv(tf.keras.layers.Layer):
         return x
 
 
-def build_mbconv_block(in_channels, out_channels, layers, stride, expansion_factor, k, drop_connect_rate):
+def build_mbconv_block(in_channels, out_channels, layers, stride,
+        expansion_factor, k, drop_connect_rate,**AConnect_args):
     block = tf.keras.Sequential()
     for i in range(layers):
         if i == 0:
@@ -124,13 +125,26 @@ def build_mbconv_block(in_channels, out_channels, layers, stride, expansion_fact
 
 class EfficientNet(tf.keras.Model):
     def __init__(self, width_coefficient, depth_coefficient, dropout_rate,
-            drop_connect_rate=0.2,**AConnect_args):
+            drop_connect_rate=0.2,
+            Wstd=0,Bstd=0,
+            isQuant=["no","no"],bw=[8,8],
+            Conv_pool=2,FC_pool=2,errDistr="normal",
+            bwErrProp=True,**kwargs):
         super(EfficientNet, self).__init__()
 
+        AConnect_args = {"Wstd": Wstd,
+                        "Bstd": Bstd,
+                        "isQuant": isQuant,
+                        "bw": bw,
+                        "errDistr": errDistr,
+                        "bwErrProp": bwErrProp,
+                        "d_type": tf.dtypes.float16}
+        
         self.conv1 = Conv_AConnect(filters=round_filters(32, width_coefficient),
                                             kernel_size=(3, 3),
                                             strides=2,
                                             padding="same",
+                                            pool=Conv_pool,
                                             **AConnect_args)
         self.bn1 = tf.keras.layers.BatchNormalization()
         self.block1 = build_mbconv_block(in_channels=round_filters(32, width_coefficient),
@@ -138,53 +152,61 @@ class EfficientNet(tf.keras.Model):
                                         layers=round_repeats(1, depth_coefficient),
                                         stride=1,
                                         expansion_factor=1, k=3, drop_connect_rate=drop_connect_rate,
+                                        pool=Conv_pool,
                                         **AConnect_args)
         self.block2 = build_mbconv_block(in_channels=round_filters(16, width_coefficient),
                                         out_channels=round_filters(24, width_coefficient),
                                         layers=round_repeats(2, depth_coefficient),
                                         stride=2,
                                         expansion_factor=6, k=3, drop_connect_rate=drop_connect_rate,
+                                        pool=Conv_pool,
                                         **AConnect_args)
         self.block3 = build_mbconv_block(in_channels=round_filters(24, width_coefficient),
                                         out_channels=round_filters(40, width_coefficient),
                                         layers=round_repeats(2, depth_coefficient),
                                         stride=2,
                                         expansion_factor=6, k=5, drop_connect_rate=drop_connect_rate,
+                                        pool=Conv_pool,
                                         **AConnect_args)
         self.block4 = build_mbconv_block(in_channels=round_filters(40, width_coefficient),
                                         out_channels=round_filters(80, width_coefficient),
                                         layers=round_repeats(3, depth_coefficient),
                                         stride=2,
                                         expansion_factor=6, k=3, drop_connect_rate=drop_connect_rate,
+                                        pool=Conv_pool,
                                         **AConnect_args)
         self.block5 = build_mbconv_block(in_channels=round_filters(80, width_coefficient),
                                         out_channels=round_filters(112, width_coefficient),
                                         layers=round_repeats(3, depth_coefficient),
                                         stride=1,
                                         expansion_factor=6, k=5, drop_connect_rate=drop_connect_rate,
+                                        pool=Conv_pool,
                                         **AConnect_args)
         self.block6 = build_mbconv_block(in_channels=round_filters(112, width_coefficient),
                                         out_channels=round_filters(192, width_coefficient),
                                         layers=round_repeats(4, depth_coefficient),
                                         stride=2,
                                         expansion_factor=6, k=5, drop_connect_rate=drop_connect_rate,
+                                        pool=Conv_pool,
                                         **AConnect_args)
         self.block7 = build_mbconv_block(in_channels=round_filters(192, width_coefficient),
                                         out_channels=round_filters(320, width_coefficient),
                                         layers=round_repeats(1, depth_coefficient),
                                         stride=1,
                                         expansion_factor=6, k=3, drop_connect_rate=drop_connect_rate,
+                                        pool=Conv_pool,
                                         **AConnect_args)
 
         self.conv2 = Conv_AConnect(filters=round_filters(1280, width_coefficient),
                                             kernel_size=(1, 1),
                                             strides=1,
                                             padding="same",
+                                            pool=Conv_pool,
                                             **AConnect_args)
         self.bn2 = tf.keras.layers.BatchNormalization()
         self.pool = tf.keras.layers.GlobalAveragePooling2D()
         self.dropout = tf.keras.layers.Dropout(rate=dropout_rate)
-        self.fc = FC_AConnect(units=NUM_CLASSES,**AConnect_args)
+        self.fc = FC_AConnect(units=NUM_CLASSES,pool=FC_pool,**AConnect_args)
         self.act = tf.keras.layers.Activation('softmax') 
 
     def call(self, inputs, training=None, mask=None):
@@ -214,41 +236,41 @@ class EfficientNet(tf.keras.Model):
 def model_creation(width_coefficient, depth_coefficient, resolution, dropout_rate):
     model = EfficientNet(width_coefficient=width_coefficient,
                        depth_coefficient=depth_coefficient,
-                       dropout_rate=dropout_rate)
+                       dropout_rate=dropout_rate,**AConnect_args)
     model.build(input_shape=(None, resolution, resolution, 3))
     #model.summary()
 
     return model
 
 
-def efficient_net_b0():
-    return model_creation(1.0, 1.0, 224, 0.2)
+def efficient_net_b0(**AConnect_args):
+    return model_creation(1.0, 1.0, 224, 0.2,**AConnect_args)
 
 
-def efficient_net_b1():
-    return model_creation(1.0, 1.1, 240, 0.2)
+def efficient_net_b1(**AConnect_args):
+    return model_creation(1.0, 1.1, 240, 0.2,**AConnect_args)
 
 
-def efficient_net_b2():
-    return model_creation(1.1, 1.2, 260, 0.3)
+def efficient_net_b2(**AConnect_args):
+    return model_creation(1.1, 1.2, 260, 0.3,**AConnect_args)
 
 
-def efficient_net_b3():
-    return model_creation(1.2, 1.4, 300, 0.3)
+def efficient_net_b3(**AConnect_args):
+    return model_creation(1.2, 1.4, 300, 0.3,**AConnect_args)
 
 
-def efficient_net_b4():
-    return model_creation(1.4, 1.8, 380, 0.4)
+def efficient_net_b4(**AConnect_args):
+    return model_creation(1.4, 1.8, 380, 0.4,**AConnect_args)
 
 
-def efficient_net_b5():
-    return model_creation(1.6, 2.2, 456, 0.4)
+def efficient_net_b5(**AConnect_args):
+    return model_creation(1.6, 2.2, 456, 0.4,**AConnect_args)
 
 
-def efficient_net_b6():
-    return model_creation(1.8, 2.6, 528, 0.5)
+def efficient_net_b6(**AConnect_args):
+    return model_creation(1.8, 2.6, 528, 0.5,**AConnect_args)
 
 
-def efficient_net_b7():
-    return model_creation(2.0, 3.1, 600, 0.5)
+def efficient_net_b7(**AConnect_args):
+    return model_creation(2.0, 3.1, 600, 0.5,**AConnect_args)
 
