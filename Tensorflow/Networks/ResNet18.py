@@ -49,7 +49,7 @@ def make_layer(x, planes, blocks, stride=1,**AConnect_args):
 
     return x
 
-def resnet(x, blocks_per_layer, num_classes=100,
+def resnet(input_shape, blocks_per_layer, num_classes=100,
             Wstd=0,Bstd=0,
             isQuant=["no","no"],bw=[8,8],
             Conv_pool=8,FC_pool=8,errDistr="normal",
@@ -63,7 +63,8 @@ def resnet(x, blocks_per_layer, num_classes=100,
                     "bwErrProp": bwErrProp,
                     "d_type": tf.dtypes.float16}
     
-    x = layers.ZeroPadding2D(padding=3)(x)
+    inputs = Input(shape=input_shape)
+    x = layers.ZeroPadding2D(padding=3)(inputs)
     x = Conv_AConnect(filters=64, kernel_size=(7,7), strides=2,
                     kernel_initializer=kaiming_normal,
                     **AConnect_args)
@@ -82,10 +83,12 @@ def resnet(x, blocks_per_layer, num_classes=100,
     x = FC_AConnect(units=num_classes, kernel_initializer=initializer, 
                     bias_initializer=initializer,**AConnect_args)(x)
 
-    return x
+    # Instantiate model.
+    model = Model(inputs=inputs, outputs=x)
+    return model
 
-def resnet18(x, **kwargs):
-    return resnet(x, [2, 2, 2, 2], **kwargs)
+def resnet18(input_shape, **kwargs):
+    return resnet(input_shape, [2, 2, 2, 2], **kwargs)
 
-def resnet34(x, **kwargs):
-    return resnet(x, [3, 4, 6, 3], **kwargs)
+def resnet34(input_shape, **kwargs):
+    return resnet(input_shape, [3, 4, 6, 3], **kwargs)
