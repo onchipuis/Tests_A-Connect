@@ -66,7 +66,7 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
                     "d_type": tf.dtypes.float16}
     
     inputs = layers.Input(shape=input_shape)
-    if isAConnect and Wstd!=0:
+    if Wstd!=0:
         x = RandomZoom(0.0)(inputs)
         x = RandomTranslation(0.0,0.0)(x)
         x = RandomZoom(0.0)(x)
