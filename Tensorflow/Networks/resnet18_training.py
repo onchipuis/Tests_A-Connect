@@ -43,6 +43,8 @@ folder_models = './Models/'+model_name
     #net_base = folder_models+'8Werr_Wstd_50_Bstd_50_8bQuant_lognormalDistr.h5'
 #    model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
 #    transferLearn = True
+model_base=None
+transferLearn=False
 
 # Does include error matrices during backward propagation?
 bwErrProp = [True]
