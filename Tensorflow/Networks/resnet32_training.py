@@ -5,7 +5,7 @@ from ResNet import resnet_v1, resnet_v2
 from general_training import general_training
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from tensorflow.keras.callbacks import ReduceLROnPlateau
-from tensorflow.keras.datasets import cifar100
+from tensorflow.keras.datasets import cifar10
 from aconnect import layers, scripts
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
@@ -63,7 +63,7 @@ Bbw = [8]
 #errDistr = ["lognormal"]
 errDistr = ["normal"]
 saveModel = True
-model_name = 'ResNet32_CIFAR100/'
+model_name = 'ResNet32_CIFAR10/'
 folder_models = './Models/'+model_name
 if isAConnect[0]:
     net_base = folder_models+'Wstd_0_Bstd_0_8bQuant.h5'
@@ -85,17 +85,16 @@ folder_results = '../Results/'+model_name+'Training_data/'
 #lrate = 1e-3        # for Adam optimizer
 if isAConnect[0]:
     lrate = 1e-1
+    epochs = 200
+    epoch1 = 80
+    epoch2 = 120
+    epoch3 = 160
+    """
     epochs = 120
-    epoch1 = 100
-    epoch2 = 150
-    epoch3 = 200
-    #epochs = 60
-    #epoch1 = 25
-    #epoch2 = 40
-    #epoch3 = 50
-    #epoch1 = 60
-    #epoch2 = 90
-    #epoch3 = 120
+    epoch1 = 30
+    epoch2 = 60
+    epoch3 = 90
+    """
 else:
     lrate = 1e-1
     epochs = 200
