@@ -77,14 +77,15 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
         x = RandomTranslation(0.1,0.1)(x)
         x = RandomZoom(0.2)(x)
     
-    x = layers.ZeroPadding2D(padding=3)(x)
-    x = Conv_AConnect(filters=64, kernel_size=(7,7), strides=2,
+    #x = layers.ZeroPadding2D(padding=3)(x)
+    #x = Conv_AConnect(filters=64, kernel_size=(7,7), strides=2,
+    x = Conv_AConnect(filters=64, kernel_size=(3,3), strides=1,
                     **AConnect_args)(x)
                     #kernel_initializer=kaiming_normal,
     x = layers.BatchNormalization()(x)
     x = layers.ReLU()(x)
-    x = layers.ZeroPadding2D(padding=1)(x)
-    x = layers.MaxPool2D(pool_size=3, strides=2)(x)
+    #x = layers.ZeroPadding2D(padding=1)(x)
+    #x = layers.MaxPool2D(pool_size=3, strides=2)(x)
 
     x = make_layer(x, 64, blocks_per_layer[0],**AConnect_args)
     x = make_layer(x, 128, blocks_per_layer[1], stride=2,**AConnect_args)
