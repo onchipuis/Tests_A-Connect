@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import RandomTranslation,RandomCrop,RandomFlip,RandomZoom
+from tensorflow.keras.layers import Flatten,RandomTranslation,RandomCrop,RandomFlip,RandomZoom
 from aconnect.layers import Conv_AConnect, FC_AConnect, DepthWiseConv_AConnect
 
 kaiming_normal = keras.initializers.VarianceScaling(scale=2.0, mode='fan_out', distribution='untruncated_normal')
@@ -76,7 +76,7 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
         x = RandomTranslation(0.1,0.1)(x)
         x = RandomZoom(0.2)(x)
     
-    #x = layers.ZeroPadding2D(padding=3)(x)
+    x = layers.ZeroPadding2D(padding=1)(x)
     #x = Conv_AConnect(filters=64, kernel_size=(7,7), strides=2,
     x = Conv_AConnect(filters=64, kernel_size=(3,3), strides=1,
                     **AConnect_args)(x)
@@ -91,6 +91,7 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
     x = make_layer(x, 512, blocks_per_layer[3], stride=2,**AConnect_args)
 
     x = layers.GlobalAveragePooling2D()(x)
+    x = Flatten()(x)
     outputs = FC_AConnect(units=num_classes,
                     **AConnect_args)(x)
 
