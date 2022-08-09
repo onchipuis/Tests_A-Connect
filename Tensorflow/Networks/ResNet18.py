@@ -68,7 +68,7 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
     x = layers.ZeroPadding2D(padding=3)(inputs)
     x = Conv_AConnect(filters=64, kernel_size=(7,7), strides=2,
                     kernel_initializer=kaiming_normal,
-                    **AConnect_args)
+                    **AConnect_args)(x)
     x = layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
     x = layers.ReLU()(x)
     x = layers.ZeroPadding2D(padding=1)(x)
