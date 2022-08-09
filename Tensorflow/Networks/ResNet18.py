@@ -82,8 +82,10 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
 
     x = layers.GlobalAveragePooling2D()(x)
     #initializer = keras.initializers.RandomUniform(-1.0 / math.sqrt(512), 1.0 / math.sqrt(512))
-    x = FC_AConnect(units=num_classes, #kernel_initializer=initializer, 
-                    bias_initializer=initializer,**AConnect_args)(x)
+    x = FC_AConnect(units=num_classes,
+                    **AConnect_args)(x)
+                    #kernel_initializer=initializer, 
+                    #bias_initializer=initializer,**AConnect_args)(x)
 
     # Instantiate model.
     model = Model(inputs=inputs, outputs=x)
