@@ -86,9 +86,9 @@ folder_results = '../Results/'+model_name+'Training_data/'
 if isAConnect[0]:
     lrate = 1e-1
     epochs = 120
-    epoch1 = 30
-    epoch2 = 60
-    epoch3 = 100
+    epoch1 = 100
+    epoch2 = 150
+    epoch3 = 200
     #epochs = 60
     #epoch1 = 25
     #epoch2 = 40
