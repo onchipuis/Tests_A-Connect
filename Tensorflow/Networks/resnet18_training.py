@@ -7,6 +7,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from tensorflow.keras.callbacks import ReduceLROnPlateau
 from tensorflow.keras.datasets import cifar100
 from aconnect import layers, scripts
+from keras.utils.vis_utils import plot_model
 custom_objects = {'Conv_AConnect':layers.Conv_AConnect,'FC_AConnect':layers.FC_AConnect}
 
 #Extra code to improve model accuracy
@@ -122,6 +123,7 @@ optimizer = tf.optimizers.SGD(learning_rate=0.0,
 ################################################################
 # TRAINING THE MODEL:
 model=resnet18(input_shape=input_shape)
+plot_model(model, show_shapes=True, show_layer_names=True)
 """
 general_training(model_int=resnet18,isAConnect=[True],
                         model_base=model_base,transferLearn=transferLearn,
