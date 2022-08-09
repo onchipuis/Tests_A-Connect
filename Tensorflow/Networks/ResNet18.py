@@ -39,7 +39,7 @@ def make_layer(x, planes, blocks, stride=1,**AConnect_args):
         downsample = [
             Conv_AConnect(filters=planes, kernel_size=(1,1), strides=stride,
                     kernel_initializer=kaiming_normal,
-                    **AConnect_args)
+                    **AConnect_args),
             layers.BatchNormalization(momentum=0.9, epsilon=1e-5),
         ]
 
