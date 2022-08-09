@@ -24,7 +24,7 @@ X_train, X_test = normalization(X_train,X_test)
 input_shape = X_train.shape[1:]
 
 # INPUT PARAMTERS:
-#isAConnect = [True]   # Which network you want to train/test True for A-Connect
+isAConnect = [True]   # Which network you want to train/test True for A-Connect
 Wstd_err = [0]   # Define the stddev for training
 Conv_pool = [1]
 FC_pool = [1]
