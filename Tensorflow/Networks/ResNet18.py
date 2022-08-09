@@ -11,8 +11,8 @@ kaiming_normal = keras.initializers.VarianceScaling(scale=2.0, mode='fan_out', d
 def conv3x3(x, out_planes, stride=1,**AConnect_args):
     x = layers.ZeroPadding2D(padding=1)(x)
     x = Conv_AConnect(filters=out_planes, kernel_size=(3,3), strides=stride, 
-                    kernel_initializer=kaiming_normal,
                     **AConnect_args)(x)
+                    #kernel_initializer=kaiming_normal,
     return x 
 
 def basic_block(x, planes, stride=1, downsample=None,**AConnect_args):
@@ -40,8 +40,8 @@ def make_layer(x, planes, blocks, stride=1,**AConnect_args):
     if stride != 1 or inplanes != planes:
         downsample = [
             Conv_AConnect(filters=planes, kernel_size=(1,1), strides=stride,
-                    kernel_initializer=kaiming_normal,
                     **AConnect_args),
+                    #kernel_initializer=kaiming_normal,
             layers.BatchNormalization(momentum=0.9, epsilon=1e-5),
         ]
 
@@ -68,8 +68,8 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
     inputs = layers.Input(shape=input_shape)
     x = layers.ZeroPadding2D(padding=3)(inputs)
     x = Conv_AConnect(filters=64, kernel_size=(7,7), strides=2,
-                    kernel_initializer=kaiming_normal,
                     **AConnect_args)(x)
+                    #kernel_initializer=kaiming_normal,
     x = layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
     x = layers.ReLU()(x)
     x = layers.ZeroPadding2D(padding=1)(x)
@@ -81,8 +81,8 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
     x = make_layer(x, 512, blocks_per_layer[3], stride=2,**AConnect_args)
 
     x = layers.GlobalAveragePooling2D()(x)
-    initializer = keras.initializers.RandomUniform(-1.0 / math.sqrt(512), 1.0 / math.sqrt(512))
-    x = FC_AConnect(units=num_classes, kernel_initializer=initializer, 
+    #initializer = keras.initializers.RandomUniform(-1.0 / math.sqrt(512), 1.0 / math.sqrt(512))
+    x = FC_AConnect(units=num_classes, #kernel_initializer=initializer, 
                     bias_initializer=initializer,**AConnect_args)(x)
 
     # Instantiate model.
