@@ -90,7 +90,7 @@ def general_training (model_int=None,isAConnect=[True],
                                                 errDistr=errDistr_aux[k],
                                                 bwErrProp=bwErrProp[b],
                                                 input_shape=input_shape,
-                                                depth=depth)
+                                                depth=depth,**kwargs)
                                 
                                 ##### PRETRAINED WEIGHTS FOR HIGHER ACCURACY LEVELS
                                 if isAConnect[d] and transferLearn:
