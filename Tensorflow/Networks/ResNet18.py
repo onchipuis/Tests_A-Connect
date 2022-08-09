@@ -66,7 +66,17 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
                     "d_type": tf.dtypes.float16}
     
     inputs = layers.Input(shape=input_shape)
-    x = layers.ZeroPadding2D(padding=3)(inputs)
+    if isAConnect and Wstd!=0:
+        x = RandomZoom(0.0)(inputs)
+        x = RandomTranslation(0.0,0.0)(x)
+        x = RandomZoom(0.0)(x)
+    else:
+        Flip = RandomFlip("horizontal")
+        x = Flip(inputs)
+        x = RandomTranslation(0.1,0.1)(x)
+        x = RandomZoom(0.2)(x)
+    
+    x = layers.ZeroPadding2D(padding=3)(x)
     x = Conv_AConnect(filters=64, kernel_size=(7,7), strides=2,
                     **AConnect_args)(x)
                     #kernel_initializer=kaiming_normal,
