@@ -13,7 +13,6 @@ def conv3x3(x, out_planes, stride=1,**AConnect_args):
     x = layers.ZeroPadding2D(padding=1)(x)
     x = Conv_AConnect(filters=out_planes, kernel_size=(3,3), strides=stride, 
                     **AConnect_args)(x)
-                    #kernel_initializer=kaiming_normal,
     return x 
 
 def basic_block(x, planes, stride=1, downsample=None,**AConnect_args):
@@ -24,13 +23,14 @@ def basic_block(x, planes, stride=1, downsample=None,**AConnect_args):
     out = layers.ReLU()(out)
 
     out = conv3x3(out, planes,**AConnect_args)
-    out = layers.BatchNormalization()(out)
+    #out = layers.BatchNormalization()(out) # Removed by Luis E. Rueda G.
 
     if downsample is not None:
         for layer in downsample:
             identity = layer(identity)
 
     out = layers.Add()([identity, out])
+    out = layers.BatchNormalization()(out)  # Added by Luis E. Rueda G.
     out = layers.ReLU()(out)
 
     return out
@@ -42,8 +42,7 @@ def make_layer(x, planes, blocks, stride=1,**AConnect_args):
         downsample = [
             Conv_AConnect(filters=planes, kernel_size=(1,1), strides=stride,
                     **AConnect_args),
-                    #kernel_initializer=kaiming_normal,
-            layers.BatchNormalization(),
+            #layers.BatchNormalization(),   # Removed by Luis E. Rueda G.
         ]
 
     x = basic_block(x, planes, stride, downsample)
@@ -81,7 +80,6 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
     #x = Conv_AConnect(filters=64, kernel_size=(7,7), strides=2,
     x = Conv_AConnect(filters=64, kernel_size=(3,3), strides=1,
                     **AConnect_args)(x)
-                    #kernel_initializer=kaiming_normal,
     x = layers.BatchNormalization()(x)
     x = layers.ReLU()(x)
     #x = layers.ZeroPadding2D(padding=1)(x)
@@ -93,14 +91,12 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
     x = make_layer(x, 512, blocks_per_layer[3], stride=2,**AConnect_args)
 
     x = layers.GlobalAveragePooling2D()(x)
-    #initializer = keras.initializers.RandomUniform(-1.0 / math.sqrt(512), 1.0 / math.sqrt(512))
-    x = FC_AConnect(units=num_classes,
+    outputs = FC_AConnect(units=num_classes,
                     **AConnect_args)(x)
-                    #kernel_initializer=initializer, 
-                    #bias_initializer=initializer,**AConnect_args)(x)
 
     # Instantiate model.
-    model = Model(inputs=inputs, outputs=x)
+    model = Model(inputs=inputs, outputs=outputs)
+    model.summary
     return model
 
 def resnet18(input_shape, **kwargs):
