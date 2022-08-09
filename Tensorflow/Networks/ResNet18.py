@@ -3,6 +3,7 @@ import math
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+from tensorflow.keras.models import Model
 from aconnect.layers import Conv_AConnect, FC_AConnect, DepthWiseConv_AConnect
 
 kaiming_normal = keras.initializers.VarianceScaling(scale=2.0, mode='fan_out', distribution='untruncated_normal')
