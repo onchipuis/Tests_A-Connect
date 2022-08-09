@@ -97,7 +97,7 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
 
     # Instantiate model.
     model = Model(inputs=inputs, outputs=outputs)
-    model.summary
+    model.summary()
     return model
 
 def resnet18(input_shape, **kwargs):
