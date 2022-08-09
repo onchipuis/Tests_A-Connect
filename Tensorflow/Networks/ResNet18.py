@@ -91,7 +91,6 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
     x = make_layer(x, 512, blocks_per_layer[3], stride=2,**AConnect_args)
 
     x = layers.GlobalAveragePooling2D()(x)
-    x = Flatten()(x)
     outputs = FC_AConnect(num_classes,
                     **AConnect_args)(x)
 
