@@ -1,10 +1,11 @@
 # Adapted from https://github.com/pytorch/vision/blob/v0.4.0/torchvision/models/resnet.py
 import math
-from tensorflow import tf
+import tensorflow as tf
+from tensorflow import keras
 from tensorflow.keras import layers
 from aconnect.layers import Conv_AConnect, FC_AConnect, DepthWiseConv_AConnect
 
-kaiming_normal = tf.initializers.VarianceScaling(scale=2.0, mode='fan_out', distribution='untruncated_normal')
+kaiming_normal = keras.initializers.VarianceScaling(scale=2.0, mode='fan_out', distribution='untruncated_normal')
 
 def conv3x3(x, out_planes, stride=1,**AConnect_args):
     x = layers.ZeroPadding2D(padding=1)(x)
@@ -79,7 +80,7 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
     x = make_layer(x, 512, blocks_per_layer[3], stride=2,**AConnect_args)
 
     x = layers.GlobalAveragePooling2D()(x)
-    initializer = tf.initializers.RandomUniform(-1.0 / math.sqrt(512), 1.0 / math.sqrt(512))
+    initializer = keras.initializers.RandomUniform(-1.0 / math.sqrt(512), 1.0 / math.sqrt(512))
     x = FC_AConnect(units=num_classes, kernel_initializer=initializer, 
                     bias_initializer=initializer,**AConnect_args)(x)
 
