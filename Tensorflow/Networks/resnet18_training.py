@@ -122,6 +122,7 @@ optimizer = tf.optimizers.SGD(learning_rate=0.0,
 
 ################################################################
 # TRAINING THE MODEL:
+print(input_shape)
 model=resnet18(input_shape=input_shape)
 plot_model(model, show_shapes=True, show_layer_names=True)
 """
