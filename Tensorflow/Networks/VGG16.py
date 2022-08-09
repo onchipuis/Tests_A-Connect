@@ -13,7 +13,7 @@ Xsz = 32
 def model_creation(isAConnect=False,Wstd=0,Bstd=0,
         Conv_pool=16,FC_pool=16,errDistr="normal",
         isQuant=['no','no'],bw=[8,8],isBin="yes",
-        bwErrProp=True,**kwargs):
+        bwErrProp=True,num_classes=10,**kwargs):
         
     AConnect_args = {"Wstd": Wstd,
                 "Bstd": Bstd,
@@ -67,7 +67,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,
                 Dense(256,activation='relu'),
                 BatchNormalization(),
                 Dropout(0.5),
-                Dense(10,activation='softmax')
+                Dense(num_classes,activation='softmax')
         ])
     else:
 
@@ -128,7 +128,7 @@ def model_creation(isAConnect=False,Wstd=0,Bstd=0,
                 BatchNormalization(),
                 ReLU(),
                 #Dropout(0.1),
-                FC_AConnect(10,pool=FC_pool,**AConnect_args),
+                FC_AConnect(num_classes,pool=FC_pool,**AConnect_args),
                 Softmax()
         ])
 

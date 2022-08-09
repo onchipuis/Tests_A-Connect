@@ -6,7 +6,6 @@ from tensorflow.keras import layers
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Flatten,RandomTranslation,RandomCrop,RandomFlip,RandomZoom
 from aconnect.layers import Conv_AConnect, FC_AConnect, DepthWiseConv_AConnect
-from keras.utils.vis_utils import plot_model
 
 kaiming_normal = keras.initializers.VarianceScaling(scale=2.0, mode='fan_out', distribution='untruncated_normal')
 
@@ -99,7 +98,6 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
     # Instantiate model.
     model = Model(inputs=inputs, outputs=outputs)
     #model.summary()
-    plot_model(model, show_shapes=True, show_layer_names=True)
     return model
 
 def resnet18(input_shape, **kwargs):
