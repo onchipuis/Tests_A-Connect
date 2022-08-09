@@ -46,7 +46,7 @@ def normalization(train_images, test_images):
     return train_images, test_images
 
 # Load the CIFAR10 data.
-(X_train, Y_train), (X_test, Y_test) = cifar100.load_data()
+(X_train, Y_train), (X_test, Y_test) = cifar10.load_data()
 X_train, X_test = normalization(X_train,X_test)    
 # Input image dimensions.
 input_shape = X_train.shape[1:]
