@@ -87,7 +87,7 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
     #x = layers.MaxPool2D(pool_size=3, strides=2)(x)
 
     x = make_layer(x, 64, blocks_per_layer[0], padding="SAME",pool=Conv_pool,**AConnect_args)
-    x = make_layer(x, 128, blocks_per_layer[1], stride=2,pool=Conv_pool,**AConnect_args)
+    x = make_layer(x, 128, blocks_per_layer[1], padding="SAME",stride=2,pool=Conv_pool,**AConnect_args)
     x = make_layer(x, 256, blocks_per_layer[2], stride=2,pool=Conv_pool,**AConnect_args)
     x = make_layer(x, 512, blocks_per_layer[3], stride=2,pool=Conv_pool,**AConnect_args)
 
