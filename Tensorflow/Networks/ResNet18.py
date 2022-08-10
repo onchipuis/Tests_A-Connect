@@ -12,7 +12,7 @@ kaiming_normal = keras.initializers.VarianceScaling(scale=2.0, mode='fan_out', d
 def conv3x3(x, out_planes, stride=1,**AConnect_args):
     #x = layers.ZeroPadding2D(padding=1)(x)
     out = Conv_AConnect(filters=out_planes, kernel_size=(3,3), strides=stride, 
-                    padding="SAME",**AConnect_args)(x)
+                    **AConnect_args)(x)
     return out 
 
 def basic_block(x, planes, stride=1, downsample=None,**AConnect_args):
