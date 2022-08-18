@@ -22,9 +22,9 @@ X_train, X_test = normalization(X_train,X_test)
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.3,0.5,0.7]   # Define the stddev for training
-Sim_err = [0,0.3,0.5,0.7]
-Conv_pool = [1,2]
+Wstd_err = [0.3,0.5]   # Define the stddev for training
+Sim_err = [0.3,0.5]
+Conv_pool = [1]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
@@ -37,7 +37,7 @@ force_save = False
 
 model_name = 'VGG16_CIFAR10/'
 # Does include error matrices during backward propagation?
-bwErrProp = [False]
+bwErrProp = [True]
 if not(bwErrProp[0]):
     model_name = model_name+'ForwNoise_only/' 
 folder_models = './Models/'+model_name
