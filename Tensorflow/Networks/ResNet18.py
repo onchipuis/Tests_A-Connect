@@ -77,8 +77,8 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
         x = RandomCrop(32,32)(inputs)
         x = RandomFlip("horizontal")(x)
         x = RandomTranslation(0.1,0.1)(x)
-        x = RandomZoom(0.2)(x)
-        x = RandomRotation(0.2)(x)
+        #x = RandomZoom(0.2)(x)
+        x = RandomRotation(0.1)(x)
     
     #x = layers.ZeroPadding2D(padding=1)(x)
     #x = Conv_AConnect(filters=64, kernel_size=(7,7), strides=2,
