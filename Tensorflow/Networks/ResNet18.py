@@ -5,6 +5,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Flatten,RandomTranslation,RandomCrop,RandomFlip,RandomZoom
+from tensorflow.keras.regularizers import l2
 from aconnect.layers import Conv_AConnect, FC_AConnect, DepthWiseConv_AConnect
 
 kaiming_normal = keras.initializers.VarianceScaling(scale=2.0, mode='fan_out', distribution='untruncated_normal')
@@ -63,7 +64,8 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
                     "bw": bw,
                     "errDistr": errDistr,
                     "bwErrProp": bwErrProp,
-                    "d_type": tf.dtypes.float16}
+                    "d_type": tf.dtypes.float16,
+                    "kernel_regularizer": l2(1e-5)}
     
     inputs = layers.Input(shape=input_shape)
     if Wstd!=0:

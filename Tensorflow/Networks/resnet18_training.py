@@ -56,25 +56,18 @@ folder_results = '../Results/'+model_name+'Training_data/'
 
 # TRAINING PARAMETERS
 #lrate = 1e-3        # for Adam optimizer
-if isAConnect[0]:
-    lrate = 1e-1
-    """
+if model_base is None:
+    lrate = 0.1
+    epochs = 200
+    epoch1 = 60
+    epoch2 = 120
+    epoch3 = 160
+else:
+    lrate = 0.1
     epochs = 120
     epoch1 = 30
     epoch2 = 60
     epoch3 = 100
-    """
-    epochs = 200
-    epoch1 = 80
-    epoch2 = 120
-    epoch3 = 160
-else:
-    lrate = 1e-1
-    epochs = 200
-    epoch1 = 80
-    epoch2 = 120
-    epoch3 = 160
-num_classes = 10
 momentum = 0.9
 batch_size = 256
 lr_decay = 0#1e-4
@@ -92,15 +85,12 @@ def lr_schedule(epoch):
     # Returns
         lr (float32): learning rate
     """
-    lr = lrate
-    if epoch > 180:
-        lr *= 0.5e-3
-    elif epoch > epoch3:
-        lr *= 1e-3
-    elif epoch > epoch2:
-        lr *= 1e-2
-    elif epoch > epoch1:
-        lr *= 1e-1
+    if epoch == epoch3:
+        lr *= 0.2
+    elif epoch == epoch2:
+        lr *= 0.2
+    elif epoch == epoch1:
+        lr = 0.2*lrate
     
     print('Learning rate: ', lr)
     return lr
