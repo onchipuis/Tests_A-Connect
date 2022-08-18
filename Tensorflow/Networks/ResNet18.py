@@ -4,7 +4,8 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Flatten,RandomTranslation,RandomCrop,RandomFlip,RandomZoom,Normalization
+from tensorflow.keras.layers import Flatten,RandomTranslation,RandomCrop,RandomFlip,RandomZoom
+from tensorflow.keras.layers import Normalization,RandomRotation
 from tensorflow.keras.regularizers import l2
 from aconnect.layers import Conv_AConnect, FC_AConnect, DepthWiseConv_AConnect
 
