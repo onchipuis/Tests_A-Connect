@@ -73,8 +73,8 @@ def resnet(input_shape, blocks_per_layer, num_classes=100,
         x = RandomTranslation(0.0,0.0)(x)
         x = RandomZoom(0.0)(x)
     else:
-        Flip = RandomFlip("horizontal")
-        x = Flip(inputs)
+        x = RandomCrop(32,32)(inputs)
+        x = RandomFlip("horizontal")(x)
         x = RandomTranslation(0.1,0.1)(x)
         x = RandomZoom(0.2)(x)
     
