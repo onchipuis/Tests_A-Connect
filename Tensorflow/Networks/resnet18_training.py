@@ -86,7 +86,7 @@ def lr_schedule(epoch):
         lr (float32): learning rate
     """
     lr = lrate
-    elif epoch > epoch3:
+    if epoch > epoch3:
         lr *= 8e-3
     elif epoch > epoch2:
         lr *= 4e-2
