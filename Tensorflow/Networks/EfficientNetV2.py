@@ -527,12 +527,13 @@ def EfficientNetV2(blocks_args,
         model.load_weights(weights)
 
     if not(include_top):
-        model.add(FC_AConnect(num_classes,
+        x = FC_AConnect(num_classes,
                      kernel_initializer=DENSE_KERNEL_INITIALIZER,
                      name='probs',
                      pool=FC_pool,
-                     **AConnect_args))
-        model.add(layers.Softmax())
+                     **AConnect_args)(model.layers[-1].output)
+        outputs = layers.Softmax()(x)
+        model = models.Model(inputs=inputs,outputs=outputs,name=model_name)
     return model
 
 
