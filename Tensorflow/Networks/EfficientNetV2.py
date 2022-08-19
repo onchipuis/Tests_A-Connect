@@ -526,7 +526,11 @@ def EfficientNetV2(blocks_args,
     elif weights:
         model.load_weights(weights)
 
+    # Included by Luis E. Rueda G.
     if not(include_top):
+        if input_shape==[32,32,3]:
+            x = tf.keras.layers.experimental.preprocessing.Resizing(128,128)(img_input)
+            x = model.layers[1](x)
         x = FC_AConnect(num_classes,
                      kernel_initializer=DENSE_KERNEL_INITIALIZER,
                      name='probs',
@@ -534,6 +538,7 @@ def EfficientNetV2(blocks_args,
                      **AConnect_args)(model.layers[-1].output)
         outputs = layers.Softmax()(x)
         model = models.Model(inputs=inputs,outputs=outputs,name=model_name)
+
     return model
 
 
