@@ -71,7 +71,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 if type(self.kernel_size) is tuple:
                     self.shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters))
                 else:
-                    self.shape = [self.kernel_size,self.kernel_size,int(input_shape[-1]),self.filters]
+                    self.shape = list((self.kernel_size,self.kernel_size)) + list((int(input_shape[-1]),self.filters))
                 print(self.shape)
 
                 self.W = self.add_weight('kernel',
