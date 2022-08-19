@@ -76,5 +76,5 @@ general_testing(isAConnect=isAConnect,
                 batch_size=batch_size,
                 MCsims=MCsims,force=force,force_save=force_save,
                 folder_models=folder_models,
-                folder_results=folder_results,top5=False)
+                folder_results=folder_results,top5=True)
 
