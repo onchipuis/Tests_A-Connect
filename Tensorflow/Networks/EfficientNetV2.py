@@ -12,22 +12,217 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+
+# Taken from https://github.com/GdoongMathew/EfficientNetV2
 import string
+import math
+import collections
 
 from tensorflow.keras import layers
 from tensorflow.keras import backend
 from tensorflow.keras import models
 from tensorflow.keras import utils as keras_utils
+from aconnect.layers import Conv_AConnect, FC_AConnect, DepthWiseConv_AConnect
 
-from .utils import CONV_KERNEL_INITIALIZER
-from .utils import DENSE_KERNEL_INITIALIZER
-from .utils import round_filters
-from .utils import round_repeats
-from .config import *
+#from .config import *
+#from .utils import CONV_KERNEL_INITIALIZER
+#from .utils import DENSE_KERNEL_INITIALIZER
+#from .utils import round_filters
+#from .utils import round_repeats
 
-from .weights import IMAGENET_WEIGHTS_URL, WEIGHTS_MAP
+#from .weights import IMAGENET_WEIGHTS_URL, WEIGHTS_MAP
+
+####################### UTILS #################################
+"""
+This is from https://github.com/qubvel/efficientnet/blob/master/efficientnet/model.py
+"""
+
+def round_filters(filters, width_coefficient, depth_divisor):
+    """Round number of filters based on width multiplier."""
+
+    filters *= width_coefficient
+    new_filters = int(filters + depth_divisor / 2) // depth_divisor * depth_divisor
+    new_filters = max(depth_divisor, new_filters)
+    # Make sure that round down does not go down by more than 10%.
+    if new_filters < 0.9 * filters:
+        new_filters += depth_divisor
+    return int(new_filters)
 
 
+def round_repeats(repeats, depth_coefficient):
+    """Round number of repeats based on depth multiplier."""
+
+    return int(math.ceil(depth_coefficient * repeats))
+
+
+CONV_KERNEL_INITIALIZER = {
+    'class_name': 'VarianceScaling',
+    'config': {
+        'scale': 2.0,
+        'mode': 'fan_out',
+        # EfficientNet actually uses an untruncated normal distribution for
+        # initializing conv layers, but keras.initializers.VarianceScaling use
+        # a truncated distribution.
+        # We decided against a custom initializer for better serializability.
+        'distribution': 'normal'
+    }
+}
+
+DENSE_KERNEL_INITIALIZER = {
+    'class_name': 'VarianceScaling',
+    'config': {
+        'scale': 1. / 3.,
+        'mode': 'fan_out',
+        'distribution': 'uniform'
+    }
+}
+
+####################### CONFIG #################################
+BlockArgs = collections.namedtuple('BlockArgs', [
+    'kernel_size', 'num_repeat', 'input_filters', 'output_filters',
+    'expand_ratio', 'id_skip', 'strides', 'se_ratio', 'conv_type'
+])
+# defaults will be a public argument for namedtuple in Python 3.7
+# https://docs.python.org/3/library/collections.html#collections.namedtuple
+BlockArgs.__new__.__defaults__ = (None,) * len(BlockArgs._fields)
+
+V2_BASE_BLOCKS_ARGS = [
+    BlockArgs(kernel_size=3, num_repeat=1, input_filters=32, output_filters=16,
+              expand_ratio=1, id_skip=True, strides=[1, 1], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=2, input_filters=16, output_filters=32,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=2, input_filters=32, output_filters=48,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=3, input_filters=48, output_filters=96,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
+    BlockArgs(kernel_size=3, num_repeat=5, input_filters=96, output_filters=112,
+              expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
+    BlockArgs(kernel_size=3, num_repeat=8, input_filters=112, output_filters=192,
+              expand_ratio=6, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
+]
+
+V2_S_BLOCKS_ARGS = [
+    BlockArgs(kernel_size=3, num_repeat=2, input_filters=24, output_filters=24,
+              expand_ratio=1, id_skip=True, strides=[1, 1], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=4, input_filters=24, output_filters=48,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=4, input_filters=48, output_filters=64,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=6, input_filters=64, output_filters=128,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
+    BlockArgs(kernel_size=3, num_repeat=9, input_filters=128, output_filters=160,
+              expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
+    BlockArgs(kernel_size=3, num_repeat=15, input_filters=160, output_filters=256,
+              expand_ratio=6, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
+]
+
+V2_M_BLOCKS_ARGS = [
+    BlockArgs(kernel_size=3, num_repeat=3, input_filters=24, output_filters=24,
+              expand_ratio=1, id_skip=True, strides=[1, 1], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=5, input_filters=24, output_filters=48,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=5, input_filters=48, output_filters=80,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=7, input_filters=80, output_filters=160,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
+    BlockArgs(kernel_size=3, num_repeat=14, input_filters=160, output_filters=176,
+              expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
+    BlockArgs(kernel_size=3, num_repeat=18, input_filters=176, output_filters=304,
+              expand_ratio=6, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
+    BlockArgs(kernel_size=3, num_repeat=5, input_filters=304, output_filters=512,
+              expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
+]
+
+V2_L_BLOCKS_ARGS = [
+    BlockArgs(kernel_size=3, num_repeat=4, input_filters=32, output_filters=32,
+              expand_ratio=1, id_skip=True, strides=[1, 1], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=7, input_filters=32, output_filters=64,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=7, input_filters=64, output_filters=96,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=10, input_filters=96, output_filters=192,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
+    BlockArgs(kernel_size=3, num_repeat=19, input_filters=192, output_filters=224,
+              expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
+    BlockArgs(kernel_size=3, num_repeat=25, input_filters=224, output_filters=384,
+              expand_ratio=6, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
+    BlockArgs(kernel_size=3, num_repeat=7, input_filters=384, output_filters=640,
+              expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
+]
+
+V2_XL_BLOCKS_ARGS = [
+    BlockArgs(kernel_size=3, num_repeat=4, input_filters=32, output_filters=32,
+              expand_ratio=1, id_skip=True, strides=[1, 1], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=8, input_filters=32, output_filters=64,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=8, input_filters=64, output_filters=96,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+    BlockArgs(kernel_size=3, num_repeat=16, input_filters=96, output_filters=192,
+              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
+    BlockArgs(kernel_size=3, num_repeat=24, input_filters=192, output_filters=256,
+              expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
+    BlockArgs(kernel_size=3, num_repeat=32, input_filters=256, output_filters=512,
+              expand_ratio=6, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
+    BlockArgs(kernel_size=3, num_repeat=8, input_filters=512, output_filters=640,
+              expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
+]
+
+####################### CONFIG #################################
+IMAGENET_WEIGHTS_URL = 'https://github.com/GdoongMathew/EfficientNetV2/releases/download/v0.0.1/'
+
+WEIGHTS_MAP = {
+    'efficientnetv2_s': {
+        'imagenet':         {
+            True:   'efficientnetv2-s_imagenet_top.h5',
+            False:  'efficientnetv2-s_imagenet_notop.h5',
+        },
+        'imagenet21k':      {
+            False:  'efficientnetv2-s_imagenet21k_notop.h5',
+        },
+        'imagenet21k-ft1k': {
+            True:   'efficientnetv2-s_imagenet21k-ft1k_top.h5',
+            False:  'efficientnetv2-s_imagenet21k-ft1k_notop.h5',
+        },
+    },
+    'efficientnetv2_m': {
+        'imagenet':         {
+            True:   'efficientnetv2-m_imagenet_top.h5',
+            False:  'efficientnetv2-m_imagenet_notop.h5',
+        },
+        'imagenet21k':      {
+            False:  'efficientnetv2-m_imagenet21k_notop.h5',
+        },
+        'imagenet21k-ft1k': {
+            True:   'efficientnetv2-m_imagenet21k-ft1k_top.h5',
+            False:  'efficientnetv2-m_imagenet21k-ft1k_notop.h5',
+        },
+    },
+    'efficientnetv2_l': {
+        'imagenet':         {
+            True:   'efficientnetv2-l_imagenet_top.h5',
+            False:  'efficientnetv2-l_imagenet_notop.h5',
+        },
+        'imagenet21k':      {
+            False:  'efficientnetv2-l_imagenet21k_notop.h5',
+        },
+        'imagenet21k-ft1k': {
+            True:   'efficientnetv2-l_imagenet21k-ft1k_top.h5',
+            False:  'efficientnetv2-l_imagenet21k-ft1k_notop.h5',
+        },
+    },
+    'efficientnetv2_xl': {
+        'imagenet21k':      {
+            False:  'efficientnetv2-xl_imagenet21k_notop.h5',
+        },
+        'imagenet21k-ft1k': {
+            True:   'efficientnetv2-xl_imagenet21k-ft1k_top.h5',
+            False:  'efficientnetv2-xl_imagenet21k-ft1k_notop.h5',
+        },
+    }
+}
+
+
+####################### MODELS #################################
 def get_dropout():
     """Wrapper over custom dropout. Fix problem of ``None`` shape for tf.keras.
     It is not possible to define FixedDropout class as global object,
@@ -56,7 +251,8 @@ def mb_conv_block(inputs,
                   drop_rate=None,
                   prefix='',
                   conv_dropout=None,
-                  mb_type='normal'):
+                  mb_type='normal',
+                  **AConnect_args):
     """Fused Mobile Inverted Residual Bottleneck"""
     assert mb_type in ['normal', 'fused']
     has_se = (block_args.se_ratio is not None) and (0 < block_args.se_ratio <= 1)
@@ -69,23 +265,25 @@ def mb_conv_block(inputs,
     # Expansion phase
     filters = block_args.input_filters * block_args.expand_ratio
     if block_args.expand_ratio != 1:
-        x = layers.Conv2D(filters,
+        x = Conv_AConnect(filters,
                           1 if mb_type == 'normal' else block_args.kernel_size,
                           strides=1 if mb_type == 'normal' else block_args.strides,
                           kernel_initializer=CONV_KERNEL_INITIALIZER,
-                          padding='same',
+                          padding="SAME",
                           use_bias=False,
-                          name=f'{prefix}expand_conv')(x)
+                          name=f'{prefix}expand_conv',
+                          **AConnect_args)(x)
         x = layers.BatchNormalization(axis=bn_axis, name=f'{prefix}expand_bn')(x)
         x = layers.Activation(activation=activation, name=f'{prefix}expand_activation')(x)
 
     if mb_type is 'normal':
-        x = layers.DepthwiseConv2D(block_args.kernel_size,
+        x = DepthWiseConv_AConnect(block_args.kernel_size,
                                    block_args.strides,
                                    depthwise_initializer=CONV_KERNEL_INITIALIZER,
-                                   padding='same',
+                                   padding="SAME",
                                    use_bias=False,
-                                   name=f'{prefix}dwconv')(x)
+                                   name=f'{prefix}dwconv',
+                                   **AConnect_args)(x)
         x = layers.BatchNormalization(axis=bn_axis, name=f'{prefix}bn')(x)
         x = layers.Activation(activation=activation, name=f'{prefix}activation')(x)
 
@@ -100,28 +298,31 @@ def mb_conv_block(inputs,
 
         target_shape = (1, 1, filters) if backend.image_data_format() == 'channels_last' else (filters, 1, 1)
         se_tensor = layers.Reshape(target_shape, name=prefix + 'se_reshape')(se_tensor)
-        se_tensor = layers.Conv2D(num_reduced_filters, 1,
+        se_tensor = Conv_AConnect(num_reduced_filters, 1,
                                   activation=activation,
-                                  padding='same',
+                                  padding="SAME",
                                   use_bias=True,
                                   kernel_initializer=CONV_KERNEL_INITIALIZER,
-                                  name=prefix + 'se_reduce')(se_tensor)
-        se_tensor = layers.Conv2D(filters, 1,
+                                  name=prefix + 'se_reduce',
+                                  **AConnect_args)(se_tensor)
+        se_tensor = Conv_AConnect(filters, 1,
                                   activation='sigmoid',
-                                  padding='same',
+                                  padding="SAME",
                                   use_bias=True,
                                   kernel_initializer=CONV_KERNEL_INITIALIZER,
-                                  name=prefix + 'se_expand')(se_tensor)
+                                  name=prefix + 'se_expand',
+                                  **AConnect_args)(se_tensor)
         x = layers.multiply([x, se_tensor], name=prefix + 'se_excite')
 
     # Output phase
-    x = layers.Conv2D(block_args.output_filters,
+    x = Conv_AConnect(block_args.output_filters,
                       kernel_size=1 if block_args.expand_ratio != 1 else block_args.kernel_size,
                       strides=1 if block_args.expand_ratio != 1 else block_args.strides,
                       kernel_initializer=CONV_KERNEL_INITIALIZER,
-                      padding='same',
+                      padding="SAME",
                       use_bias=False,
-                      name=f'{prefix}project_conv')(x)
+                      name=f'{prefix}project_conv',
+                      **AConnect_args)(x)
 
     x = layers.BatchNormalization(axis=bn_axis, name=f'{prefix}project_bn')(x)
     if block_args.expand_ratio == 1:
@@ -152,7 +353,11 @@ def EfficientNetV2(blocks_args,
                    activation='swish',
                    pooling='avg',
                    final_drop_rate=None,
-                   classes=1000,
+                   num_classes=1000,
+                   Wstd=0,Bstd=0,
+                   isQuant=["no","no"],bw=[8,8],
+                   Conv_pool=8,FC_pool=8,errDistr="normal",
+                   bwErrProp=True,
                    **kwargs):
     """
     Create an EfficientNetV2 model using given inputs.
@@ -174,10 +379,17 @@ def EfficientNetV2(blocks_args,
         - `avg`: global average pooling.
         - `max`: global maximum pooling.
     :param final_drop_rate: dropout rate before the final output layer if include_top is set to True
-    :param classes: (optional) number of classes to in the final output.
+    :param num_classes: (optional) number of num_classes to in the final output.
     :param kwargs:
     :return: tf.keras Model instance.
     """
+    AConnect_args = {"Wstd": Wstd,
+                    "Bstd": Bstd,
+                    "isQuant": isQuant,
+                    "bw": bw,
+                    "errDistr": errDistr,
+                    "bwErrProp": bwErrProp,
+                    "d_type": tf.dtypes.float16}
 
     assert isinstance(blocks_args, list) and False not in [isinstance(block_args, BlockArgs) for block_args in
                                                            blocks_args]
@@ -202,12 +414,14 @@ def EfficientNetV2(blocks_args,
     # build stem layer
     x = img_input
 
-    x = layers.Conv2D(round_filters(blocks_args[0].input_filters, width_coefficient, depth_divisor), 3,
+    x = Conv_AConnect(round_filters(blocks_args[0].input_filters, width_coefficient, depth_divisor), 3,
                       strides=2,
                       kernel_initializer=CONV_KERNEL_INITIALIZER,
                       use_bias=False,
-                      padding='same',
-                      name='stem_conv')(x)
+                      padding="SAME",
+                      name='stem_conv',
+                      pool=Conv_pool,
+                      **AConnect_args)(x)
     x = layers.BatchNormalization(axis=bn_axis, name='stem_bn')(x)
     x = layers.Activation(activation=activation, name='stem_activation')(x)
 
@@ -243,7 +457,9 @@ def EfficientNetV2(blocks_args,
                           activation=activation,
                           drop_rate=drop_rate,
                           mb_type=conv_type,
-                          prefix=f'{conv_type}_block{idx + 1}a_')
+                          prefix=f'{conv_type}_block{idx + 1}a_',
+                          pool=Conv_pool,
+                          **AConnect_args)
         block_num += 1
         if block_args.num_repeat > 1:
             block_args = block_args._replace(
@@ -259,18 +475,22 @@ def EfficientNetV2(blocks_args,
                                   activation=activation,
                                   drop_rate=drop_rate,
                                   mb_type=conv_type,
-                                  prefix=block_prefix)
+                                  prefix=block_prefix,
+                                  pool=Conv_pool,
+                                  **AConnect_args)
                 block_num += 1
 
     # build head
-    x = layers.Conv2D(
+    x = Conv_AConnect(
         filters=round_filters(1280, width_coefficient, depth_divisor),
         kernel_size=1,
         strides=1,
         kernel_initializer=CONV_KERNEL_INITIALIZER,
-        padding='same',
+        padding="SAME",
         use_bias=False,
-        name='head_conv')(x)
+        name='head_conv',
+        pool=Conv_pool,
+        **AConnect_args)(x)
     x = layers.BatchNormalization(axis=bn_axis, name='head_bn')(x)
     x = layers.Activation(activation=activation, name='head_activation')(x)
 
@@ -278,9 +498,11 @@ def EfficientNetV2(blocks_args,
         x = layers.GlobalAveragePooling2D(name='head_avg_pool')(x)
         if final_drop_rate and final_drop_rate > 0:
             x = layers.Dropout(final_drop_rate, name='head_dropout')(x)
-        x = layers.Dense(classes,
+        x = FC_AConnect(num_classes,
                          kernel_initializer=DENSE_KERNEL_INITIALIZER,
-                         name='probs')(x)
+                         name='probs',
+                         pool=FC_pool,
+                         **AConnect_args)(x)
     else:
         if pooling == 'avg':
             x = layers.GlobalAveragePooling2D(name='head_avg_pool')(x)
@@ -309,7 +531,7 @@ def EfficientNetV2_Base(include_top=True,
                         weights='imagenet',
                         input_tensor=None,
                         input_shape=None,
-                        classes=1000,
+                        num_classes=1000,
                         **kwargs
                         ):
     return EfficientNetV2(
@@ -321,7 +543,7 @@ def EfficientNetV2_Base(include_top=True,
         weights=weights,
         input_tensor=input_tensor,
         input_shape=input_shape,
-        classes=classes,
+        num_classes=num_classes,
         **kwargs
     )
 
@@ -330,7 +552,7 @@ def EfficientNetV2_S(include_top=True,
                      weights='imagenet',
                      input_tensor=None,
                      input_shape=None,
-                     classes=1000,
+                     num_classes=1000,
                      **kwargs
                      ):
     return EfficientNetV2(
@@ -342,7 +564,7 @@ def EfficientNetV2_S(include_top=True,
         weights=weights,
         input_tensor=input_tensor,
         input_shape=input_shape,
-        classes=classes,
+        num_classes=num_classes,
         **kwargs
     )
 
@@ -351,7 +573,7 @@ def EfficientNetV2_M(include_top=True,
                      weights='imagenet',
                      input_tensor=None,
                      input_shape=None,
-                     classes=1000,
+                     num_classes=1000,
                      **kwargs
                      ):
     return EfficientNetV2(
@@ -363,7 +585,7 @@ def EfficientNetV2_M(include_top=True,
         weights=weights,
         input_tensor=input_tensor,
         input_shape=input_shape,
-        classes=classes,
+        num_classes=num_classes,
         **kwargs
     )
 
@@ -372,7 +594,7 @@ def EfficientNetV2_L(include_top=True,
                      weights='imagenet',
                      input_tensor=None,
                      input_shape=None,
-                     classes=1000,
+                     num_classes=1000,
                      **kwargs
                      ):
     return EfficientNetV2(
@@ -384,7 +606,7 @@ def EfficientNetV2_L(include_top=True,
         weights=weights,
         input_tensor=input_tensor,
         input_shape=input_shape,
-        classes=classes,
+        num_classes=num_classes,
         **kwargs
     )
 
@@ -393,7 +615,7 @@ def EfficientNetV2_XL(include_top=True,
                       weights='imagenet',
                       input_tensor=None,
                       input_shape=None,
-                      classes=1000,
+                      num_classes=1000,
                       **kwargs
                       ):
     return EfficientNetV2(
@@ -405,7 +627,7 @@ def EfficientNetV2_XL(include_top=True,
         weights=weights,
         input_tensor=input_tensor,
         input_shape=input_shape,
-        classes=classes,
+        num_classes=num_classes,
         **kwargs
     )
 

@@ -1,7 +1,7 @@
-# Based on https://keras.io/zh/examples/cifar10_resnet/
 import tensorflow as tf
+import os
 import numpy as np
-from ResNet18 import resnet18
+from EfficientNetV2 import EfficientNetV2_S,EfficientNetV2_M, EfficientNetV2_L
 from general_training import general_training
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from tensorflow.keras.callbacks import ReduceLROnPlateau
@@ -26,9 +26,9 @@ input_shape = X_train.shape[1:]
 
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect
-Wstd_err = [0.7]   # Define the stddev for training
-Conv_pool = [1,2,4,8,16]
-FC_pool = [1,2,2,2,2]
+Wstd_err = [0]   # Define the stddev for training
+Conv_pool = [1]
+FC_pool = [1]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]
@@ -36,16 +36,15 @@ Bbw = [8]
 #errDistr = ["lognormal"]
 errDistr = ["normal"]
 saveModel = True
-model_name = 'ResNet18_CIFAR100/'
+model_name = 'EfficientNetV2_CIFAR100/'
 folder_models = './Models/'+model_name
-if isAConnect[0]:
-    net_base = folder_models+'Wstd_0_Bstd_0_8bQuant.h5'
-    #net_base = folder_models+'8Werr_Wstd_70_Bstd_70_8bQuant_normalDistr.h5'
-    #net_base = folder_models+'8Werr_Wstd_50_Bstd_50_8bQuant_lognormalDistr.h5'
+net_base = folder_models+'Wstd_0_Bstd_0_8bQuant.h5'
+if isAConnect[0] and os.path.exists(net_base): 
     model_base = tf.keras.models.load_model(net_base,custom_objects=custom_objects)
     transferLearn = True
-#model_base=None
-#transferLearn=False
+else:
+    model_base=None
+    transferLearn=False
 
 # Does include error matrices during backward propagation?
 bwErrProp = [True]
@@ -112,7 +111,7 @@ optimizer = tf.optimizers.SGD(learning_rate=0.0,
 
 ################################################################
 # TRAINING THE MODEL:
-general_training(model_int=resnet18,isAConnect=[True],
+general_training(model_int=EfficientNetV2_S,isAConnect=[True],
                         model_base=model_base,transferLearn=transferLearn,
                         Wstd_err=Wstd_err,
                         WisQuant=WisQuant,BisQuant=BisQuant,
@@ -129,5 +128,6 @@ general_training(model_int=resnet18,isAConnect=[True],
                         epochs=epochs,
                         callbacks=callbacks,
                         saveModel=saveModel,folder_models=folder_models,
-                        folder_results=folder_results)
+                        folder_results=folder_results,
+                        num_classes=100)
 
