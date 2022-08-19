@@ -69,11 +69,8 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Chin] RGB
                 if len(list(self.kernel_size,)) > 1:
                     self.shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters))
-                    print('hola')
                 else:
-                    print('sano')
                     self.shape = list(self.kernel_size) + list(self.kernel_size) + list((int(input_shape[-1]),self.filters))
-                print(self.kernel_size)
 
                 self.W = self.add_weight('kernel',
                                           shape = self.shape,
