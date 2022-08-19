@@ -16,16 +16,15 @@ def normalization(train_images, test_images):
     return train_images, test_images
 
 # LOADING DATASET:
-(X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar10.load_data()	
+(X_train, Y_train), (X_test, Y_test) = tf.keras.datasets.cifar100.load_data()	
 X_train, X_test = normalization(X_train,X_test)    
 
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0]   # Define the stddev for training
-Sim_err = [0]
-#Conv_pool = [1,2,4,8,16]
-Conv_pool = [16]
+Wstd_err = [0.7]   # Define the stddev for training
+Sim_err = [0.7]
+Conv_pool = [1,2,4,8,16]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
 Wbw = [8]

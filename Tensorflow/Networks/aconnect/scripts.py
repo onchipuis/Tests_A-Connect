@@ -147,10 +147,10 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
         
         def classify(net,Xtest,Ytest,top5):#,ev_batch_size=None):
                 #_, accuracy, top5acc = net.evaluate(Xtest,Ytest,verbose=0,batch_size=ev_batch_size)
-                y_predict = net.predict(Xtest,verbose=0)#,batch_size=ev_batch_size)
                 #XtestIn = tf.convert_to_tensor(Xtest) 
                 #y_predict = net(XtestIn,training=False)
                 #y_predict = net(Xtest,training=False)
+                y_predict = net.predict(Xtest,verbose=0)#,batch_size=ev_batch_size)
                 accuracy = get_top_n_score(Ytest, y_predict, 1)
                 if top5:
                     acc_top5 = get_top_n_score(Ytest, y_predict, 5)
