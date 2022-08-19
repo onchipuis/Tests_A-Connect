@@ -21,8 +21,8 @@ def normalization(train_images, test_images):
 # Load the CIFAR100 data.
 (X_train, Y_train), (X_test, Y_test) = cifar100.load_data()
 X_train, X_test = normalization(X_train,X_test)    
-X_train = tf.image.resize(X_train,[128,128])
-X_test = tf.image.resize(X_test,[128,128])
+#X_train = tf.image.resize(X_train,[128,128])
+#X_test = tf.image.resize(X_test,[128,128])
 # Input image dimensions.
 input_shape = X_train.shape[1:]
 
