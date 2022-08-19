@@ -73,7 +73,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 else:
                     print('sano')
                     #self.shape = [self.kernel_size,self.kernel_size,input_shape[-1],self.filters]
-                print(self.kernel_size)
+                print(list(self.kernel_size))
 
                 self.W = self.add_weight('kernel',
                                           shape = self.shape,
