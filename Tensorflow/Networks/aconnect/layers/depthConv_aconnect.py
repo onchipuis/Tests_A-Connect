@@ -162,7 +162,10 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                             if use_bias:
                                 berr_aux = self.custom_mult(bias,Berr[i])
                                 Z1 = tf.add(Z1,berr_aux)
-                            Z = Z1 if i==0 else Z = tf.concat([Z,Z1],axis=0)
+                            if i==0:
+                                Z = Z1
+                            else: 
+                                Z = tf.concat([Z,Z1],axis=0)
                     else:
                         #Custom Conv layer operation
                         w = weights*self.Werr
