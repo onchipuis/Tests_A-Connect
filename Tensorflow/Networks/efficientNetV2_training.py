@@ -129,5 +129,5 @@ general_training(model_int=EfficientNetV2_S,isAConnect=[True],
                         callbacks=callbacks,
                         saveModel=saveModel,folder_models=folder_models,
                         folder_results=folder_results,
-                        num_classes=100)
+                        num_classes=100,include_top=False)
 

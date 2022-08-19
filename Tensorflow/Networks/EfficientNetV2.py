@@ -409,6 +409,7 @@ def EfficientNetV2(blocks_args,
             img_input = layers.Input(tensor=input_tensor, shape=input_shape)
         else:
             img_input = input_tensor
+    inputs = img_input if input_tensor is None else keras_utils.get_source_inputs(input_tensor)
 
     bn_axis = 3 if backend.image_data_format() == 'channels_last' else 1
 
@@ -495,7 +496,7 @@ def EfficientNetV2(blocks_args,
     x = layers.BatchNormalization(axis=bn_axis, name='head_bn')(x)
     x = layers.Activation(activation=activation, name='head_activation')(x)
 
-    if include_top:
+    if include_top
         x = layers.GlobalAveragePooling2D(name='head_avg_pool')(x)
         if final_drop_rate and final_drop_rate > 0:
             x = layers.Dropout(final_drop_rate, name='head_dropout')(x)
@@ -504,21 +505,17 @@ def EfficientNetV2(blocks_args,
                          name='probs',
                          pool=FC_pool,
                          **AConnect_args)(x)
+        outputs = layers.Softmax()(x)
     else:
         if pooling == 'avg':
-            x = layers.GlobalAveragePooling2D(name='head_avg_pool')(x)
+            outputs = layers.GlobalAveragePooling2D(name='head_avg_pool')(x)
         elif pooling == 'max':
-            x = layers.GlobalMaxPooling2D(name='head_max_pool')(x)
+            outputs = layers.GlobalMaxPooling2D(name='head_max_pool')(x)
 
-    inputs = img_input if input_tensor is None else keras_utils.get_source_inputs(input_tensor)
+    model = models.Model(inputs=inputs,outputs=outputs,name=model_name)
 
-    model = models.Model(inputs, x, name=model_name)
 
     if weights in ['imagenet', 'imagenet21k', 'imagenet21k-ft1k']:
-        if num_classes==1000:
-            include_top = True
-        else:
-            include_top = False
         file_name = WEIGHTS_MAP[arch][weights][include_top]
         weight_path = keras_utils.get_file(
             file_name,
@@ -526,9 +523,16 @@ def EfficientNetV2(blocks_args,
             cache_subdir='models'
         )
         model.load_weights(weight_path)
-
     elif weights:
         model.load_weights(weights)
+
+    if not(include_top):
+        model.add(FC_AConnect(num_classes,
+                     kernel_initializer=DENSE_KERNEL_INITIALIZER,
+                     name='probs',
+                     pool=FC_pool,
+                     **AConnect_args))
+        model.add(layers.Softmax())
     return model
 
 
