@@ -531,7 +531,8 @@ def EfficientNetV2(blocks_args,
         if input_shape[1]==32:
             print('hola')
             x = tf.keras.layers.experimental.preprocessing.Resizing(128,128)(img_input)
-            x = model.layers[1](x)
+            outputs = model(x)
+            model = models.Model(inputs=inputs,outputs=outputs,name=model_name)
         x = FC_AConnect(num_classes,
                      kernel_initializer=DENSE_KERNEL_INITIALIZER,
                      name='probs',
