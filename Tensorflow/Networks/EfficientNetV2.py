@@ -539,6 +539,7 @@ def EfficientNetV2(blocks_args,
         outputs = layers.Softmax()(x)
         model = models.Model(inputs=inputs,outputs=outputs,name=model_name)
 
+    model.summary()
     return model
 
 
