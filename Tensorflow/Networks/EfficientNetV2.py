@@ -530,7 +530,9 @@ def EfficientNetV2(blocks_args,
     if not(include_top):
         if input_shape[1]==32:
             print('hola')
-            x = tf.keras.layers.experimental.preprocessing.Resizing(128,128)(img_input)
+            model.layers.pop(0)
+            x = img_input
+            x = tf.keras.layers.experimental.preprocessing.Resizing(128,128)(x)
             outputs = model(x)
             model = models.Model(inputs=inputs,outputs=outputs,name=model_name)
         x = FC_AConnect(num_classes,
