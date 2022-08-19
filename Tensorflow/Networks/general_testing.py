@@ -145,7 +145,9 @@ def general_testing (isAConnect=[True],
                                     print('\n\n*********************************************************************')
                                     print('\n Simulation started at: ',starttime)
                                     print('Simulation finished at: ', endtime)
-                                    del net,acc,acc_top5,stats,stats_top5
+                                    del net,acc,stats
+                                    if top5:
+                                        del acc_top5,stats_top5
                                     gc.collect()
                                     tf.keras.backend.clear_session()
                                     tf.compat.v1.reset_default_graph()
