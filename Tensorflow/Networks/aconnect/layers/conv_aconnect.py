@@ -44,7 +44,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
 
                 super(Conv_AConnect, self).__init__()
                 self.filters = filters
-                self.kernel_size = kernel_size
+                self.kernel_size = kernel_size,
                 self.strides = strides
                 self.padding = padding
                 self.data_format=data_format
@@ -67,13 +67,13 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 self.validate_init()
         def build(self,input_shape):
                 ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Chin] RGB
-                self.shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters))
-                if type(self.kernel_size) is tuple:
+                if len(self.kernel_size) > 1:
+                    self.shape = list(self.kernel_size) + list((int(input_shape[-1]),self.filters))
                     print('hola')
                 else:
                     print('sano')
-                    #self.shape = [self.kernel_size,self.kernel_size,input_shape[-1],self.filters]
-                print(list(self.kernel_size))
+                    self.shape = list(self.kernel_size) + list(self.kernel_size) + list((int(input_shape[-1]),self.filters))
+                print(self.kernel_size)
 
                 self.W = self.add_weight('kernel',
                                           shape = self.shape,
