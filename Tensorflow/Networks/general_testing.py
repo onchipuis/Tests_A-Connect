@@ -49,6 +49,7 @@ def general_testing (isAConnect=[True],
                         folder_models=None,
                         folder_results=None,
                         enable_exit=False,
+                        top5=False,
                         **kwargs):
 
     for d in range(len(isAConnect)): #Iterate over the networks
@@ -119,14 +120,20 @@ def general_testing (isAConnect=[True],
                                     #net = tf.keras.models.load_model(string,custom_objects = custom_objects) 
                                     net = string
                                     #MC sim
-                                    acc, stats = scripts.MonteCarlo(net=net,Xtest=X_test,Ytest=Y_test,M=N,
-                                            Wstd=Err,Bstd=Err,force=force,Derr=0,net_name=name,
-                                            custom_objects=custom_objects,
-                                            optimizer=optimizer,
-                                            loss='sparse_categorical_crossentropy',
-                                            metrics=['accuracy'],top5=False,dtype='float16',
-                                            errDistr=errDistr[k],evaluate_batch_size=batch_size
-                                            )
+                                    MC_args= {"net":net,"Xtest":X_test,"Ytest":Y_test,"M":N,
+                                            "Wstd":Err,"Bstd":Err,"force":force,"Derr":0,"net_name":name,
+                                            "custom_objects":custom_objects,
+                                            "optimizer":optimizer,
+                                            "loss":'sparse_categorical_crossentropy',
+                                            "metrics":['accuracy'],"top5":top5,"dtype":'float16',
+                                            "errDistr":errDistr[k],"evaluate_batch_size":batch_size}
+                                    if top5:
+                                        acc, stats = scripts.MonteCarlo(**MC_args)
+                                    else:
+                                        acc,acc_top5,stats,stats_top5 = scripts.MonteCarlo(**MC_args)
+                                        np.savetxt(folder_results+name_sim+'_top5.txt',acc_top5,fmt="%.4f")
+                                        np.savetxt(folder_results+name_stats+'_top5.txt',stats_top5,fmt="%.4f")
+
                                     np.savetxt(folder_results+name_sim+'.txt',acc,fmt="%.4f")
                                     np.savetxt(folder_results+name_stats+'.txt',stats,fmt="%.4f")
 
@@ -138,7 +145,7 @@ def general_testing (isAConnect=[True],
                                     print('\n\n*********************************************************************')
                                     print('\n Simulation started at: ',starttime)
                                     print('Simulation finished at: ', endtime)
-                                    del net,acc,stats
+                                    del net,acc,acc_top5,stats,stats_top5
                                     gc.collect()
                                     tf.keras.backend.clear_session()
                                     tf.compat.v1.reset_default_graph()
