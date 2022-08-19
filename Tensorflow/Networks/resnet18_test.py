@@ -23,7 +23,7 @@ X_train, X_test = normalization(X_train,X_test)
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
 Wstd_err = [0.7]   # Define the stddev for training
-Sim_err = [0.7]
+Sim_err = [0]
 #Conv_pool = [1,2,4,8,16]
 Conv_pool = [16]
 WisQuant = ["yes"]		    # Do you want binary weights?
