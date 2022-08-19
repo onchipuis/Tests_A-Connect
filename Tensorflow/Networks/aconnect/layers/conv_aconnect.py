@@ -43,7 +43,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
 
                 super(Conv_AConnect, self).__init__()
                 self.filters = filters
-                self.kernel_size = kernel_size
+                self.kernel_size = kernel_size if type(kernel_size)==tuple else (kernel_size,kernel_size)
                 self.strides = strides
                 self.padding = padding
                 self.data_format=data_format

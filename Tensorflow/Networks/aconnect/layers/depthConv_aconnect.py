@@ -40,7 +40,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 #dilation_rate=(1, 1),
 
                 super(DepthWiseConv_AConnect, self).__init__()
-                self.kernel_size = kernel_size
+                self.kernel_size = kernel_size if type(kernel_size)==tuple else (kernel_size,kernel_size)
                 self.strides = self._strides = strides
                 self.padding = padding
                 self.data_format=data_format
