@@ -64,7 +64,7 @@ if model_base is None:
     epoch3 = 160
 else:
     lrate = 0.1
-    epochs = 120
+    epochs = 100
     epoch1 = 30
     epoch2 = 60
     epoch3 = 100
