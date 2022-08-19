@@ -101,7 +101,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 #If the layer will take into account the standard deviation of the weights or the std of 
                 #the bias or both
                 if(self.Wstd != 0 or self.Bstd != 0): 
-                    if use_bias:
+                    if self.use_bias:
                         if(self.Bstd != 0):
                             self.infBerr = Merr_distr([self.bias_shape,],self.Bstd,self.d_type,self.errDistr)
                             #It is necessary to convert the tensor to a numpy array.Tensors are constants 
@@ -117,7 +117,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                         self.Werr = tf.constant(1,dtype=self.d_type)
                 else:
                     self.Werr = tf.constant(1,dtype=self.d_type) #We need to define the number 1 as a float32.
-                    if use_bias:
+                    if self.use_bias:
                         self.Berr = tf.constant(1,dtype=self.d_type)
                 super(DepthWiseConv_AConnect, self).build(input_shape)
         def call(self,X,training):
@@ -130,7 +130,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 else:
                     weights = self.W
                 #Quantize the biases
-                if use_bias:
+                if self.use_bias:
                     if(self.isQuant[1]=="yes"):
                         bias = self.LQuant(self.bias)
                     else:
@@ -144,7 +144,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                         else:
                             Werr = self.Werr
 
-                        if use_bias:
+                        if self.use_bias:
                             if(self.Bstd != 0):
                                 berr_shape = [self.pool,self.bias_shape]
                                 Berr = Merr_distr(berr_shape,self.Bstd,self.d_type,self.errDistr)
@@ -159,7 +159,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                                                         strides=self._strides,
                                                         padding=self.padding,
                                                         data_format=self.data_format)
-                            if use_bias:
+                            if self.use_bias:
                                 berr_aux = self.custom_mult(bias,Berr[i])
                                 Z1 = tf.add(Z1,berr_aux)
                             if i==0:
@@ -174,7 +174,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                                                     strides=self._strides,
                                                     padding=self.padding,
                                                     data_format=self.data_format)
-                        if use_bias:
+                        if self.use_bias:
                             b = bias*self.Berr
                             Z=Z+b
                 else:
@@ -183,14 +183,14 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                                 Werr = self.infWerr
                         else:
                                 Werr = self.Werr
-                        if use_bias:
+                        if self.use_bias:
                             if(self.Bstd != 0):
                                     Berr = self.infBerr
                             else:
                                     Berr = self.Berr
                     else:
                         Werr = self.Werr
-                        if use_bias:
+                        if self.use_bias:
                             Berr = self.Berr
                     
                     #Custom Conv layer operation
@@ -200,7 +200,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                                                 strides=self._strides,
                                                 padding=self.padding,
                                                 data_format=self.data_format)
-                    if use_bias:
+                    if self.use_bias:
                         b = bias*Berr
                         Z=Z+b
                 
