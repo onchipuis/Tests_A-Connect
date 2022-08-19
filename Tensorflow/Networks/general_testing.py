@@ -128,11 +128,11 @@ def general_testing (isAConnect=[True],
                                             "metrics":['accuracy'],"top5":top5,"dtype":'float16',
                                             "errDistr":errDistr[k],"evaluate_batch_size":batch_size}
                                     if top5:
-                                        acc, stats = scripts.MonteCarlo(**MC_args)
-                                    else:
                                         acc,acc_top5,stats,stats_top5 = scripts.MonteCarlo(**MC_args)
                                         np.savetxt(folder_results+name_sim+'_top5.txt',acc_top5,fmt="%.4f")
                                         np.savetxt(folder_results+name_stats+'_top5.txt',stats_top5,fmt="%.4f")
+                                    else:
+                                        acc, stats = scripts.MonteCarlo(**MC_args)
 
                                     np.savetxt(folder_results+name_sim+'.txt',acc,fmt="%.4f")
                                     np.savetxt(folder_results+name_stats+'.txt',stats,fmt="%.4f")
