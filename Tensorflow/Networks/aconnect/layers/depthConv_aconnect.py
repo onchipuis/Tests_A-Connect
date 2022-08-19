@@ -32,6 +32,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 bw=[1,1],
                 bwErrProp = True,
                 d_type=tf.dtypes.float16,
+                use_bias=True,
                 kernel_initializer=tf.keras.initializers.GlorotUniform(),
                 bias_initializer=tf.keras.initializers.Constant(0.),
                 kernel_regularizer=None,
@@ -55,6 +56,7 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 self.bw = bw
                 self.bwErrProp = bwErrProp
                 self.d_type = d_type
+                self.use_bias = use_bias
                 self.kernel_initializer = kernel_initializer 
                 self.bias_initializer = bias_initializer
                 self.kernel_regularizer = kernel_regularizer 
@@ -81,7 +83,6 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 ### Compute the shape of the weights. Input shape could be
                 ### [H,W,Ch,depth_mult] RGB
                 self.filter_shape = [self.kernel_size[0],self.kernel_size[1],self.in_channels, self.depth_multiplier]
-                self.bias_shape = self.in_channels*self.depth_multiplier
 
                 self.W = self.add_weight('kernel',
                                           shape = self.filter_shape,
@@ -89,31 +90,34 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                                           regularizer = self.kernel_regularizer,
                                           dtype=self.d_type,
                                           trainable=True)
-                self.bias = self.add_weight('bias',
-                                            shape=self.bias_shape,
-                                            initializer = self.bias_initializer,
-                                            regularizer = self.bias_regularizer,
-                                            dtype=self.d_type,
-                                            trainable=True)
+                if self.use_bias:
+                    self.bias_shape = self.in_channels*self.depth_multiplier
+                    self.bias = self.add_weight('bias',
+                                                shape=self.bias_shape,
+                                                initializer = self.bias_initializer,
+                                                regularizer = self.bias_regularizer,
+                                                dtype=self.d_type,
+                                                trainable=True)
                 #If the layer will take into account the standard deviation of the weights or the std of 
                 #the bias or both
                 if(self.Wstd != 0 or self.Bstd != 0): 
+                    if use_bias:
                         if(self.Bstd != 0):
-                                self.infBerr = Merr_distr([self.bias_shape,],self.Bstd,self.d_type,self.errDistr)
-                                #It is necessary to convert the tensor to a numpy array.Tensors are constants 
-                                #and cannot be changed. Necessary to change the error matrix/array when 
-                                #Monte Carlo is running.
-                                self.infBerr = self.infBerr.numpy()  
+                            self.infBerr = Merr_distr([self.bias_shape,],self.Bstd,self.d_type,self.errDistr)
+                            #It is necessary to convert the tensor to a numpy array.Tensors are constants 
+                            #and cannot be changed. Necessary to change the error matrix/array when 
+                            #Monte Carlo is running.
+                            self.infBerr = self.infBerr.numpy()  
                         else:
-                                self.Berr = tf.constant(1,dtype=self.d_type)
-                        if(self.Wstd !=0):
-                                self.infWerr = Merr_distr(self.filter_shape,self.Wstd,self.d_type,self.errDistr)
-                                self.infWerr = self.infWerr.numpy()
-
-                        else:
-                                self.Werr = tf.constant(1,dtype=self.d_type)
+                            self.Berr = tf.constant(1,dtype=self.d_type)
+                    if(self.Wstd !=0):
+                        self.infWerr = Merr_distr(self.filter_shape,self.Wstd,self.d_type,self.errDistr)
+                        self.infWerr = self.infWerr.numpy()
+                    else:
+                        self.Werr = tf.constant(1,dtype=self.d_type)
                 else:
-                        self.Werr = tf.constant(1,dtype=self.d_type) #We need to define the number 1 as a float32.
+                    self.Werr = tf.constant(1,dtype=self.d_type) #We need to define the number 1 as a float32.
+                    if use_bias:
                         self.Berr = tf.constant(1,dtype=self.d_type)
                 super(DepthWiseConv_AConnect, self).build(input_shape)
         def call(self,X,training):
@@ -126,10 +130,11 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 else:
                     weights = self.W
                 #Quantize the biases
-                if(self.isQuant[1]=="yes"):
-                    bias = self.LQuant(self.bias)
-                else:
-                    bias = self.bias
+                if use_bias:
+                    if(self.isQuant[1]=="yes"):
+                        bias = self.LQuant(self.bias)
+                    else:
+                        bias = self.bias
                 
                 if(training):
                     if(self.Wstd != 0 or self.Bstd != 0):
@@ -139,57 +144,62 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                         else:
                             Werr = self.Werr
 
-                        if(self.Bstd != 0):
-                            berr_shape = [self.pool,self.bias_shape]
-                            Berr = Merr_distr(berr_shape,self.Bstd,self.d_type,self.errDistr)
-                        else:
-                            Berr = self.Berr
+                        if use_bias:
+                            if(self.Bstd != 0):
+                                berr_shape = [self.pool,self.bias_shape]
+                                Berr = Merr_distr(berr_shape,self.Bstd,self.d_type,self.errDistr)
+                            else:
+                                Berr = self.Berr
 
                         newBatch = tf.cast(tf.floor(tf.cast(self.batch_size/self.pool,dtype=tf.float16)),dtype=tf.int32)
                         for i in range(self.pool):
                             werr_aux = self.custom_mult(weights,Werr[i])
-                            berr_aux = self.custom_mult(bias,Berr[i])
                             Z1 = tf.nn.depthwise_conv2d(input=self.X[(i)*newBatch:(i+1)*newBatch],
                                                         filter=werr_aux,
                                                         strides=self._strides,
                                                         padding=self.padding,
                                                         data_format=self.data_format)
-                            Z1 = tf.add(Z1,berr_aux)
-                            if i==0:
-                                Z = Z1
-                            else:
-                                Z = tf.concat([Z,Z1],axis=0)
+                            if use_bias:
+                                berr_aux = self.custom_mult(bias,Berr[i])
+                                Z1 = tf.add(Z1,berr_aux)
+                            Z = Z1 if i==0 else Z = tf.concat([Z,Z1],axis=0)
                     else:
                         #Custom Conv layer operation
                         w = weights*self.Werr
-                        b = bias*self.Berr
-                        Z = b+tf.nn.depthwise_conv2d(input=self.X,
+                        Z = tf.nn.depthwise_conv2d(input=self.X,
                                                     filter=w,
                                                     strides=self._strides,
                                                     padding=self.padding,
                                                     data_format=self.data_format)
+                        if use_bias:
+                            b = bias*self.Berr
+                            Z=Z+b
                 else:
                     if(self.Wstd != 0 or self.Bstd !=0):
                         if(self.Wstd !=0):
                                 Werr = self.infWerr
                         else:
                                 Werr = self.Werr
-                        if(self.Bstd != 0):
-                                Berr = self.infBerr
-                        else:
-                                Berr = self.Berr
+                        if use_bias:
+                            if(self.Bstd != 0):
+                                    Berr = self.infBerr
+                            else:
+                                    Berr = self.Berr
                     else:
                         Werr = self.Werr
-                        Berr = self.Berr
+                        if use_bias:
+                            Berr = self.Berr
                     
                     #Custom Conv layer operation
                     w = weights*Werr
-                    b = bias*Berr
-                    Z = b+tf.nn.depthwise_conv2d(input=self.X,
+                    Z = tf.nn.depthwise_conv2d(input=self.X,
                                                 filter=w,
                                                 strides=self._strides,
                                                 padding=self.padding,
                                                 data_format=self.data_format)
+                    if use_bias:
+                        b = bias*Berr
+                        Z=Z+b
                 
                 Z = self.LQuant(Z)
                 return Z
@@ -210,16 +220,17 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 config = super(DepthWiseConv_AConnect, self).get_config()
                 config.update({
                         'kernel_size': self.kernel_size,
+                        'strides': self.strides,
+                        'padding': self.padding,
+                        'data_format': self.data_format,
+                        'use_bias': self.use_bias,
                         'Wstd': self.Wstd,
                         'Bstd': self.Bstd,
                         'errDistr': self.errDistr,
                         'pool': self.pool,
                         'isQuant': self.isQuant,
                         'bw': self.bw,
-                        'strides': self.strides,
-                        'padding': self.padding,
                         'd_type': self.d_type,
-                        'data_format': self.data_format,
                         'depth_multiplier': self.data_multiplier})
                 return config
         
