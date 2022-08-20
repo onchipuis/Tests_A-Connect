@@ -106,9 +106,11 @@ V2_S_BLOCKS_ARGS = [
     BlockArgs(kernel_size=3, num_repeat=2, input_filters=24, output_filters=24,
               expand_ratio=1, id_skip=True, strides=[1, 1], se_ratio=None, conv_type=1),
     BlockArgs(kernel_size=3, num_repeat=4, input_filters=24, output_filters=48,
-              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+              #expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+              expand_ratio=4, id_skip=True, strides=[1, 1], se_ratio=None, conv_type=1),
     BlockArgs(kernel_size=3, num_repeat=4, input_filters=48, output_filters=64,
-              expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+              #expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=None, conv_type=1),
+              expand_ratio=4, id_skip=True, strides=[1, 1], se_ratio=None, conv_type=1),
     BlockArgs(kernel_size=3, num_repeat=6, input_filters=64, output_filters=128,
               expand_ratio=4, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
     BlockArgs(kernel_size=3, num_repeat=9, input_filters=128, output_filters=160,
@@ -415,7 +417,7 @@ def EfficientNetV2(blocks_args,
 
     # build stem layer
     x = img_input
-    x = layers.Resizing(128,128)(x)
+    #x = layers.Resizing(128,128)(x)
 
     x = Conv_AConnect(round_filters(blocks_args[0].input_filters, width_coefficient, depth_divisor), 3,
                       #strides=2,
