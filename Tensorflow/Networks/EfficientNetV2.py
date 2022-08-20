@@ -415,6 +415,7 @@ def EfficientNetV2(blocks_args,
 
     # build stem layer
     x = img_input
+    x = layers.Resizing(128,128)(x)
 
     x = Conv_AConnect(round_filters(blocks_args[0].input_filters, width_coefficient, depth_divisor), 3,
                       strides=2,
@@ -528,14 +529,15 @@ def EfficientNetV2(blocks_args,
 
     # Included by Luis E. Rueda G.
     if not(include_top):
+        """
         if input_shape[1]==32:
             print('hola')
             model.layers.pop(0)
             x = img_input
             #x = tf.keras.layers.experimental.preprocessing.Resizing(128,128)(x)
-            x = layers.Resizing(128,128)(x)
             outputs = model(x)
             model = models.Model(inputs=inputs,outputs=outputs,name=model_name)
+        """
         x = FC_AConnect(num_classes,
                      kernel_initializer=DENSE_KERNEL_INITIALIZER,
                      name='probs',
