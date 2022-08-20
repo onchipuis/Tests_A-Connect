@@ -113,7 +113,7 @@ optimizer = tf.optimizers.SGD(learning_rate=0.0,
 
 ################################################################
 # TRAINING THE MODEL:
-general_training(model_int=EfficientNetV2_Base,isAConnect=[True],
+general_training(model_int=EfficientNetV2_S,isAConnect=[True],
                         model_base=model_base,transferLearn=transferLearn,
                         Wstd_err=Wstd_err,
                         WisQuant=WisQuant,BisQuant=BisQuant,
