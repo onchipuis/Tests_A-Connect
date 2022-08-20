@@ -1,7 +1,7 @@
 import tensorflow as tf
 import os
 import numpy as np
-from EfficientNetV2 import EfficientNetV2_S,EfficientNetV2_M, EfficientNetV2_L
+from EfficientNetV2 import EfficientNetV2_S,EfficientNetV2_Base
 from general_training import general_training
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from tensorflow.keras.callbacks import ReduceLROnPlateau
@@ -113,7 +113,7 @@ optimizer = tf.optimizers.SGD(learning_rate=0.0,
 
 ################################################################
 # TRAINING THE MODEL:
-general_training(model_int=EfficientNetV2_S,isAConnect=[True],
+general_training(model_int=EfficientNetV2_Base,isAConnect=[True],
                         model_base=model_base,transferLearn=transferLearn,
                         Wstd_err=Wstd_err,
                         WisQuant=WisQuant,BisQuant=BisQuant,
