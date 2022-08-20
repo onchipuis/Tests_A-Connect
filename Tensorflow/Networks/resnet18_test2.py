@@ -62,7 +62,7 @@ optimizer = tf.optimizers.SGD(learning_rate=lr_schedule,
 
 ################################################################
 # TESTING THE MODEL:
-for i in len(Wstd_err):
+for i in range(len(Wstd_err)):
     general_testing(isAConnect=isAConnect,
                     Wstd_err=[Wstd_err[i]],
                     Sim_err=[Wstd_err[i]],
