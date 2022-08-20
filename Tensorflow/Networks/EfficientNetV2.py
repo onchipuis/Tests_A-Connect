@@ -424,8 +424,8 @@ def EfficientNetV2(blocks_args,
     #x = layers.Resizing(128,128)(x)
 
     x = Conv_AConnect(round_filters(blocks_args[0].input_filters, width_coefficient, depth_divisor), 3,
-                      #strides=2,
-                      strides=1,
+                      strides=2,
+                      #strides=1,
                       kernel_initializer=CONV_KERNEL_INITIALIZER,
                       use_bias=False,
                       padding="SAME",
