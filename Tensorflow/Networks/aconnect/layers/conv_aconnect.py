@@ -72,7 +72,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 else:
                     kernel_size = self.kernel_size
                 kernel_size = list(kernel_size)
-                print(kernel_size)
+                
                 if len(kernel_size) > 1:
                     self.shape = kernel_size + list((int(input_shape[-1]),self.filters))
                 else:
