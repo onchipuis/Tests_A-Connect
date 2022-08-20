@@ -48,7 +48,7 @@ def general_training (model_int=None,isAConnect=[True],
                         callbacks=None,
                         saveModel=False,folder_models=None,
                         folder_results=None,
-                        force_save=False,
+                        force_save=True,
                         **kwargs):
 
     for d in range(len(isAConnect)): #Iterate over the networks
