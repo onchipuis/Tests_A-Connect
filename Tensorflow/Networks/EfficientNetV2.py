@@ -415,7 +415,7 @@ def EfficientNetV2(blocks_args,
 
     # build stem layer
     x = img_input
-    x = layers.Resizing(128,128)(x)
+    x = layers.Resizing(256,256)(x)
 
     x = Conv_AConnect(round_filters(blocks_args[0].input_filters, width_coefficient, depth_divisor), 3,
                       strides=2,
@@ -546,7 +546,7 @@ def EfficientNetV2(blocks_args,
         outputs = layers.Softmax()(x)
         model = models.Model(inputs=inputs,outputs=outputs,name=model_name)
 
-    model.summary()
+    #model.summary()
     return model
 
 
