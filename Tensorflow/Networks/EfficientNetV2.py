@@ -102,8 +102,8 @@ V2_BASE_BLOCKS_ARGS = [
     BlockArgs(kernel_size=3, num_repeat=5, input_filters=96, output_filters=112,
               expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
     BlockArgs(kernel_size=3, num_repeat=8, input_filters=112, output_filters=192,
-              #expand_ratio=6, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
-              expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
+              expand_ratio=6, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
+              #expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
 ]
 
 V2_S_BLOCKS_ARGS = [
