@@ -48,6 +48,7 @@ def general_training (model_int=None,isAConnect=[True],
                         callbacks=None,
                         saveModel=False,folder_models=None,
                         folder_results=None,
+                        force_save=False,
                         **kwargs):
 
     for d in range(len(isAConnect)): #Iterate over the networks
@@ -112,38 +113,39 @@ def general_training (model_int=None,isAConnect=[True],
                                 else:
                                     name = 'Base'+namev
                                 
-                                print("*************************TRAINING NETWORK*********************")
-                                print("\n\t\t\t", folder_models + name)
-                                
-                                #TRAINING PARAMETERS
-                                model.compile(loss='sparse_categorical_crossentropy',
-                                              optimizer=optimizer,
-                                              metrics=['accuracy'])
+                                if not(os.path.exists(folder_models+name+'.h5')) or force_save: 
+                                    print("*************************TRAINING NETWORK*********************")
+                                    print("\n\t\t\t", folder_models + name)
+                                    
+                                    #TRAINING PARAMETERS
+                                    model.compile(loss='sparse_categorical_crossentropy',
+                                                  optimizer=optimizer,
+                                                  metrics=['accuracy'])
 
-                                # Run training, with or without data augmentation.
-                                history = model.fit(X_train, Y_train,
-                                              batch_size=batch_size,
-                                              epochs=epochs,
-                                              validation_data=(X_test, Y_test),
-                                              shuffle=True,
-                                              callbacks=callbacks)
-                                model.evaluate(X_test,Y_test) 
-                                
-                                y_predict =model.predict(X_test)
-                                elapsed_time = time.time() - start_time
-                                print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
-                                print("Elapsed time: {}".format(hms_string(elapsed_time)))
-                                print('Tiempo de procesamiento (secs): ', time.time()-tic)
-                                #Save the accuracy and the validation accuracy
-                                acc = history.history['accuracy'] 
-                                val_acc = history.history['val_accuracy']
-                                              
-                                # SAVE MODEL:
-                                if saveModel:
-                                    string = folder_models + name + '.h5'
-                                    model.save(string,include_optimizer=False)
-                                    #Save in a txt the accuracy and the validation accuracy for further analysis
-                                    if not os.path.isdir(folder_results):
-                                        os.makedirs(folder_results)
-                                    np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.4f") 
-                                    np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.4f")              
+                                    # Run training, with or without data augmentation.
+                                    history = model.fit(X_train, Y_train,
+                                                  batch_size=batch_size,
+                                                  epochs=epochs,
+                                                  validation_data=(X_test, Y_test),
+                                                  shuffle=True,
+                                                  callbacks=callbacks)
+                                    model.evaluate(X_test,Y_test) 
+                                    
+                                    y_predict =model.predict(X_test)
+                                    elapsed_time = time.time() - start_time
+                                    print("top-1 score:", get_top_n_score(Y_test, y_predict, 1))
+                                    print("Elapsed time: {}".format(hms_string(elapsed_time)))
+                                    print('Tiempo de procesamiento (secs): ', time.time()-tic)
+                                    #Save the accuracy and the validation accuracy
+                                    acc = history.history['accuracy'] 
+                                    val_acc = history.history['val_accuracy']
+                                                  
+                                    # SAVE MODEL:
+                                    if saveModel:
+                                        string = folder_models + name + '.h5'
+                                        model.save(string,include_optimizer=False)
+                                        #Save in a txt the accuracy and the validation accuracy for further analysis
+                                        if not os.path.isdir(folder_results):
+                                            os.makedirs(folder_results)
+                                        np.savetxt(folder_results+name+'_acc'+'.txt',acc,fmt="%.4f") 
+                                        np.savetxt(folder_results+name+'_val_acc'+'.txt',val_acc,fmt="%.4f")              
