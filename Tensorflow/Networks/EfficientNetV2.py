@@ -556,7 +556,7 @@ def EfficientNetV2(blocks_args,
 
 
 def EfficientNetV2_Base(include_top=True,
-                        weights='imagenet',
+                        weights=None,
                         input_tensor=None,
                         input_shape=None,
                         num_classes=1000,
