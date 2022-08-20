@@ -82,13 +82,13 @@ class DepthWiseConv_AConnect(tf.keras.layers.Layer):
                 
                 ### Compute the shape of the weights. Input shape could be
                 ### [H,W,Ch,depth_mult] RGB
-                """
-                if len(list(self.kernel_size,)) > 1:
-                    self.filter_shape = list(self.kernel_size) + list((self.in_channels,self.filters))
+                kernel_size = self.kernel_size,
+                kernel_size = list(kernel_size)
+                if len(kernel_size) > 1:
+                    self.filter_shape = kernel_size + list((self.in_channels,self.filters))
                 else:
-                    self.filter_shape = list(self.kernel_size) + list(self.kernel_size) + list((self.in_channels,self.filters))
-                """
-                self.filter_shape = [self.kernel_size[0],self.kernel_size[1],self.in_channels, self.depth_multiplier]
+                    self.filter_shape = kernel_size + kernel_size + list((self.in_channels,self.filters))
+                #self.filter_shape = [self.kernel_size[0],self.kernel_size[1],self.in_channels, self.depth_multiplier]
 
                 self.W = self.add_weight('kernel',
                                           shape = self.filter_shape,
