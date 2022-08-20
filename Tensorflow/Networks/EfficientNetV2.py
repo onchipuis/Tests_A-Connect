@@ -532,7 +532,8 @@ def EfficientNetV2(blocks_args,
             print('hola')
             model.layers.pop(0)
             x = img_input
-            x = tf.keras.layers.experimental.preprocessing.Resizing(128,128)(x)
+            #x = tf.keras.layers.experimental.preprocessing.Resizing(128,128)(x)
+            x = layers.Resizing(128,128)(x)
             outputs = model(x)
             model = models.Model(inputs=inputs,outputs=outputs,name=model_name)
         x = FC_AConnect(num_classes,
