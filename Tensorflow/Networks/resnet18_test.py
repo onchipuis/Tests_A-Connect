@@ -34,7 +34,7 @@ errDistr = ["normal","lognormal"]
 MCsims = 100
 acc=np.zeros([MCsims,1])
 force = "yes"
-force_save = True
+force_save = False
 namev=''
 
 model_name = 'ResNet18_CIFAR100/'

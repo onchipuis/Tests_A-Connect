@@ -91,14 +91,16 @@ def general_testing (isAConnect=[True],
                                         quant = ''
                                     if Werr == '0':
                                         name = 'Wstd_0_Bstd_0_'+quant
+                                        name_sim = name + '_'+errDistr[k]+'Distr'
                                     else:
                                         name = Nm+'Werr'+'_Wstd_'+Werr+'_Bstd_'+Werr+'_'+quant+'_'+errDistr[k]+'Distr'+namev
+                                        name_sim = name
                                 else:
                                     name = 'Base'+namev
                                 
                                 string = folder_models + name + '.h5'
-                                name_sim = name+'_simErr_'+str(int(100*Err))                      
-                                name_stats = name+'_stats_simErr_'+str(int(100*Err))                      
+                                name_sim = name_sim+'_simErr_'+str(int(100*Err))                      
+                                name_stats = name_sim+'_stats_simErr_'+str(int(100*Err))                      
                                 
                                 if not(os.path.exists(folder_results+name_sim+'.txt')) or force_save: 
                                     if Err == 0:
@@ -113,6 +115,7 @@ def general_testing (isAConnect=[True],
                                     starttime = now.time()
                                     print('\n\n******************************************************************\n\n')
                                     print('TESTING NETWORK: ', folder_models+name)
+                                    print('With distribution: ', errDistr[k])
                                     print('With simulation error: ', Err)
                                     print('\n\n**********************************************************************')
                                     
