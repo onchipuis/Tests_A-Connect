@@ -102,8 +102,8 @@ V2_BASE_BLOCKS_ARGS = [
     BlockArgs(kernel_size=3, num_repeat=5, input_filters=96, output_filters=112,
               expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
     BlockArgs(kernel_size=3, num_repeat=8, input_filters=112, output_filters=192,
-              expand_ratio=6, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
-              #expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
+              #expand_ratio=6, id_skip=True, strides=[2, 2], se_ratio=0.25, conv_type=0),
+              expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25, conv_type=0),
 ]
 
 V2_S_BLOCKS_ARGS = [
@@ -424,8 +424,8 @@ def EfficientNetV2(blocks_args,
     #x = layers.Resizing(128,128)(x)
 
     x = Conv_AConnect(round_filters(blocks_args[0].input_filters, width_coefficient, depth_divisor), 3,
-                      #strides=2,
-                      strides=1,
+                      strides=2,
+                      #strides=1,
                       kernel_initializer=CONV_KERNEL_INITIALIZER,
                       use_bias=False,
                       padding="SAME",
