@@ -67,7 +67,7 @@ class Conv_AConnect(tf.keras.layers.Layer):
                 self.validate_init()
         def build(self,input_shape):
                 ### Compute the shape of the weights. Input shape could be [batchSize,H,W,Chin] RGB
-                if type(self.kernel) is int:
+                if type(self.kernel_size) is int:
                     kernel_size = self.kernel_size,
                 else:
                     kernel_size = self.kernel_size
