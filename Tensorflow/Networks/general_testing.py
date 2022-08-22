@@ -99,8 +99,8 @@ def general_testing (isAConnect=[True],
                                     name = 'Base'+namev
                                 
                                 string = folder_models + name + '.h5'
-                                name_sim = name_sim+'_simErr_'+str(int(100*Err))                      
                                 name_stats = name_sim+'_stats_simErr_'+str(int(100*Err))                      
+                                name_sim = name_sim+'_simErr_'+str(int(100*Err))                      
                                 
                                 if not(os.path.exists(folder_results+name_sim+'.txt')) or force_save: 
                                     if Err == 0:
