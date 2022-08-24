@@ -12,8 +12,8 @@ X_test = np.float32(X_test) #Convert it to float32
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0.7]   # Define the stddev for training
-Sim_err = [0.7]
+Wstd_err = [0]   # Define the stddev for training
+Sim_err = [0.5]
 Conv_pool = [8]
 WisQuant = ["yes"]		    # Do you want binary weights?
 BisQuant = WisQuant 
@@ -22,7 +22,7 @@ Bbw = Wbw
 errDistr = ["lognormal"]
 #errDistr = ["normal"]
 MCsims = 100
-acc=np.zeros([500,1])
+acc=np.zeros([MCsims,1])
 force = "yes"
 force_save = True
 
