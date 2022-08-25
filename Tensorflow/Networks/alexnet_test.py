@@ -21,7 +21,7 @@ def normalization(train_images, test_images):
 #### MODEL TESTING WITH MONTE CARLO STAGE ####
 # INPUT PARAMTERS:
 isAConnect = [True]   # Which network you want to train/test True for A-Connect false for normal LeNet
-Wstd_err = [0]   # Define the stddev for training
+Wstd_err = [0,0.7]   # Define the stddev for training
 Sim_err = [1,1.5]
 Conv_pool = [8]
 WisQuant = ["yes"]		    # Do you want binary weights?
