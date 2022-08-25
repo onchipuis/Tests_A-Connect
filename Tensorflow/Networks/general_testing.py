@@ -32,7 +32,6 @@ def get_top_n_score(target, prediction, n):
 
 ################################################################
 ### TRAINING
-acc=np.zeros([500,1])
 def general_testing (isAConnect=[True],
                         Wstd_err=[0],
                         Sim_err=[0],
@@ -52,6 +51,7 @@ def general_testing (isAConnect=[True],
                         top5=False,
                         **kwargs):
 
+    acc=np.zeros([MCsims,1])
     for d in range(len(isAConnect)): #Iterate over the networks
         if isAConnect[d]: #is a network with A-Connect?
             Wstd_aux = Wstd_err
