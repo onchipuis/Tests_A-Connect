@@ -48,21 +48,25 @@ def MonteCarlo(net=None,Xtest=None,Ytest=None,M=100,Wstd=0,Bstd=0,errDistr="norm
                 Nlayers = np.size(layers) #Get the number of layers
 
                 #Merr_aux0 = np.random.randn(100000).astype(dtype)
-                for i in range(Nlayers): #Iterate over the number of layers
-                        if layers[i].count_params() != 0: #If the layer does not have training parameters it is omitted
-
-                                if hasattr(layers[i],'kernel') or hasattr(layers[i],'W'):  #Does the layer have weights or kernel?
-
+                #Iterate over the number of layers
+                for i in range(Nlayers): 
+                        #If the layer does not have training parameters it is omitted
+                        if layers[i].count_params() != 0: 
+                                #Does the layer have weights or kernel?
+                                if hasattr(layers[i],'kernel') or hasattr(layers[i],'W'):  
                                         Wsz = np.shape(layers[i].weights[0]) #Takes the weights/kernel size
                                         Wsize = np.prod(Wsz)
                                         Bsz = np.shape(layers[i].weights[1]) #Takes the bias size
                                         MBerr_aux = np.random.randn(Bsz[0])
-                                        if hasattr(layers[i],'strides'): #If the layer have the attribute strides means that it is a convolutional layer
+
+                                        #If the layer have the attribute strides means that it is a convolutional layer
+                                        if hasattr(layers[i],'strides'): 
                                                 Merr_aux = np.random.randn(Wsz[0],Wsz[1],Wsz[2],Wsz[3]).astype(dtype)
                                                 #Merr_aux = np.reshape(Merr_aux0[:Wsize],(Wsz[0],Wsz[1],Wsz[2],Wsz[3]))
                                         else:
-                                                Merr_aux = np.random.randn(Wsz[0], Wsz[1]).astype(dtype) #If the layer does not have strides, it is a FC layer
+                                                Merr_aux = np.random.randn(Wsz[0], Wsz[1]).astype(dtype) 
                                                 #Merr_aux  = np.reshape(Merr_aux0[:Wsize],(Wsz[0],Wsz[1]))
+                                        
                                         #Does the layer have Wstd? if it is true is an A-Connect or DropConnect network
                                         if hasattr(layers[i], 'Wstd'):
                                                 #IF the value it is different from zero, the layer is working with the algorithm
